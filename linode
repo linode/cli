@@ -1,0 +1,25 @@
+#!/usr/bin/env perl
+
+# linode-cli
+# Copyright (C) 2013 Linode, LLC
+
+use 5.010;
+use strict;
+use warnings;
+
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use Getopt::Long (qw(:config pass_through));
+use Linode::CLI::Util ':basic';
+
+my $object;
+
+if (defined($ARGV[0]) && lc($ARGV[0]) ~~ @MODES) {
+    $object = shift;
+}
+else {
+    GetOptions('o|object=s' => \$object) || die 'Unable to parse options';
+}
+
+$object = 'linode' unless $object ~~ @MODES;
+exec($FindBin::Bin . "/linode-$object", @ARGV);

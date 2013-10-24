@@ -1,0 +1,239 @@
+#!/usr/bin/env perl
+
+# linode-cli
+# Copyright (C) 2013 Linode, LLC
+
+use 5.010;
+use strict;
+use warnings;
+
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use Linode::CLI;
+use Linode::CLI::Util ':basic';
+my $mode = 'linode';
+my $cmdargs = Linode::CLI::Util::eat_cmdargs($mode);
+
+my $cli = Linode::CLI->new(
+    api_key         => $cmdargs->{'api-key'},
+    mode            => $mode,
+    opts            => $cmdargs,
+    output_format   => $cmdargs->{output},
+);
+
+my $runaction = $cmdargs->{run};
+print $cli->$runaction || die "Nothing to display\n";
+
+__END__
+
+=head1 NAME
+
+linode-linode - command-line interface for Linode instances
+
+=head1 SYNOPSIS
+
+B<linode-linode> [B<--api-key> API key] [B<-a> action] [action-options...] [options...]
+
+B<Actions> available: B<create>, B<start>, B<stop>, B<restart>, B<rename>, B<group>, B<delete>, B<list>, B<show>.
+
+Most actions require a B<-l> option specifying the Linode's label.
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-a>, B<--action>
+
+An action to perform on one Linode. One of: B<create>, B<start>, B<stop>, B<restart>, B<rename>, B<group>, B<delete>.
+
+Read-only operations are available as well: B<list>, B<show>.
+
+Each action has a set of options that apply to it, which are outlined in the section B<ACTIONS>.
+
+=item B<--api-key>
+
+API key to use when communicating with the Linode API. Alternatively, you can specify the API key in a B<.linodecli> file in the working user's home directory, using the format `api-key foobar`.
+
+=item B<-h>, B<--help>
+
+Brief help message.
+
+=item B<-m>, B<--man>
+
+Full documentation
+
+=back
+
+=head1 ACTIONS
+
+=head2 CREATE
+
+=over 8
+
+Create and start a new Linode. This action prompts for a password which will be used as the root password on the newly-created Linode.
+
+=over 8
+
+=item B<-d>, B<--distribution>
+
+Distribution name or DistributionID to deploy.
+
+=item B<-g>, B<--group>
+
+Optional. Linode Manager display group to place this Linode under. Default: none.
+
+=item B<-K>, B<--kernel>
+
+Kernel name or KernelID to use.
+
+=item B<-L>, B<--location>
+
+City name or DatacenterID to deploy to.
+
+=item B<-l>, B<--label>
+
+A Linode to operate on.
+
+=item B<-p>, B<--plan>
+
+A PlanID to deploy.
+
+=item B<-t>, B<--payment-term>
+
+Optional. Payment term, one of 1, 12, or 24 (months). Default: 1.
+
+=back
+
+=back
+
+=head2 START, STOP, RESTART
+
+=over 8
+
+Stop, start, or restart a Linode.
+
+=over 8
+
+=item B<-l>, B<--label>
+
+A Linode to operate on.
+
+=back
+
+=back
+
+=head2 RENAME
+
+=over 8
+
+Change a Linode's label.
+
+=over 8
+
+=item B<-l>, B<--label>
+
+A Linode to operate on.
+
+=item B<--new-label>
+
+New label to apply to this Linode.
+
+=back
+
+=back
+
+=head2 GROUP
+
+=over 8
+
+Set a Linode's display group.
+
+=over 8
+
+=item B<-g>, B<--group>
+
+Linode Manager display group to place this Linode under.
+
+=item B<-l>, B<--label>
+
+A Linode to operate on.
+
+=back
+
+=back
+
+=head2 DELETE
+
+=over 8
+
+Delete a Linode, its disk image(s), and configuration profile(s).
+
+=over 8
+
+=item B<-l>, B<--label>
+
+A Linode to operate on.
+
+=back
+
+=back
+
+=head2 LIST
+
+=over 8
+
+List information about one or more Linodes.
+
+=over 8
+
+=item B<-l>, B<--label>
+
+A Linode to list.
+
+=back
+
+=back
+
+=head2 SHOW
+
+=over 8
+
+Display detailed information about a single Linode.
+
+=over 8
+
+=item B<-l>, B<--label>
+
+Label of the Linode to show information about.
+
+=back
+
+=back
+
+=head1 COPYRIGHT/LICENSE
+
+Copyright 2013 Linode, LLC.  Linode CLI is made available under the terms
+of the Perl Artistic License, or GPLv2 at the recipients discretion.
+
+=head2 Perl Artistic License
+
+Read it at L<http://dev.perl.org/licenses/artistic.html>.
+
+=head2 GNU General Public License (GPL) Version 2
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see http://www.gnu.org/licenses/
+
+See the full license at L<http://www.gnu.org/licenses/>.
+
+=cut
