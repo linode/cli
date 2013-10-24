@@ -22,9 +22,10 @@ $ ./cli-master/linode
 
 Installing dependencies on OS X requires either XCode or Command Line Tools for XCode, available from [Apple](https://developer.apple.com/xcode/).
 
+You'll first want to install cpanminus, either using cpan packaged with OS X (`$ cpan App::cpanminus`) or using a one-line install helper: https://github.com/miyagawa/cpanminus#installing-to-system-perl
+
 ```
-$ cpan App::cpanminus
-$ cpanm -S Crypt::SSLeay JSON LWP::UserAgent Mozilla:CA Try::Tiny
+$ cpanm -S Crypt::SSLeay JSON LWP::UserAgent Mozilla::CA Try::Tiny
 $ curl -Lo linode-cli.tar.gz https://github.com/linode/cli/archive/master.tar.gz
 $ tar xf linode-cli.tar.gz
 $ ./cli-master/linode
@@ -32,9 +33,10 @@ $ ./cli-master/linode
 
 ### Others
 
+You'll first want to install cpanminus, either using cpan packaged with your system (`$ cpan App::cpanminus`) or using a one-line install helper: https://github.com/miyagawa/cpanminus#installing-to-system-perl
+
 ```
-$ cpan App::cpanminus
-$ cpanm -S Crypt::SSLeay JSON LWP::UserAgent Mozilla:CA Try::Tiny
+$ cpanm -S Crypt::SSLeay JSON LWP::UserAgent Mozilla::CA Try::Tiny
 $ curl -Lo linode-cli.tar.gz https://github.com/linode/cli/archive/master.tar.gz
 $ tar xf linode-cli.tar.gz
 $ ./cli-master/linode
