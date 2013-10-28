@@ -11,18 +11,20 @@ use FindBin;
 use lib "$FindBin::Bin/lib";
 use Linode::CLI;
 use Linode::CLI::Util ':basic';
-my $mode = 'linode';
+my $mode    = 'linode';
 my $cmdargs = Linode::CLI::Util::eat_cmdargs($mode);
 
 my $cli = Linode::CLI->new(
-    api_key         => $cmdargs->{'api-key'},
-    mode            => $mode,
-    opts            => $cmdargs,
-    output_format   => $cmdargs->{output},
+    api_key       => $cmdargs->{'api-key'},
+    mode          => $mode,
+    opts          => $cmdargs,
+    output_format => $cmdargs->{output},
+    wait          => $cmdargs->{wait},
 );
 
 my $runaction = $cmdargs->{run};
-print $cli->$runaction || die "Nothing to display\n";
+$cli->$runaction;
+$cli->response;
 
 __END__
 
@@ -36,7 +38,7 @@ B<linode-linode> [B<--api-key> API key] [B<-a> action] [action-options...] [opti
 
 B<Actions> available: B<create>, B<start>, B<stop>, B<restart>, B<rename>, B<group>, B<delete>, B<list>, B<show>.
 
-Most actions require a B<-l> option specifying the Linode's label.
+Most actions require a B<-l> or B<--label> option specifying the Linode's label.  You can also specify multiple Linodes using thier labels.
 
 =head1 OPTIONS
 
@@ -52,7 +54,15 @@ Each action has a set of options that apply to it, which are outlined in the sec
 
 =item B<--api-key>
 
-API key to use when communicating with the Linode API. Alternatively, you can specify the API key in a B<.linodecli> file in the working user's home directory, using the format `api-key foobar`.
+API key to use when communicating with the Linode API. The API key can also be set using an environment variable (LINODE_API_KEY). Alternatively, you can specify the API key in a B<.linodecli> file in the working user's home directory, using the format `api-key foobar`.
+
+=item B<-j>, B<--json>:
+
+Optional. JSON output.
+
+=item B<-w>, B<--wait>
+
+Optional. Waits and provides feedback while the task(s) run.
 
 =item B<-h>, B<--help>
 
@@ -81,10 +91,6 @@ Distribution name or DistributionID to deploy.
 =item B<-g>, B<--group>
 
 Optional. Linode Manager display group to place this Linode under. Default: none.
-
-=item B<-K>, B<--kernel>
-
-Kernel name or KernelID to use.
 
 =item B<-L>, B<--location>
 
@@ -205,6 +211,23 @@ Display detailed information about a single Linode.
 =item B<-l>, B<--label>
 
 Label of the Linode to show information about.
+
+
+=back
+
+=back
+
+=head1 EXAMPLES
+
+=head2 WORKING WITH MULTIPLE LINODES
+
+=over 8
+
+Actions can be performed on multiple Linodes using their labels. Using multiple --label arguments will accomplish the same thing.
+
+$ linode start My-Linode-Label1 My-Linode-Label2
+
+$ linode show --label My-Linode-Label1 --label My-Linode-Label2
 
 =back
 

@@ -14,12 +14,14 @@ use Linode::CLI::Util ':basic';
 
 my $object;
 
-if (defined($ARGV[0]) && lc($ARGV[0]) ~~ @MODES) {
+if ( defined( $ARGV[0] ) && ( my @found = grep { $_ eq lc( $ARGV[0] ) } @MODES ) ) {
     $object = shift;
 }
 else {
-    GetOptions('o|object=s' => \$object) || die 'Unable to parse options';
+    GetOptions( 'o|object=s' => \$object ) || die 'Unable to parse options';
 }
 
-$object = 'linode' unless $object ~~ @MODES;
-exec($FindBin::Bin . "/linode-$object", @ARGV);
+$object = 'linode'
+    unless ( defined($object) && ( my @found = grep { $_ eq $object } @MODES ) );
+
+exec( $FindBin::Bin . "/linode-$object", @ARGV );

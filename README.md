@@ -50,6 +50,8 @@ Before using linode-cli for the first time, you'll want to drop your API key in 
 api-key foobarbaz123456
 ```
 
+The API key can also be set using an environment variable (LINODE_API_KEY).
+
 Alternatively, you can pass an `--api-key` option on the command line.
 
 That's it! Now you're ready to start using linode-cli. If you didn't place linode-cli somewhere in your PATH, you'll need to call it directly: `/path/to/linode-cli/linode`. Otherwise, you can simply use `linode`.
@@ -59,6 +61,7 @@ That's it! Now you're ready to start using linode-cli. If you didn't place linod
 ```
 $ linode list
 $ linode list My-Linode-Label
+$ linode list My-Linode-Label1 My-Linode-Label2
 ```
 
 ### Showing details about a single Linode
@@ -80,7 +83,7 @@ $ linode restart My-Linode-Label
 **Warning:** This *will* attempt to charge the credit card on file, or use any account credit available, and spin up a new Linode 1GB.
 
 ```
-$ linode create New-Linode --location dallas --plan 1 --payment-term 1 --distribution 'Debian 7' --kernel 'Latest 64' --group Frontends
+$ linode create New-Linode --location dallas --plan 1 --payment-term 1 --distribution 'Debian 7' --group Frontends
 ```
 
 ### Deleting a Linode
@@ -90,6 +93,14 @@ $ linode create New-Linode --location dallas --plan 1 --payment-term 1 --distrib
 ```
 $ linode delete New-Linode
 ```
+### Working with multiple Linodes
+
+Actions can be performed on multiple Linodes using their labels.  Using multiple --label arguments will accomplish the same thing.
+
+```
+$ linode start My-Linode-Label1 My-Linode-Label2
+$ linode show --label My-Linode-Label1 --label My-Linode-Label2
+```
 
 ### JSON output
 
@@ -97,35 +108,32 @@ JSON output is available for most actions.
 
 ```
 $ linode list --output json
+$ linode list --json
 ```
 
 ```
-[
-   {
-      "error_message" : "",
-      "error" : false
+{
+   "linodefrontend1" : {
+      "datacenterid" : 2,
+      "status" : "powered off",
+      "backupsenabled" : false,
+      "totalram" : "1GB",
+      "request_error" : "",
+      "totalhd" : "24GB",
+      "label" : "linodefrontend1",
+      "linodeid" : 900001
    },
-   {
-      "linodefrontend1" : {
-         "datacenterid" : 2,
-         "status" : "powered off",
-         "backupsenabled" : false,
-         "totalram" : "1GB",
-         "totalhd" : "24GB",
-         "label" : "linodefrontend1",
-         "linodeid" : 900001
-      },
-      "linodebackend1" : {
-         "datacenterid" : 2,
-         "status" : "running",
-         "backupsenabled" : true,
-         "totalram" : "1GB",
-         "totalhd" : "48GB",
-         "label" : "linodebackend1",
-         "linodeid" : 900002
-      }
+   "linodebackend1" : {
+      "datacenterid" : 2,
+      "status" : "running",
+      "backupsenabled" : true,
+      "totalram" : "1GB",
+      "request_error" : "",
+      "totalhd" : "48GB",
+      "label" : "linodebackend1",
+      "linodeid" : 900002
    }
-]
+}
 ```
 
 ## Usage
@@ -137,6 +145,10 @@ $ linode list --output json
 Each action has a set of options that apply to it, which are outlined in the section ACTIONS.
 
 **--api-key**: API key to use when communicating with the Linode API. Alternatively, you can specify the API key in a .linodecli file in the working user's home directory, using the format `api-key foobar`.
+
+**-j**, **--json**: Optional. JSON output.
+
+**-w**, **--wait**: Optional. Waits and provides feedback while the task(s) run.
 
 **-h**, **--help**: Brief help message.
 
@@ -151,8 +163,6 @@ Create and start a new Linode. This action prompts for a password which will be 
 **-d**, **--distribution**: Distribution name or DistributionID to deploy.
 
 **-g**, **--group**: Optional. Linode Manager display group to place this Linode under. Default: none.
-
-**-K**, **--kernel**: Kernel name or KernelID to use.
 
 **-L**, **--location**: City name or DatacenterID to deploy to.
 
