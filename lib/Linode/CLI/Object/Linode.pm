@@ -114,12 +114,12 @@ sub list {
         $longestlabel += 2; # pad
         $longestid += 2;
         $return .= sprintf(
-            "%-${longestlabel}s %-${longestid}s %-12s %-8s %-6s %-6s\n",
+            "%-${longestlabel}s %-${longestid}s %-12s %-8s %-10s %-10s\n",
             'label', 'id', 'status', 'backups', 'disk', 'ram' );
-        $return .= ( '=' x ( 36 + $longestlabel + $longestid ) ) . "\n";
+        $return .= ( '=' x ( 44 + $longestlabel + $longestid ) ) . "\n";
         for my $object_label ( keys %{$out_hashref} ) {
             $return .= sprintf(
-                "%-${longestlabel}s %-${longestid}s %-12s %-8s %-6s %-6s\n",
+                "%-${longestlabel}s %-${longestid}s %-12s %-8s %-10s %-10s\n",
                 $out_hashref->{$object_label}->{label},
                 $out_hashref->{$object_label}->{linodeid},
                 $out_hashref->{$object_label}->{status},
@@ -128,7 +128,7 @@ sub list {
                 $out_hashref->{$object_label}->{totalram},
             );
         }
-        $return .= ( '=' x ( 36 + $longestlabel + $longestid ) ) . "\n";
+        $return .= ( '=' x ( 44 + $longestlabel + $longestid ) ) . "\n";
         return $return;
     }
 }

@@ -205,7 +205,7 @@ sub eat_cmdargs {
 
 sub human_displaymemory {
     my $mem = shift;
-    return ( $mem / 1024 ) . 'GB';
+    return sprintf( "%.2f", $mem / 1024 ) . 'GB';
 }
 
 sub load_config {
