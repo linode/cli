@@ -169,6 +169,11 @@ sub eat_cmdargs {
         # 3) .linodecli file
         my $home_directory = $ENV{HOME} || ( getpwuid($<) )[7];
         if ( -f "$home_directory/.linodecli" ) {
+            # check user's file permissions
+            my $filemode = ( stat( "$home_directory/.linodecli" ) )[2];
+            if ( $filemode & 4 ) {
+                die "CRITICAL: $home_directory/.linodecli is world readable and contains your API key. Adjust your permissions and try again. Aborting.\n";
+            }
             my $config = load_config("$home_directory/.linodecli");
             for my $item ( keys %{$config} ) {
                 if ( !exists $cmdargs->{$item} ) { # don't override a more important one
