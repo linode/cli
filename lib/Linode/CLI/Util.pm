@@ -79,7 +79,8 @@ my %paramsdef = (
                 'label'     => 'label|l=s@',
                 'new-label' => 'new-label|n=s'
             },
-            'run' => 'update',
+            'run'      => 'update',
+            'seeknext' => 'new-label'
         },
         'group' => {
             'options' => {
@@ -122,8 +123,14 @@ sub eat_cmdargs {
         my ( $i, $parsing ) = ( 1, 1 );
         while ($parsing) {
             if ( defined( $ARGV[$i] ) && $ARGV[$i] !~ m/^\-/ ) {
-                push( @{ $cmdargs->{label} }, $ARGV[$i] ); # assume this is the label
-                $i++;
+                if ( $i == 2 && exists $paramsdef{$mode}{ $cmdargs->{action} }{'seeknext'} ) {
+                    # some shortcuts have specific second parameters following the label
+                    $cmdargs->{ $paramsdef{$mode}{ $cmdargs->{action} }{'seeknext'} } = $ARGV[$i];
+                    $parsing = 0;
+                } else {
+                    push( @{ $cmdargs->{label} }, $ARGV[$i] ); # assume this is the label
+                    $i++;
+                }
             }
             else {
                 $parsing = 0;
