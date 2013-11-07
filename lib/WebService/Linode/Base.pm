@@ -15,27 +15,27 @@ WebService::Linode::Base - Perl Interface to the Linode.com API.
 
 =cut
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 our $err;
 our $errstr;
 
 sub new {
-	my ($package, %args) = @_;
-	my $self;
+    my ($package, %args) = @_;
+    my $self;
 
-	$self->{_apikey}	= $args{apikey} if $args{apikey};
+    $self->{_apikey}    = $args{apikey} if $args{apikey};
 
-	$self->{_nocache}	= $args{nocache}	|| 0;
-	$self->{_debug}		= $args{debug}		|| 0;
-	$self->{_fatal}		= $args{fatal}		|| 0;
-	$self->{_nowarn}	= $args{nowarn}		|| 0;
-	$self->{_apiurl}	= $args{apiurl}	|| 'https://api.linode.com/api/';
+    $self->{_nocache}   = $args{nocache}    || 0;
+    $self->{_debug}     = $args{debug}      || 0;
+    $self->{_fatal}     = $args{fatal}      || 0;
+    $self->{_nowarn}    = $args{nowarn}     || 0;
+    $self->{_apiurl}    = $args{apiurl} || 'https://api.linode.com/api/';
 
-	$self->{_ua} = LWP::UserAgent->new;
-	$self->{_ua}->agent("WebService::Linode::Base/$WebService::Linode::Base::VERSION ");
+    $self->{_ua} = LWP::UserAgent->new;
+    $self->{_ua}->agent("WebService::Linode::Base/$WebService::Linode::Base::VERSION ");
 
-	bless $self, $package;
-	return $self;
+    bless $self, $package;
+    return $self;
 }
 
 sub apikey {
@@ -45,79 +45,82 @@ sub apikey {
 }
 
 sub do_request {
-	my ($self, %args) = @_;
+    my ($self, %args) = @_;
 
-	my $response = $self->send_request(%args);
-	return $self->parse_response($response);
+    my $response = $self->send_request(%args);
+    return $self->parse_response($response);
 }
 
 sub send_request {
-	my ($self, %args) = @_;
+    my ($self, %args) = @_;
 
-	{
-		local $SIG{__WARN__} = sub {};
-		$self->_debug(10, "About to send request: " . join(' ' , %args));
-	}
+    {
+        local $SIG{__WARN__} = sub {};
+        $self->_debug(10, "About to send request: " . join(' ' , %args));
+    }
 
     $args{api_key} = $self->{_apikey} if $self->{_apikey};
 
-	return $self->{_ua}->post( $self->{_apiurl}, content => { %args } );
+    return $self->{_ua}->post( $self->{_apiurl}, content => { %args } );
 }
 
 sub parse_response {
-	my $self = shift;
-	my $response = shift;
+    my $self = shift;
+    my $response = shift;
 
-	if ($response->content =~ m|ERRORARRAY|i) {
-		my $json = from_json($response->content);
-		if (scalar (@{$json->{ERRORARRAY}}) == 0) {
-			return $json->{DATA};
-		} else {
-			# TODO this only returns the first error from the API
-	
-			my $msg = "API Error " .
-				$json->{ERRORARRAY}->[0]->{ERRORCODE} .  ": " .
-				$json->{ERRORARRAY}->[0]->{ERRORMESSAGE};
+    if ( $response->content =~ m|ERRORARRAY|i ) {
+        my $json = from_json( $response->content );
+        if (scalar( @{ $json->{ERRORARRAY} } ) == 0
+            || ( scalar( @{ $json->{ERRORARRAY} } ) == 1
+                && $json->{ERRORARRAY}->[0]->{ERRORCODE} == 0 ) )
+        {   return $json->{DATA};
+        }
+        else {
+            # TODO this only returns the first error from the API
 
-			$self->_error(
-				$json->{ERRORARRAY}->[0]->{ERRORCODE},
-				$msg
-			);
-			return;
-		}
-	} elsif ($response->status_line) {
-		$self->_error(-1, $response->status_line);
-		return;
-	} else {
-		$self->_error(-1, 'No JSON found');
-		return;
-	}
+            my $msg
+                = "API Error "
+                . $json->{ERRORARRAY}->[0]->{ERRORCODE} . ": "
+                . $json->{ERRORARRAY}->[0]->{ERRORMESSAGE};
+
+            $self->_error( $json->{ERRORARRAY}->[0]->{ERRORCODE}, $msg );
+            return;
+        }
+    }
+    elsif ( $response->status_line ) {
+        $self->_error( -1, $response->status_line );
+        return;
+    }
+    else {
+        $self->_error( -1, 'No JSON found' );
+        return;
+    }
 }
 
 sub _lc_keys {
-	my ($self, $hashref) = @_;
+    my ($self, $hashref) = @_;
 
-	return { map { lc($_) => $hashref->{$_} } keys (%$hashref) };
+    return { map { lc($_) => $hashref->{$_} } keys (%$hashref) };
 }
 
 sub _error {
-	my $self = shift;
-	my $code = shift;
-	my $msg  = shift;
+    my $self = shift;
+    my $code = shift;
+    my $msg  = shift;
 
-	$err = $code;
-	$errstr = $msg;
+    $err = $code;
+    $errstr = $msg;
 
-	croak $msg if $self->{_fatal};
-	carp $msg unless $self->{_nowarn};
+    croak $msg if $self->{_fatal};
+    carp $msg unless $self->{_nowarn};
 }
 
 sub _debug {
-	my $self  = shift;
-	my $level = shift;
-	my $msg   = shift;
+    my $self  = shift;
+    my $level = shift;
+    my $msg   = shift;
 
-	print STDERR $msg, "\n" if $self->{_debug} >= $level;
+    print STDERR $msg, "\n" if $self->{_debug} >= $level;
 }
 
 =head1 SYNOPSIS
@@ -126,10 +129,10 @@ This module provides a simple OOish interface to the Linode.com API.
 
 Example usage:
 
-	use WebService::Linode::Base;
+    use WebService::Linode::Base;
 
-	my $api = WebService::Linode::Base->new(apikey => 'mmmcake');
-	my $data = $api->do_request( api_action => 'domains.list' );
+    my $api = WebService::Linode::Base->new(apikey => 'mmmcake');
+    my $data = $api->do_request( api_action => 'domains.list' );
 
 =head1 METHODS
 

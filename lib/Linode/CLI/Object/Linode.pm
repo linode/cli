@@ -395,6 +395,85 @@ sub change_state {
     return $self->{_result};
 }
 
+sub resize {
+    my ( $self, %args ) = @_;
+
+    my $api     = $self->{_api_obj};
+    my $options = $args{options};
+    my $format  = $args{format};
+    my $wait    = $args{wait};
+
+    my $queue = {};
+
+    for my $object ( keys %{ $self->{object} } ) {
+        my $id     = $self->{object}->{$object}->{linodeid};
+        my $label  = $self->{object}->{$object}->{label};
+        my $params = {
+            linodeid => $id,
+            planid   => $options->{planid},
+        };
+
+        my ( $resize, $boot );
+        my $resize_result = try {
+            $resize = $api->linode_resize(%$params);
+            $boot = $api->linode_boot( linodeid => $id );
+        };
+
+        if ( !$resize_result ) {
+            $self->{_result} = $self->fail(
+                label   => $label,
+                message => "Unable to resize and boot $label",
+                result  => $self->{_result},
+            );
+            next;
+        }
+
+        if ($wait) {
+            say "Resizing and booting $label..." if ( $format eq 'human' );
+            $queue->{ $boot->{jobid} } = [ $id, $label ];
+            next;
+        }
+
+        $self->{_result} = $self->succeed(
+            label   => $label,
+            message => "Resizing and booting $label...",
+            payload => { jobid => $resize->{jobid}, job => 'resize' },
+            result  => $self->{_result},
+        );
+    }
+
+    if ($wait && scalar keys %$queue) {
+        print "waiting..." if ( $format eq 'human' );
+
+        for my $job ( keys %$queue ) {
+            my $jobid = $job;
+            my $id    = $queue->{$job}[0];
+            my $label = $queue->{$job}[1];
+            my $job_result
+                = $self->_poll_and_wait( $api, $id, $jobid, $format, 240 );
+
+            if ( !$job_result ) {
+                $self->{_result} = $self->fail(
+                    label   => $label,
+                    message => "Unable to resize and boot $label",
+                    payload => { jobid => $jobid, job => 'resize' },
+                    result  => $self->{_result},
+                );
+                next;
+            }
+
+            $self->{_result} = $self->succeed(
+                label   => $label,
+                message => "Resized and booted $label",
+                payload => { jobid => $jobid, job => 'resize' },
+                result  => $self->{_result},
+            );
+        }
+    }
+
+    return $self->{_result};
+}
+
 sub update {
     my ( $self, $args ) = @_;
     my $api_obj = $self->{_api_obj};
@@ -469,10 +548,11 @@ sub delete {
 }
 
 sub _poll_and_wait {
-    my ( $self, $api_obj, $linode_id, $job_id, $output_format ) = @_;
+    my ( $self, $api_obj, $linode_id, $job_id, $output_format, $timeout ) = @_;
+    $timeout ||= 60;
 
     my $poll_result = try {
-        for ( my $i = 0; $i <= 60; $i++ ) {
+        for ( my $i = 0; $i <= $timeout; $i++ ) {
             my $job = $api_obj->linode_job_list(
                 linodeid => $linode_id,
                 jobid    => $job_id,
@@ -481,12 +561,12 @@ sub _poll_and_wait {
             my $job_complete = $job->{host_finish_dt};
             my $job_success  = $job->{host_success};
 
-            if ( ( $job_complete && $job_success ) || ( $i == 60 && !$job_complete ) ) {
+            if ( ( $job_complete && $job_success ) || ( $i == $timeout && !$job_complete ) ) {
                 print STDOUT "\n" if ( $output_format eq 'human' );
             }
 
             return 1 if ( $job_complete && $job_success );
-            return 0 if ( $i == 60 || ( $job_complete && !$job_success ) );
+            return 0 if ( $i == $timeout || ( $job_complete && !$job_success ) );
 
             print STDOUT '.' if ( $output_format eq 'human' );
             sleep 5;

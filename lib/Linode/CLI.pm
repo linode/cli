@@ -79,6 +79,23 @@ sub change_state {
     );
 }
 
+sub resize {
+    my $self = shift;
+
+    my $linodes = Linode::CLI::Object::Linode->new_from_list(
+        api_obj     => $self->{_api_obj},
+        linode_list => $self->_get_object_list(
+            'linode', $self->{_distilled_options}{label}
+        ),
+    );
+
+    $self->{_result} = $linodes->resize(
+        options => $self->{_distilled_options},
+        format  => $self->{output_format},
+        wait    => $self->{wait},
+    );
+}
+
 sub list {
     my $self = shift;
 

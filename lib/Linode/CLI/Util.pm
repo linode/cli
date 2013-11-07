@@ -82,6 +82,13 @@ my %paramsdef = (
             'run'      => 'update',
             'seeknext' => 'new-label'
         },
+        'resize' => {
+            'options' => {
+                'label' => 'label|l=s@',
+                'plan'  => 'plan|p=i'
+            },
+            'seeknext' => 'plan'
+        },
         'group' => {
             'options' => {
                 'label' => 'label|l=s@',

@@ -86,6 +86,16 @@ $ linode restart My-Linode-Label
 $ linode create New-Linode --location dallas --plan 1 --payment-term 1 --distribution 'Debian 7' --group Frontends
 ```
 
+### Resizing a Linode
+
+**Warning:** This *will* attempt to charge the credit card on file, or use any account credit available, if you resize to a larger Linode plan size.
+
+A boot job is automatically queued up immediately following the resize.
+
+```
+$ linode resize New-Linode --plan 3
+```
+
 ### Deleting a Linode
 
 **Warning:** This *will* permanently delete a Linode, its disk images and configuration profiles.
@@ -140,7 +150,7 @@ $ linode list --json
 
 ### Options
 
-**-a**, **--action**: An action to perform on one Linode. One of: create, start, stop, restart, rename, group, delete. Read-only operations are available as well: list, show.
+**-a**, **--action**: An action to perform on one Linode. One of: create, start, stop, restart, rename, group, resize, delete. Read-only operations are available as well: list, show.
 
 Each action has a set of options that apply to it, which are outlined in the section ACTIONS.
 
@@ -193,6 +203,14 @@ Set a Linode's display group.
 **-g**, **--group**: Linode Manager display group to place this Linode under.
 
 **-l**, **--label**: A Linode to operate on.
+
+#### Resize
+
+Resize a Linode to a new plan size, and issue a boot job.
+
+**-l**, **--label**: A Linode to operate on.
+
+**-p**, **--plan**: The new PlanID to resize to.
 
 #### Delete
 

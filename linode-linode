@@ -36,7 +36,7 @@ linode-linode - command-line interface for Linode instances
 
 B<linode-linode> [B<--api-key> API key] [B<-a> action] [action-options...] [options...]
 
-B<Actions> available: B<create>, B<start>, B<stop>, B<restart>, B<rename>, B<group>, B<delete>, B<list>, B<show>.
+B<Actions> available: B<create>, B<start>, B<stop>, B<restart>, B<rename>, B<group>, B<resize>, B<delete>, B<list>, B<show>.
 
 Most actions require a B<-l> or B<--label> option specifying the Linode's label.  You can also specify multiple Linodes using thier labels.
 
@@ -46,7 +46,7 @@ Most actions require a B<-l> or B<--label> option specifying the Linode's label.
 
 =item B<-a>, B<--action>
 
-An action to perform on one Linode. One of: B<create>, B<start>, B<stop>, B<restart>, B<rename>, B<group>, B<delete>.
+An action to perform on one Linode. One of: B<create>, B<start>, B<stop>, B<restart>, B<rename>, B<group>, B<resize>, B<delete>.
 
 Read-only operations are available as well: B<list>, B<show>.
 
@@ -168,6 +168,26 @@ A Linode to operate on.
 
 =back
 
+=head2 RESIZE
+
+=over 8
+
+Resize a Linode to a new plan size, and issue a boot job.
+
+=over 8
+
+=item B<-l>, B<--label>
+
+A Linode to operate on.
+
+=item B<-p>, B<--plan>
+
+The new PlanID to resize to.
+
+=back
+
+=back
+
 =head2 DELETE
 
 =over 8
@@ -228,8 +248,6 @@ Actions can be performed on multiple Linodes using their labels. Using multiple 
 $ linode start My-Linode-Label1 My-Linode-Label2
 
 $ linode show --label My-Linode-Label1 --label My-Linode-Label2
-
-=back
 
 =back
 
