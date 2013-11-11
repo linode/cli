@@ -78,6 +78,12 @@ $ linode stop My-Linode-Label
 $ linode restart My-Linode-Label
 ```
 
+### Renaming a Linode
+
+```
+$ linode rename mylinodename mylinodenewname
+```
+
 ### Creating a new Linode
 
 **Warning:** This *will* attempt to charge the credit card on file, or use any account credit available, and spin up a new Linode 1GB.
@@ -88,12 +94,12 @@ $ linode create New-Linode --location dallas --plan 1 --payment-term 1 --distrib
 
 ### Resizing a Linode
 
-**Warning:** This *will* attempt to charge the credit card on file, or use any account credit available, if you resize to a larger Linode plan size.
+**Warning:** This *will* shut the Linode down, charge/credit the account, and issue a migration to another host server.
 
-A boot job is automatically queued up immediately following the resize.
+This example resizes a Linode 1024 to a Linode 2048. The plan is provided using a planid.
 
 ```
-$ linode resize New-Linode --plan 3
+$ linode linode resize mylinode 3
 ```
 
 ### Deleting a Linode
