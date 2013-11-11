@@ -160,6 +160,11 @@ sub show {
                     $self->{_output_fields}->{$key},
                     $humanyn{ $self->{object}->{$object_label}->{$key} } );
             }
+            elsif ( $key eq 'datacenterid' ) {
+                $return .= sprintf( "\n%8s %-32s",
+                    $self->{_output_fields}->{$key},
+                    $humandc{ $self->{object}->{$object_label}->{$key} } );
+            }
             else {
                 $return .= sprintf( "\n%8s %-32s",
                     $self->{_output_fields}->{$key},

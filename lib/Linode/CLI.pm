@@ -30,7 +30,12 @@ sub new {
 
     $self->_test_api;
 
-    $self->_warm_cache if ( $self->{_opts}->{action} eq 'create' );
+    if (   $self->{_opts}->{action} eq 'create'
+        || $self->{_opts}->{action} eq 'show' ) {
+
+        $self->_warm_cache;
+    }
+
     $self->_distill_options;
 
     return $self;

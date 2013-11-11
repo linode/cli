@@ -9,13 +9,13 @@ our @EXPORT      = qw();
 our %EXPORT_TAGS = (
     basic => [(qw(
         error load_config human_displaymemory succeed fail
-        %correct_case %humanstatus %humanyn $cli_err @MODES
+        %correct_case %humanstatus %humanyn %humandc $cli_err @MODES
     ))],
     json => ['json_response'],
 );
 our @EXPORT_OK = (qw(
         json_response error load_config human_displaymemory succeed
-        fail %correct_case %humanstatus %humanyn $cli_err @MODES
+        fail %correct_case %humanstatus %humanyn %humandc $cli_err @MODES
 ));
 
 use Carp;
@@ -44,6 +44,15 @@ our %humanstatus = (
 our %humanyn = (
     '0' => 'no',
     '1' => 'yes',
+);
+
+our %humandc = (
+    '2' => 'dallas',
+    '3' => 'fremont',
+    '4' => 'atlanta',
+    '6' => 'newark',
+    '7' => 'london',
+    '8' => 'tokyo',
 );
 
 my %paramsdef = (
