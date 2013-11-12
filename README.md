@@ -99,7 +99,7 @@ $ linode create New-Linode --location dallas --plan 1 --payment-term 1 --distrib
 This example resizes a Linode 1024 to a Linode 2048. The plan is provided using a planid.
 
 ```
-$ linode linode resize mylinode 3
+$ linode resize mylinode 3
 ```
 
 ### Deleting a Linode
