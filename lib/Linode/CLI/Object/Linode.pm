@@ -18,7 +18,7 @@ sub new {
 
     return $class->new_from_list(
         api_obj     => $api_obj,
-        linode_list => $api_obj->linode_list( linodeid => $linode_id ) );
+        object_list => $api_obj->linode_list( linodeid => $linode_id ) );
 }
 
 sub new_from_list {
@@ -26,7 +26,7 @@ sub new_from_list {
 
     my $api_obj = $args{api_obj};
 
-    my $linode_list = $args{linode_list};
+    my $linode_list = $args{object_list};
     my $field_list
         = [qw(label linodeid status backupsenabled totalhd totalram)];
 

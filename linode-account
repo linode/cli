@@ -1,0 +1,113 @@
+#!/usr/bin/env perl
+
+# linode-cli
+# Copyright (C) 2013 Linode, LLC
+
+use 5.010;
+use strict;
+use warnings;
+
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use Linode::CLI;
+use Linode::CLI::Util ':basic';
+my $mode    = 'account';
+my $cmdargs = Linode::CLI::Util::eat_cmdargs($mode);
+
+my $cli = Linode::CLI->new(
+    api_key       => $cmdargs->{'api-key'},
+    mode          => $mode,
+    opts          => $cmdargs,
+    output_format => $cmdargs->{output},
+    wait          => $cmdargs->{wait},
+);
+
+my $runaction = $cmdargs->{run};
+$cli->$runaction;
+$cli->response;
+
+__END__
+
+=head1 NAME
+
+linode-account - command-line interface for Linode account information
+
+=head1 SYNOPSIS
+
+B<linode-account> [B<--api-key> API key] [B<-a> action] [action-options...] [options...]
+
+B<Actions> available: B<info>.
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-a>, B<--action>
+
+An action to perform on one Linode. One of: B<create>, B<start>, B<stop>, B<restart>, B<rename>, B<group>, B<resize>, B<delete>.
+
+Read-only operations are available as well: B<list>, B<show>.
+
+Each action has a set of options that apply to it, which are outlined in the section B<ACTIONS>.
+
+=item B<--api-key>
+
+API key to use when communicating with the Linode API. The API key can also be set using an environment variable (LINODE_API_KEY). Alternatively, you can specify the API key in a B<.linodecli> file in the working user's home directory, using the format `api-key foobar`.
+
+=item B<-j>, B<--json>:
+
+Optional. JSON output.
+
+=item B<-w>, B<--wait>
+
+Optional. Waits and provides feedback while the task(s) run.
+
+=item B<-h>, B<--help>
+
+Brief help message.
+
+=item B<-m>, B<--man>
+
+Full documentation
+
+=back
+
+=head1 ACTIONS
+
+=head2 LIST
+
+=over 8
+
+List information about this Linode account.
+
+=back
+
+=head1 EXAMPLES
+
+=head1 COPYRIGHT/LICENSE
+
+Copyright 2013 Linode, LLC.  Linode CLI is made available under the terms
+of the Perl Artistic License, or GPLv2 at the recipients discretion.
+
+=head2 Perl Artistic License
+
+Read it at L<http://dev.perl.org/licenses/artistic.html>.
+
+=head2 GNU General Public License (GPL) Version 2
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see http://www.gnu.org/licenses/
+
+See the full license at L<http://www.gnu.org/licenses/>.
+
+=cut

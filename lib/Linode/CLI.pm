@@ -6,6 +6,7 @@ use 5.010;
 
 use Linode::CLI::Object;
 use Linode::CLI::Object::Linode;
+use Linode::CLI::Object::Account;
 use Linode::CLI::Util (qw(:basic :json));
 use Try::Tiny;
 use WebService::Linode;
@@ -55,71 +56,105 @@ sub create {
 sub update {
     my $self = shift;
 
-    my $linodes = Linode::CLI::Object::Linode->new_from_list(
-        api_obj     => $self->{_api_obj},
-        linode_list => $self->_get_object_list(
-            'linode', $self->{_distilled_options}{label}
-        ),
-    );
+    my $update_result = try {
+        my $linodes = Linode::CLI::Object::Linode->new_from_list(
+            api_obj     => $self->{_api_obj},
+            object_list => $self->_get_object_list(
+                'linode', $self->{_distilled_options}{label}
+            ),
+        );
 
-    $self->{_result} = $linodes->update( $self->{_distilled_options} );
+        $self->{_result} = $linodes->update( $self->{_distilled_options} );
+    };
+
+    $self->{_result} = $self->fail(
+        label   => 'Generic error',
+        message => "Problem while trying to run '$self->{mode} update'",
+        result  => $self->{_result},
+    ) unless $update_result;
 }
 
 sub change_state {
     my $self = shift;
 
-    my $new_state = $self->{_distilled_options}->{new_state};
+    my $change_state_result = try {
+        my $new_state = $self->{_distilled_options}->{new_state};
 
-    my $linodes = Linode::CLI::Object::Linode->new_from_list(
-        api_obj     => $self->{_api_obj},
-        linode_list => $self->_get_object_list(
-            'linode', $self->{_distilled_options}{label}
-        ),
-    );
+        my $linodes = Linode::CLI::Object::Linode->new_from_list(
+            api_obj     => $self->{_api_obj},
+            object_list => $self->_get_object_list(
+                'linode', $self->{_distilled_options}{label}
+            ),
+        );
 
-    $self->{_result} = $linodes->change_state(
-        format => $self->{output_format},
-        wait   => $self->{wait},
-        state  => $new_state,
-    );
+        $self->{_result} = $linodes->change_state(
+            format => $self->{output_format},
+            wait   => $self->{wait},
+            state  => $new_state,
+        );
+    };
+
+    $self->{_result} = $self->fail(
+        label   => 'Generic error',
+        message => "Problem while trying to run '$self->{mode} change_state'",
+        result  => $self->{_result},
+    ) unless $change_state_result;
 }
 
 sub resize {
     my $self = shift;
 
-    my $linodes = Linode::CLI::Object::Linode->new_from_list(
-        api_obj     => $self->{_api_obj},
-        linode_list => $self->_get_object_list(
-            'linode', $self->{_distilled_options}{label}
-        ),
-    );
+    my $resize_result = try {
+        my $linodes = Linode::CLI::Object::Linode->new_from_list(
+            api_obj     => $self->{_api_obj},
+            object_list => $self->_get_object_list(
+                'linode', $self->{_distilled_options}{label}
+            ),
+        );
 
-    $self->{_result} = $linodes->resize(
-        options => $self->{_distilled_options},
-        format  => $self->{output_format},
-        wait    => $self->{wait},
-    );
+        $self->{_result} = $linodes->resize(
+            options => $self->{_distilled_options},
+            format  => $self->{output_format},
+            wait    => $self->{wait},
+        );
+    };
+
+    $self->{_result} = $self->fail(
+        label   => 'Generic error',
+        message => "Problem while trying to run '$self->{mode} resize'",
+        result  => $self->{_result},
+    ) unless $resize_result;
 }
 
 sub list {
     my $self = shift;
 
-    if ( $self->{output_format} eq 'json' ) {
-        $self->{_result} = Linode::CLI::Object::Linode->new_from_list(
-            api_obj     => $self->{_api_obj},
-            linode_list => $self->_get_object_list(
-                'linode', $self->{_distilled_options}{label}
-            ),
-        )->list( output_format => $self->{output_format}, );
-    }
-    else {
-        print Linode::CLI::Object::Linode->new_from_list(
-            api_obj     => $self->{_api_obj},
-            linode_list => $self->_get_object_list(
-                'linode', $self->{_distilled_options}{label}
-            ),
-        )->list( output_format => $self->{output_format}, );
-    }
+    my $list_result = try {
+        if ( $self->{output_format} eq 'json' ) {
+            $self->{_result} = "Linode::CLI::Object::$correct_case{$self->{mode}}"
+                ->new_from_list(
+                    api_obj     => $self->{_api_obj},
+                    object_list => $self->_get_object_list(
+                        $self->{mode}, $self->{_distilled_options}{label}
+                    ),
+                )->list( output_format => $self->{output_format}, );
+        }
+        else {
+            print "Linode::CLI::Object::$correct_case{$self->{mode}}"
+                ->new_from_list(
+                    api_obj     => $self->{_api_obj},
+                    object_list => $self->_get_object_list(
+                        $self->{mode}, $self->{_distilled_options}{label}
+                    ),
+                )->list( output_format => $self->{output_format}, );
+        }
+    };
+
+    $self->{_result} = $self->fail(
+        label   => 'Generic error',
+        message => "Problem while trying to run '$self->{mode} list'",
+        result  => $self->{_result},
+    ) unless $list_result;
 }
 
 sub show {
@@ -129,7 +164,7 @@ sub show {
     if ( $self->{output_format} eq 'json' ) {
         $self->{_result} = Linode::CLI::Object::Linode->new_from_list(
             api_obj     => $self->{_api_obj},
-            linode_list => $self->_get_object_list(
+            object_list => $self->_get_object_list(
                 'linode', $self->{_distilled_options}{label}
             ),
         )->list( output_format => $self->{output_format}, );
@@ -138,7 +173,7 @@ sub show {
         print Linode::CLI::Object::Linode->new_from_list(
             api_obj       => $self->{_api_obj},
             output_format => $self->{output_format},
-            linode_list   => $self->_get_object_list(
+            object_list   => $self->_get_object_list(
                 'linode', $self->{_distilled_options}{label}
             ),
         )->show;
@@ -147,16 +182,23 @@ sub show {
 
 sub delete {
     my $self   = shift;
-    my $object = {};
 
-    my $linode = Linode::CLI::Object::Linode->new_from_list(
-        api_obj     => $self->{_api_obj},
-        linode_list => $self->_get_object_list(
-            'linode', $self->{_distilled_options}{label}
-        ),
-    );
+    my $delete_result = try {
+        my $linode = Linode::CLI::Object::Linode->new_from_list(
+            api_obj     => $self->{_api_obj},
+            object_list => $self->_get_object_list(
+                'linode', $self->{_distilled_options}{label}
+            ),
+        );
 
-    $self->{_result} = $linode->delete( $self->{_distilled_options} );
+        $self->{_result} = $linode->delete( $self->{_distilled_options} );
+    };
+
+    $self->{_result} = $self->fail(
+        label   => 'Generic error',
+        message => "Problem while trying to run '$self->{mode} delete'",
+        result  => $self->{_result},
+    ) unless $delete_result;
 }
 
 sub response {
@@ -172,9 +214,6 @@ sub response {
     else {
         print json_response( $self->{_result} );
     }
-
-    # In case we're flushing output
-    delete $self->{_result};
 }
 
 sub _warm_cache {
@@ -224,30 +263,35 @@ sub _use_or_evict_cache {
 sub _get_object_list {
     my ( $self, $object, $labels ) = @_;
 
-    my $linodes = $self->{_api_obj}->linode_list();
+    if ($self->{mode} eq 'linode') {
+        my $linodes = $self->{_api_obj}->linode_list();
 
-    return $linodes if ( !$labels );
+        return $linodes if ( !$labels );
 
-    my $filtered = ();
-    my %targets = map { $_ => 1 } @$labels;
+        my $filtered = ();
+        my %targets = map { $_ => 1 } @$labels;
 
-    for my $linode (@$linodes) {
-        my $linode_label = $linode->{label};
-        if ( exists( $targets{$linode_label} ) ) {
-            push @$filtered, $linode;
-            delete $targets{$linode_label};
+        for my $linode (@$linodes) {
+            my $linode_label = $linode->{label};
+            if ( exists( $targets{$linode_label} ) ) {
+                push @$filtered, $linode;
+                delete $targets{$linode_label};
+            }
         }
-    }
 
-    for my $mismatch ( keys %targets ) {
-        $self->{_result} = $self->fail(
-            label   => $mismatch,
-            message => "Couldn't find $mismatch",
-            result  => $self->{_result},
-        );
-    }
+        for my $mismatch ( keys %targets ) {
+            $self->{_result} = $self->fail(
+                label   => $mismatch,
+                message => "Couldn't find $mismatch",
+                result  => $self->{_result},
+            );
+        }
 
-    return $filtered;
+        return $filtered;
+    }
+    elsif ($self->{mode} eq 'account') {
+        return $self->{_api_obj}->account_info();
+    }
 }
 
 sub _get_id_by_label {

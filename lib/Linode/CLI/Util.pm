@@ -29,7 +29,7 @@ our @MODES = (qw(
 
 our $cli_err;
 
-our %correct_case = ( 'linode' => 'Linode', );
+our %correct_case = ( 'linode' => 'Linode', 'account' => 'Account' );
 
 our %humanstatus = (
     '-2' => 'boot failed',
@@ -108,6 +108,9 @@ my %paramsdef = (
         'list'   => { 'options' => { 'label' => 'label|l:s@', }, },
         'show'   => { 'options' => { 'label' => 'label|l:s@' }, },
         'delete' => { 'options' => { 'label' => 'label|l=s@' }, },
+    },
+    'account' => {
+        'info'   => { 'run' => 'list' },
     },
 );
 

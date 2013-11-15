@@ -26,8 +26,11 @@ sub new_from_list {
     my ( $class, %args ) = @_;
 
     my $self = bless {}, $class;
+    my $object_list = [];
 
-    my $object_list = $args{object_list};
+    ref($args{object_list}) eq 'ARRAY'
+    ? $object_list = $args{object_list}
+    : push @$object_list, $args{object_list};
 
     for my $object_item (@$object_list) {
         my $object_label = $object_item->{label} || $object_item->{abbr};
@@ -42,25 +45,25 @@ sub new_from_list {
     return $self;
 }
 
-sub list {
-    my ( $self, %args ) = @_;
-    my $label         = $args{label}         || 0;
-    my $output_format = $args{output_format} || 'human';
-    my $out_hashref;
+# sub list {
+#     my ( $self, %args ) = @_;
+#     my $label         = $args{label}         || 0;
+#     my $output_format = $args{output_format} || 'human';
+#     my $out_hashref;
 
-    for my $object_label ( keys %{ $self->{object} } ) {
-        next if ( $label && $object_label ne $label );
-        for my $key ( keys %{ $self->{object}->{$object_label} } ) {
-            $out_hashref->{$object_label}->{$key}
-                = $self->{object}->{$object_label}->{$key};
-        }
-    }
+#     for my $object_label ( keys %{ $self->{object} } ) {
+#         next if ( $label && $object_label ne $label );
+#         for my $key ( keys %{ $self->{object}->{$object_label} } ) {
+#             $out_hashref->{$object_label}->{$key}
+#                 = $self->{object}->{$object_label}->{$key};
+#         }
+#     }
 
-    return
-          $args{output_format} eq 'raw'  ? $out_hashref
-        : $args{output_format} eq 'json' ? json_response($out_hashref)
-        : 'Not implemented.';
-}
+#     return
+#           $args{output_format} eq 'raw'  ? $out_hashref
+#         : $args{output_format} eq 'json' ? json_response($out_hashref)
+#         : 'Not implemented.';
+# }
 
 sub show {
     my ( $self, $label ) = @_;
