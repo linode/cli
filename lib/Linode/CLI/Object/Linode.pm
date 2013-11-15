@@ -10,6 +10,8 @@ use Linode::CLI::Util (qw(:basic :json));
 use JSON;
 use Try::Tiny;
 
+use Data::Dumper;
+
 sub new {
     my ( $class, %args ) = @_;
 
@@ -50,38 +52,87 @@ sub new_from_list {
 
 sub list {
     my ( $self, %args ) = @_;
-    my $label         = $args{label}         || 0;
+    my $label         = $args{label};
     my $output_format = $args{output_format} || 'human';
-    my $out_hashref;
+    my $out_arrayref = [];
+    my $out_hashref = {};
 
-    for my $object_label ( keys %{ $self->{object} } ) {
-        next if ( $label && $object_label ne $label );
-        for my $key ( keys %{ $self->{object}->{$object_label} } ) {
-            next unless ( my @found = grep { $_ eq $key } %{ $self->{_output_fields} } );
-            if ( $key eq 'totalhd' || $key eq 'totalram' ) {
-                $out_hashref->{$object_label}->{$key} = human_displaymemory(
-                    $self->{object}->{$object_label}->{$key} );
-            }
-            elsif ( $key eq 'status' ) {
-                $out_hashref->{$object_label}->{$key}
-                    = $humanstatus{ $self->{object}->{$object_label}->{$key} };
-            }
-            elsif ( $key eq 'backupsenabled' ) {
-                if ( $args{output_format} eq 'json' ) {
-                    $out_hashref->{$object_label}->{$key} = (
-                        $self->{object}->{$object_label}->{$key} ? \1 : \0 );
-                }
-                else {
-                    $out_hashref->{$object_label}->{$key}
-                        = $humanyn{ $self->{object}->{$object_label}->{$key} };
-                }
+    my $grouped_objects = {};
+
+    # Group into display groups
+    for my $object ( keys %{ $self->{object} } ) {
+        next if ( $label && $object ne $label );
+        my $display_group = $self->{object}{$object}->{lpm_displaygroup};
+        $grouped_objects->{$display_group}{$object}
+            = $self->{object}{$object};
+    }
+
+
+    for my $group ( keys %{ $grouped_objects } ) {
+        my ( $longestlabel, $longestid );
+        if ( $output_format eq 'human' ) {
+            push @$out_arrayref, $group if $group;
+            push @$out_arrayref, (
+                ( ' ' x 4 ) . "+ " . ( '-' x 32 ) . " + " . ( '-' x 8 ) . " + " .
+                ( '-' x 12 ) . " + " . ( '-' x 8 ) . " + " . ( '-' x 10 ) . " + " .
+                ( '-' x 10 ) . " + ");
+            push @$out_arrayref, sprintf(
+                ( ' ' x 4 ) . "| %-32s | %-8s | %-12s | %-8s | %-10s | %-10s |",
+                'label', 'id', 'status', 'backups', 'disk', 'ram' );
+            push @$out_arrayref, (
+                ( ' ' x 4 ) . "| " . ( '-' x 32 ) . " + " . ( '-' x 8 ) . " + " .
+                ( '-' x 12 ) . " + " . ( '-' x 8 ) . " + " . ( '-' x 10 ) . " + " .
+                ( '-' x 10 ) . " | ");
+        }
+
+        for my $object ( keys %{ $grouped_objects->{$group} } ) {
+            if ( $output_format eq 'human' ) {
+                push @$out_arrayref, sprintf(
+                    ( ' ' x 4 )
+                    . "| %-32s | %-8s | %-12s | %-8s | %-10s | %-10s |",
+                    $grouped_objects->{$group}{$object}{label},
+                    $grouped_objects->{$group}{$object}{linodeid},
+                    $humanstatus{ $grouped_objects->{$group}{$object}{status} },
+                    $humanyn{ $grouped_objects->{$group}{$object}{backupsenabled} },
+                    human_displaymemory( $grouped_objects->{$group}{$object}{totalhd} ),
+                    human_displaymemory( $grouped_objects->{$group}{$object}{totalram} ),
+                );
             }
             else {
-                $out_hashref->{$object_label}->{$key}
-                    = $self->{object}->{$object_label}->{$key};
+                for my $key ( keys %{ $grouped_objects->{$group}{$object} } ) {
+                    next unless (
+                        my @found = grep { $_ eq $key } %{ $self->{_output_fields} }
+                    );
+                    if ( $key eq 'totalhd' || $key eq 'totalram' ) {
+                        $out_hashref->{$object}{$key} = human_displaymemory(
+                            $grouped_objects->{$group}{$object}{$key}
+                        );
+                    }
+                    elsif ( $key eq 'status' ) {
+                        $out_hashref->{$object}{$key} = $humanstatus{
+                            $grouped_objects->{$group}{$object}{$key}
+                        };
+                    }
+                    elsif ( $key eq 'backupsenabled' ) {
+                        $out_hashref->{$object}{$key}
+                            = ( $grouped_objects->{$group}{$object}{$key} )
+                            ? \1
+                            : \0;
+                    }
+                    else {
+                        $out_hashref->{$object}{$key}
+                            = $grouped_objects->{$group}{$object}{$key};
+                    }
+                }
             }
         }
+
+
+        push @$out_arrayref, ( ( ' ' x 4 ) . "+ " . ( '-' x 32 ) . " + " .
+            ( '-' x 8 ) . " + " . ( '-' x 12 ) . " + " . ( '-' x 8 ) . " + " .
+            ( '-' x 10 ) . " + " . ( '-' x 10 ) . " +\n" ) if ($output_format eq 'human');
     }
+
     if ( $output_format eq 'raw' ) {
         return $out_hashref;
     }
@@ -97,40 +148,9 @@ sub list {
         return $self->{_result};
     }
     else {
-        my $return;
-        my $longestlabel = 0;
-        my $longestid    = 0;
-
-        # find the longest label and id, so we can format the output to look pretty - (label is max 32)
-        for my $object_label ( keys %{$out_hashref} ) {
-            if ( length($object_label) > $longestlabel ) {
-                $longestlabel = length($object_label);
-            }
-            if (length( $out_hashref->{$object_label}->{linodeid} ) > $longestid ) {
-                $longestid
-                    = length( $out_hashref->{$object_label}->{linodeid} );
-            }
-        }
-        $longestlabel += 2; # pad
-        $longestid += 2;
-        $return .= sprintf(
-            "%-${longestlabel}s %-${longestid}s %-12s %-8s %-10s %-10s\n",
-            'label', 'id', 'status', 'backups', 'disk', 'ram' );
-        $return .= ( '=' x ( 44 + $longestlabel + $longestid ) ) . "\n";
-        for my $object_label ( keys %{$out_hashref} ) {
-            $return .= sprintf(
-                "%-${longestlabel}s %-${longestid}s %-12s %-8s %-10s %-10s\n",
-                $out_hashref->{$object_label}->{label},
-                $out_hashref->{$object_label}->{linodeid},
-                $out_hashref->{$object_label}->{status},
-                $out_hashref->{$object_label}->{backupsenabled},
-                $out_hashref->{$object_label}->{totalhd},
-                $out_hashref->{$object_label}->{totalram},
-            );
-        }
-        $return .= ( '=' x ( 44 + $longestlabel + $longestid ) ) . "\n";
-        return $return;
+        return join( "\n", @$out_arrayref );
     }
+
 }
 
 sub show {

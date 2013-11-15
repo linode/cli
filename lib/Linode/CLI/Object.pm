@@ -34,7 +34,7 @@ sub new_from_list {
 
     for my $object_item (@$object_list) {
         my $object_label = $object_item->{label} || $object_item->{abbr};
-        $self->{object}->{$object_label} = $object_item;
+        $self->{object}->{$object_label} = $object_item if ($object_label);
     }
 
     $self->{_api_obj}       = $args{api_obj};
