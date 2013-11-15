@@ -156,7 +156,7 @@ sub eat_cmdargs {
 
     # action validation
     my @validactions = keys %{ $paramsdef{$mode} }; # load valid actions for this mode
-    if ( my @found = grep { $_ eq $cmdargs->{action} } @validactions ) { # is this a valid action?
+    if ( exists $cmdargs->{action} && (my @found = grep { $_ eq $cmdargs->{action} } @validactions) ) { # is this a valid action?
 
         # check if this action is an alias to another action
         if ( exists $paramsdef{$mode}{ $cmdargs->{action} }{'alias'} ) {
