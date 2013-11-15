@@ -162,21 +162,22 @@ sub show {
 
     # Eventually, 'show' will have more comprehensive JSON output than 'list'
     if ( $self->{output_format} eq 'json' ) {
-        $self->{_result} = Linode::CLI::Object::Linode->new_from_list(
-            api_obj     => $self->{_api_obj},
-            object_list => $self->_get_object_list(
-                'linode', $self->{_distilled_options}{label}
-            ),
-        )->list( output_format => $self->{output_format}, );
+        $self->{_result} = "Linode::CLI::Object::$correct_case{$self->{mode}}"
+            ->new_from_list(
+                api_obj     => $self->{_api_obj},
+                object_list => $self->_get_object_list(
+                    'linode', $self->{_distilled_options}{label}
+                ),
+            )->list( output_format => $self->{output_format}, );
     }
     else {
-        print Linode::CLI::Object::Linode->new_from_list(
-            api_obj       => $self->{_api_obj},
-            output_format => $self->{output_format},
-            object_list   => $self->_get_object_list(
-                'linode', $self->{_distilled_options}{label}
-            ),
-        )->show;
+        print "Linode::CLI::Object::$correct_case{$self->{mode}}"->new_from_list(
+                api_obj       => $self->{_api_obj},
+                output_format => $self->{output_format},
+                object_list   => $self->_get_object_list(
+                    'linode', $self->{_distilled_options}{label}
+                ),
+            )->show;
     }
 }
 

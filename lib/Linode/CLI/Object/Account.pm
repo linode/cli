@@ -65,26 +65,21 @@ sub list {
             payload => $self->{object}{info},
         );
     }
-    else {
-        my $return;
+}
 
+sub show {
+    my ( $self, %args ) = @_;
+    delete $self->{object}{info}{label};
+
+    my $return;
+    for my $key ( keys %{ $self->{object}{info} } ) {
         $return .= sprintf(
-            "%-24s %-14s %-14s %-18s %-10s %-10s\n",
-            'active since', 'transfer pool', 'transfer used',
-            'transfer billable', 'managed', 'balance' );
-        $return .= ( '=' x 94 ) . "\n";
-        $return .= sprintf(
-            "%-24s %-14s %-14s %-18s %-10s %-10s\n",
-            $self->{object}{info}{active_since},
-            $self->{object}{info}{transfer_pool},
-            $self->{object}{info}{transfer_used},
-            $self->{object}{info}{transfer_billable},
-            $self->{object}{info}{managed},
-            $self->{object}{info}{balance},
-        );
-        $return .= ( '=' x 94 ) . "\n";
-        return $return;
+            "%18s %-32s\n",
+            $self->{_output_fields}{$key},
+            $self->{object}{info}{$key} );
     }
+
+    return $return;
 }
 
 1;

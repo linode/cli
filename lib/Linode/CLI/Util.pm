@@ -110,7 +110,7 @@ my %paramsdef = (
         'delete' => { 'options' => { 'label' => 'label|l=s@' }, },
     },
     'account' => {
-        'info'   => { 'run' => 'list' },
+        'info'   => { 'run' => 'show' },
     },
 );
 
