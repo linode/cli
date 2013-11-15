@@ -44,11 +44,7 @@ B<Actions> available: B<info>.
 
 =item B<-a>, B<--action>
 
-An action to perform on one Linode. One of: B<create>, B<start>, B<stop>, B<restart>, B<rename>, B<group>, B<resize>, B<delete>.
-
-Read-only operations are available as well: B<list>, B<show>.
-
-Each action has a set of options that apply to it, which are outlined in the section B<ACTIONS>.
+Read-only operations for Linode account information: B<show>.
 
 =item B<--api-key>
 
@@ -74,11 +70,11 @@ Full documentation
 
 =head1 ACTIONS
 
-=head2 LIST
+=head2 SHOW
 
 =over 8
 
-List information about this Linode account.
+Shows information about this Linode account.
 
 =back
 

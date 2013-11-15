@@ -105,12 +105,13 @@ my %paramsdef = (
             },
             'run' => 'update',
         },
-        'list'   => { 'options' => { 'label' => 'label|l:s@', }, },
+        'list'   => { 'options' => { 'label' => 'label|l:s@' }, },
         'show'   => { 'options' => { 'label' => 'label|l:s@' }, },
         'delete' => { 'options' => { 'label' => 'label|l=s@' }, },
     },
     'account' => {
-        'info'   => { 'run' => 'show' },
+        'info'  => { 'alias' => 'show' },
+        'show'  => { 'run' => 'show' }
     },
 );
 
@@ -124,11 +125,7 @@ sub eat_cmdargs {
 
     GetOptions( $cmdargs, @paramsfirst );
 
-    if ( exists $cmdargs->{help} ) {
-        pod2usage();
-        exit;
-    }
-    elsif ( exists $cmdargs->{man} ) {
+    if ( exists $cmdargs->{man} ) {
         pod2usage( -exitval => 0, -verbose => 2 );
     }
     elsif ( exists $cmdargs->{version} ) {
@@ -165,6 +162,12 @@ sub eat_cmdargs {
         if ( exists $paramsdef{$mode}{ $cmdargs->{action} }{'alias'} ) {
             $cmdargs->{action}
                 = $paramsdef{$mode}{ $cmdargs->{action} }{'alias'}; # switch to real action
+        }
+
+        # HELP - is the user only requesting help for this action?
+        if ( exists $cmdargs->{help} ) {
+            # show help specificially for this command/action and exit
+            pod2usage(-verbose => 99, -sections => [ 'ACTIONS/' . uc($cmdargs->{action}) ], -exitval => 1);
         }
 
         # decide which command to run for this action
@@ -227,8 +230,12 @@ sub eat_cmdargs {
         }
     }
     else {
-        # TODO: offer some help
-        die "Unknown command.  Run --help or --man for usage.\n";
+        if ( exists $cmdargs->{help} ) {
+            # they asked for help
+            pod2usage();
+        } else {
+            die "Unknown command.  Run --help or --man for usage.\n";
+        }
     }
 
     return $cmdargs;

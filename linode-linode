@@ -112,11 +112,43 @@ Optional. Payment term, one of 1, 12, or 24 (months). Default: 1.
 
 =back
 
-=head2 START, STOP, RESTART
+=head2 START
 
 =over 8
 
-Stop, start, or restart a Linode.
+Starts (boots) a Linode.
+
+=over 8
+
+=item B<-l>, B<--label>
+
+A Linode to operate on.
+
+=back
+
+=back
+
+=head2 STOP
+
+=over 8
+
+Stops (powers down) a Linode.
+
+=over 8
+
+=item B<-l>, B<--label>
+
+A Linode to operate on.
+
+=back
+
+=back
+
+=head2 RESTART
+
+=over 8
+
+Restart (reboots) a Linode.
 
 =over 8
 
