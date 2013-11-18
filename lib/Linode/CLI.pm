@@ -32,8 +32,8 @@ sub new {
     $self->_test_api;
 
     if (   $self->{_opts}->{action} eq 'create'
-        || $self->{_opts}->{action} eq 'show' ) {
-
+        || $self->{_opts}->{action} eq 'show'
+        || $self->{_opts}->{action} eq 'resize' ) {
         $self->_warm_cache;
     }
 
@@ -240,6 +240,13 @@ sub _warm_cache {
         object_list => $self->{_api_obj}->avail_kernels(),
     )->list( output_format => 'raw' );
     $self->{_cache}->{kernel}->{$expire} = $kernels;
+
+    my $plans = Linode::CLI::Object->new_from_list(
+        api_obj     => $self->{_api_obj},
+        object_list => $self->{_api_obj}->avail_linodeplans(),
+    )->list( output_format => 'raw' );
+
+    $self->{_cache}->{plan}->{$expire} = $plans;
 }
 
 sub _use_or_evict_cache {
@@ -314,10 +321,8 @@ sub _get_id_by_label {
 sub _distill_options {
     my $self = shift;
 
-    $self->_fuzzy_match($_) foreach (qw(datacenter distribution kernel));
+    $self->_fuzzy_match($_) foreach (qw(datacenter distribution kernel plan));
 
-    $self->{_distilled_options}->{planid}
-        = $self->{_opts}->{plan} if ( $self->{_opts}->{plan} );
     $self->{_distilled_options}->{paymentterm}
         = $self->{_opts}->{'payment-term'} if ( $self->{_opts}->{'payment-term'} );
     $self->{_distilled_options}->{label}
@@ -346,6 +351,7 @@ sub _fuzzy_match {
     if ( $self->{_opts}->{$object} ) {
         my $param = $self->{_opts}->{$object};
         my $cache = $self->_use_or_evict_cache($object);
+
         for my $object_label ( keys %$cache ) {
             if ( $param =~ /^\d+$/ && $param == $cache->{$object_label}->{ $object . 'id' } ) {
                 $self->{_distilled_options}->{ $object . 'id' } = $param;
@@ -355,7 +361,16 @@ sub _fuzzy_match {
                 }
                 last;
             }
-            elsif ( lc $object_label eq lc $param ) {
+            elsif ( lc( $object_label ) eq lc( $param ) ) {
+                $self->{_distilled_options}->{ $object . 'id' }
+                    = $cache->{$object_label}->{ $object . 'id' };
+                if ( $object eq 'distribution' ) {
+                    $self->{_distilled_options}->{kernelid}
+                        = $kernel->[ ( $cache->{$object_label}->{is64bit} ) ? 1 : 0 ];
+                }
+                last;
+            }
+            elsif ( format_squish( $object_label ) eq $param ) { # ex: Linode 1024 as linode1024
                 $self->{_distilled_options}->{ $object . 'id' }
                     = $cache->{$object_label}->{ $object . 'id' };
                 if ( $object eq 'distribution' ) {
@@ -375,7 +390,7 @@ sub _fuzzy_match {
         }
 
         $self->{_distilled_options}->{ $object . 'id' }
-            || $self->_die("Unable to fuzzy match $object: $param");
+            || die "Unable to fuzzy match $object: $param\n";
     }
 }
 

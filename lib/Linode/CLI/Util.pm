@@ -8,14 +8,15 @@ use Exporter 'import';
 our @EXPORT      = qw();
 our %EXPORT_TAGS = (
     basic => [(qw(
-        error load_config human_displaymemory succeed fail
+        error load_config human_displaymemory succeed fail format_squish
         %correct_case %humanstatus %humanyn %humandc $cli_err @MODES
     ))],
     json => ['json_response'],
 );
 our @EXPORT_OK = (qw(
-        json_response error load_config human_displaymemory succeed
-        fail %correct_case %humanstatus %humanyn %humandc $cli_err @MODES
+        json_response error load_config human_displaymemory succeed fail
+        format_squish %correct_case %humanstatus %humanyn %humandc $cli_err
+        @MODES
 ));
 
 use Carp;
@@ -67,6 +68,7 @@ my %paramsdef = (
                 'quantity'     => 'quantity|q:i',
                 'group'        => 'group|g:s'
             },
+            'format' => { 'plan' => 'format_squish', 'datacenter'  => 'format_squish' }
         },
         'boot'  => { 'alias' => 'start' },
         'start' => {
@@ -96,6 +98,7 @@ my %paramsdef = (
                 'label' => 'label|l=s@',
                 'plan'  => 'plan|p=i'
             },
+            'format' => { 'plan' => 'format_squish' },
             'seeknext' => 'plan'
         },
         'group' => {
@@ -220,6 +223,15 @@ sub eat_cmdargs {
                 }
             }
         }
+        # perform an special formatting, if specified
+        if ( exists $paramsdef{$mode}{ $cmdargs->{action} }{'format'} ) {
+            for my $formatoption ( keys %{ $paramsdef{$mode}{ $cmdargs->{action} }{'format'} } ) {
+                if ( $paramsdef{$mode}{ $cmdargs->{action} }{'format'}{ $formatoption } eq 'format_squish' ) {
+                    $cmdargs->{ $formatoption } = format_squish( $cmdargs->{ $formatoption } );
+                }
+            }
+        }
+
         if ( exists $cmdargs->{json} || $cmdargs->{output} eq 'json' ) {
             $cmdargs->{output} = 'json';
         }
@@ -244,6 +256,13 @@ sub eat_cmdargs {
 sub human_displaymemory {
     my $mem = shift;
     return sprintf( "%.2f", $mem / 1024 ) . 'GB';
+}
+
+# converts to lowercase and removes spaces
+sub format_squish {
+    my $cleanme = shift;
+    $cleanme =~ s/\s//g; # goodbye spaces
+    return lc($cleanme);
 }
 
 sub load_config {
