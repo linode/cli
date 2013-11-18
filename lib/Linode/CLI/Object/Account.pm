@@ -13,11 +13,11 @@ use Try::Tiny;
 sub new {
     my ( $class, %args ) = @_;
 
-    my $api_obj   = $args{api_obj};
+    my $api_obj = $args{api_obj};
 
     return $class->new_from_list(
-        api_obj      => $api_obj,
-        object_list  => $api_obj->account_info,
+        api_obj     => $api_obj,
+        object_list => $api_obj->account_info,
     );
 }
 
@@ -28,9 +28,10 @@ sub new_from_list {
 
     my $account_info = $args{object_list};
     $account_info->{label} = 'info';
-    my $field_list
-        = [qw(active_since transfer_pool transfer_used transfer_billable
-            manaaged balance)];
+    my $field_list = [qw(
+        active_since transfer_pool transfer_used transfer_billable
+        manaaged balance
+    )];
 
     my $output_fields = {
         active_since      => 'active since',
@@ -73,10 +74,22 @@ sub show {
 
     my $return;
     for my $key ( keys %{ $self->{object}{info} } ) {
-        $return .= sprintf(
-            "%18s %-32s\n",
-            $self->{_output_fields}{$key},
-            $self->{object}{info}{$key} );
+        if ( $self->{_output_fields}{$key} =~ m/^transfer/ ) {
+            $return .= sprintf( "%18s %-32s\n",
+                $self->{_output_fields}{$key},
+                human_displaymemory( $self->{object}{info}{$key} * 1024 ) );
+        }
+        elsif ( $self->{_output_fields}{$key} eq 'balance' ) {
+            $return .= sprintf(
+                "%18s \$ %-32.2f\n",
+                $self->{_output_fields}{$key},
+                $self->{object}{info}{$key} );
+        }
+        else {
+            $return .= sprintf( "%18s %-32s\n",
+                $self->{_output_fields}{$key},
+                $self->{object}{info}{$key} );
+        }
     }
 
     return $return;

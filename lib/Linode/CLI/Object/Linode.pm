@@ -10,8 +10,6 @@ use Linode::CLI::Util (qw(:basic :json));
 use JSON;
 use Try::Tiny;
 
-use Data::Dumper;
-
 sub new {
     my ( $class, %args ) = @_;
 
