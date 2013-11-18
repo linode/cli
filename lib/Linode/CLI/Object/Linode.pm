@@ -7,7 +7,6 @@ use warnings;
 use parent 'Linode::CLI::Object';
 
 use Linode::CLI::Util (qw(:basic :json));
-use JSON;
 use Try::Tiny;
 
 sub new {
@@ -71,16 +70,16 @@ sub list {
         if ( $output_format eq 'human' ) {
             push @$out_arrayref, $group if $group;
             push @$out_arrayref, (
-                ( ' ' x 4 ) . "+ " . ( '-' x 32 ) . " + " . ( '-' x 8 ) . " + " .
-                ( '-' x 12 ) . " + " . ( '-' x 8 ) . " + " . ( '-' x 10 ) . " + " .
-                ( '-' x 10 ) . " + ");
+                ( ' ' x 4 ) . '+ ' . ( '-' x 32 ) . ' + ' . ( '-' x 8 ) . ' + ' .
+                ( '-' x 12 ) . ' + ' . ( '-' x 8 ) . ' + ' . ( '-' x 10 ) . ' + ' .
+                ( '-' x 10 ) . ' + ');
             push @$out_arrayref, sprintf(
                 ( ' ' x 4 ) . "| %-32s | %-8s | %-12s | %-8s | %-10s | %-10s |",
                 'label', 'id', 'status', 'backups', 'disk', 'ram' );
             push @$out_arrayref, (
-                ( ' ' x 4 ) . "| " . ( '-' x 32 ) . " + " . ( '-' x 8 ) . " + " .
-                ( '-' x 12 ) . " + " . ( '-' x 8 ) . " + " . ( '-' x 10 ) . " + " .
-                ( '-' x 10 ) . " | ");
+                ( ' ' x 4 ) . '| ' . ( '-' x 32 ) . ' + ' . ( '-' x 8 ) . ' + ' .
+                ( '-' x 12 ) . ' + ' . ( '-' x 8 ) . ' + ' . ( '-' x 10 ) . ' + ' .
+                ( '-' x 10 ) . ' | ');
         }
 
         for my $object ( keys %{ $grouped_objects->{$group} } ) {
@@ -126,9 +125,9 @@ sub list {
         }
 
 
-        push @$out_arrayref, ( ( ' ' x 4 ) . "+ " . ( '-' x 32 ) . " + " .
-            ( '-' x 8 ) . " + " . ( '-' x 12 ) . " + " . ( '-' x 8 ) . " + " .
-            ( '-' x 10 ) . " + " . ( '-' x 10 ) . " +\n" ) if ($output_format eq 'human');
+        push @$out_arrayref, ( ( ' ' x 4 ) . '+ ' . ( '-' x 32 ) . ' + ' .
+            ( '-' x 8 ) . ' + ' . ( '-' x 12 ) . ' + ' . ( '-' x 8 ) . ' + ' .
+            ( '-' x 10 ) . ' + ' . ( '-' x 10 ) . " +\n" ) if ($output_format eq 'human');
     }
 
     if ( $output_format eq 'raw' ) {
@@ -219,7 +218,7 @@ sub create {
         },
         linode_disk_create => {
             label           => "$options->{label}-swap",
-            type            => "swap",
+            type            => 'swap',
             size            => 256,
         },
         linode_config_create => {
@@ -244,7 +243,10 @@ sub create {
             %{ $params->{linode_create} }
         )->{linodeid};
     };
-    $self->error("Unable to create Linode") unless $create_result;
+    return $self->fail(
+        label   => $params->{linode_update}{label},
+        message => "Unable to create $options->{label}",
+    ) unless $create_result;
 
     $params->{linode_disk_createfromdistribution}{linodeid} = $linode_id;
     $params->{linode_disk_create}{linodeid}                 = $linode_id;
@@ -275,7 +277,7 @@ sub create {
     };
     return $self->fail(
         label   => $params->{linode_update}{label},
-        message => "Unable to create primary disk image",
+        message => 'Unable to create primary disk image',
     ) unless $distribution_result;
 
     push @disk_list, $disk->{diskid};
@@ -287,7 +289,7 @@ sub create {
     };
     return $self->fail(
         label   => $params->{linode_update}{label},
-        message => "Unable to create swap image",
+        message => 'Unable to create swap image',
     ) unless $swap_result;
 
     push @disk_list, $swap_disk->{diskid};
@@ -300,7 +302,7 @@ sub create {
     };
     return $self->fail(
         label   => $params->{linode_update}{label},
-        message => "Unable to create configuration profile",
+        message => 'Unable to create configuration profile',
     ) unless $config_result;
 
     # Boot!
@@ -466,7 +468,7 @@ sub resize {
     }
 
     if ($wait && scalar keys %$queue) {
-        print "waiting..." if ( $format eq 'human' );
+        print 'waiting...' if ( $format eq 'human' );
 
         for my $job ( keys %$queue ) {
             my $jobid = $job;

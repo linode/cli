@@ -9,13 +9,13 @@ our @EXPORT      = qw();
 our %EXPORT_TAGS = (
     basic => [(qw(
         error load_config human_displaymemory succeed fail format_squish
-        %correct_case %humanstatus %humanyn %humandc $cli_err @MODES
+        %correct_case %humanstatus %humanyn %humandc @MODES
     ))],
     json => ['json_response'],
 );
 our @EXPORT_OK = (qw(
         json_response error load_config human_displaymemory succeed fail
-        format_squish %correct_case %humanstatus %humanyn %humandc $cli_err
+        format_squish %correct_case %humanstatus %humanyn %humandc
         @MODES
 ));
 
@@ -27,8 +27,6 @@ use Getopt::Long (qw(:config no_ignore_case bundling pass_through));
 our @MODES = (qw(
     linode stackscript domain nodebalancer longview account user
 ));
-
-our $cli_err;
 
 our %correct_case = ( 'linode' => 'Linode', 'account' => 'Account' );
 
@@ -328,13 +326,6 @@ sub version_message {
     say 'linode-cli';
     say 'Copyright (C) 2013 Linode, LLC';
     exit;
-}
-
-sub error {
-    my ( $self, $message ) = @_;
-
-    $cli_err = $message;
-    croak $message;
 }
 
 1;

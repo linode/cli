@@ -240,7 +240,7 @@ A Linode to operate on.
 
 =over 8
 
-List information about one or more Linodes.
+List information about one or more Linodes. Linodes are grouped by their display group.
 
 =over 8
 
@@ -263,7 +263,6 @@ Display detailed information about a single Linode.
 =item B<-l>, B<--label>
 
 Label of the Linode to show information about.
-
 
 =back
 

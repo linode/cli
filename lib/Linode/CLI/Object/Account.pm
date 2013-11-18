@@ -7,8 +7,6 @@ use warnings;
 use parent 'Linode::CLI::Object';
 
 use Linode::CLI::Util (qw(:basic :json));
-use JSON;
-use Try::Tiny;
 
 sub new {
     my ( $class, %args ) = @_;

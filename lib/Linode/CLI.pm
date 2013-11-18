@@ -166,7 +166,7 @@ sub show {
             ->new_from_list(
                 api_obj     => $self->{_api_obj},
                 object_list => $self->_get_object_list(
-                    'linode', $self->{_distilled_options}{label}
+                    $self->{mode}, $self->{_distilled_options}{label}
                 ),
             )->list( output_format => $self->{output_format}, );
     }
@@ -175,7 +175,7 @@ sub show {
                 api_obj       => $self->{_api_obj},
                 output_format => $self->{output_format},
                 object_list   => $self->_get_object_list(
-                    'linode', $self->{_distilled_options}{label}
+                    $self->{mode}, $self->{_distilled_options}{label}
                 ),
             )->show;
     }
@@ -401,12 +401,12 @@ sub _test_api {
     my $api_availability_test = try {
         $self->{_api_obj}->api_spec();
     };
-    die "API unavailable" unless $api_availability_test;
+    die 'API unavailable' unless $api_availability_test;
 
     my $api_key_test = try {
         $self->{_api_obj}->test_echo();
     };
-    die "API key invalid" unless $api_key_test;
+    die 'API key invalid' unless $api_key_test;
 
     return 1;
 }

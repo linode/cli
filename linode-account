@@ -36,7 +36,7 @@ linode-account - command-line interface for Linode account information
 
 B<linode-account> [B<--api-key> API key] [B<-a> action] [action-options...] [options...]
 
-B<Actions> available: B<info>.
+B<Actions> available: B<show>.
 
 =head1 OPTIONS
 
@@ -53,10 +53,6 @@ API key to use when communicating with the Linode API. The API key can also be s
 =item B<-j>, B<--json>:
 
 Optional. JSON output.
-
-=item B<-w>, B<--wait>
-
-Optional. Waits and provides feedback while the task(s) run.
 
 =item B<-h>, B<--help>
 
@@ -77,8 +73,6 @@ Full documentation
 Shows information about this Linode account.
 
 =back
-
-=head1 EXAMPLES
 
 =head1 COPYRIGHT/LICENSE
 

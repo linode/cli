@@ -109,6 +109,7 @@ $ linode resize mylinode linode2048
 ```
 $ linode delete New-Linode
 ```
+
 ### Working with multiple Linodes
 
 Actions can be performed on multiple Linodes using their labels.  Using multiple --label arguments will accomplish the same thing.
@@ -118,9 +119,26 @@ $ linode start My-Linode-Label1 My-Linode-Label2
 $ linode show --label My-Linode-Label1 --label My-Linode-Label2
 ```
 
+### Displaying account information
+
+Account information, including the current account balance and network transfer pool usage, can be queried with the `linode-account` tool.
+
+```
+$ linode account show
+```
+
+```
+          managed true
+          balance $ 0.00
+    transfer pool 7527.00GB
+transfer billable 0.00GB
+     active since 2013-09-10 14:44:27.0
+    transfer used 1.00GB
+```
+
 ### JSON output
 
-JSON output is available for most actions.
+JSON output is available for actions.
 
 ```
 $ linode list --output json
@@ -226,7 +244,7 @@ Delete a Linode, its disk image(s), and configuration profile(s).
 
 #### List
 
-List information about one or more Linodes.
+List information about one or more Linodes. Linodes are grouped by their display group.
 
 **-l**, **--label**: A Linode to list.
 
