@@ -102,7 +102,7 @@ A Linode to operate on.
 
 =item B<-p>, B<--plan>
 
-A PlanID to deploy.
+The Plan to deploy. Plans are linode1024, linode2048, linode4096, linode8192, linode16384, linode24576, linode32768, and linode40960.
 
 =item B<-t>, B<--payment-term>
 
@@ -214,7 +214,7 @@ A Linode to operate on.
 
 =item B<-p>, B<--plan>
 
-The new PlanID to resize to.
+The Plan to resize to. Plans are linode1024, linode2048, linode4096, linode8192, linode16384, linode24576, linode32768, and linode40960.
 
 =back
 

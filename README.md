@@ -89,17 +89,17 @@ $ linode rename mylinodename mylinodenewname
 **Warning:** This *will* attempt to charge the credit card on file, or use any account credit available, and spin up a new Linode 1GB.
 
 ```
-$ linode create New-Linode --location dallas --plan 1 --payment-term 1 --distribution 'Debian 7' --group Frontends
+$ linode create New-Linode --location dallas --plan linode1024 --payment-term 1 --distribution 'Debian 7' --group Frontends
 ```
 
 ### Resizing a Linode
 
 **Warning:** This *will* shut the Linode down, charge/credit the account, and issue a migration to another host server.
 
-This example resizes a Linode 1024 to a Linode 2048. The plan is provided using a planid.
+This example resizes a Linode 1024 to a Linode 2048.
 
 ```
-$ linode resize mylinode 3
+$ linode resize mylinode linode2048
 ```
 
 ### Deleting a Linode
@@ -184,7 +184,7 @@ Create and start a new Linode. This action prompts for a password which will be 
 
 **-l**, **--label**: A Linode to operate on.
 
-**-p**, **--plan**: A PlanID to deploy.
+**-p**, **--plan**: The Plan to deploy. Plans are linode1024, linode2048, linode4096, linode8192, linode16384, linode24576, linode32768, and linode40960.
 
 **-t**, **--payment-term**: Optional. Payment term, one of 1, 12, or 24 (months). Default: 1.
 
@@ -216,7 +216,7 @@ Resize a Linode to a new plan size, and issue a boot job.
 
 **-l**, **--label**: A Linode to operate on.
 
-**-p**, **--plan**: The new PlanID to resize to.
+**-p**, **--plan**: The Plan to resize to. Plans are linode1024, linode2048, linode4096, linode8192, linode16384, linode24576, linode32768, and linode40960.
 
 #### Delete
 
