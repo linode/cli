@@ -38,7 +38,7 @@ B<linode-linode> [B<--api-key> API key] [B<-a> action] [action-options...] [opti
 
 B<Actions> available: B<create>, B<start>, B<stop>, B<restart>, B<rename>, B<group>, B<resize>, B<delete>, B<list>, B<show>.
 
-Most actions require a B<-l> or B<--label> option specifying the Linode's label.  You can also specify multiple Linodes using thier labels.
+Most actions require a B<-l> or B<--label> option specifying the Linode's label. You can also specify multiple Linodes using their labels.
 
 =head1 OPTIONS
 
