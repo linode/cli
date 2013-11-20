@@ -45,12 +45,14 @@ sub new {
 sub create {
     my $self = shift;
 
-    $self->{_result} = Linode::CLI::Object::Linode->create(
+    my $result = Linode::CLI::Object::Linode->create(
         api     => $self->{_api_obj},
         options => $self->{_distilled_options},
         format  => $self->{output_format},
         wait    => $self->{wait},
     );
+    my %combined = (%$result, %{$self->{_result}});
+    %{$self->{_result}} = %combined;
 }
 
 sub update {
@@ -62,10 +64,13 @@ sub update {
             object_list => $self->_get_object_list(
                 'linode', $self->{_distilled_options}{label}
             ),
+
             action => $self->{_opts}->{action},
         );
 
-        $self->{_result} = $linodes->update( $self->{_distilled_options} );
+        my $result = $linodes->update( $self->{_distilled_options} );
+        my %combined = (%$result, %{$self->{_result}});
+        %{$self->{_result}} = %combined;
     };
 
     $self->{_result} = $self->fail(
@@ -89,11 +94,13 @@ sub change_state {
             action => $self->{_opts}->{action},
         );
 
-        $self->{_result} = $linodes->change_state(
+        my $result = $linodes->change_state(
             format => $self->{output_format},
             wait   => $self->{wait},
             state  => $new_state,
         );
+        my %combined = (%$result, %{$self->{_result}});
+        %{$self->{_result}} = %combined;
     };
 
     $self->{_result} = $self->fail(
@@ -115,11 +122,13 @@ sub resize {
             action => $self->{_opts}->{action},
         );
 
-        $self->{_result} = $linodes->resize(
+        my $result = $linodes->resize(
             options => $self->{_distilled_options},
             format  => $self->{output_format},
             wait    => $self->{wait},
         );
+        my %combined = (%$result, %{$self->{_result}});
+        %{$self->{_result}} = %combined;
     };
 
     $self->{_result} = $self->fail(
@@ -134,7 +143,7 @@ sub list {
 
     my $list_result = try {
         if ( $self->{output_format} eq 'json' ) {
-            $self->{_result} = "Linode::CLI::Object::$correct_case{$self->{mode}}"
+            my $result = "Linode::CLI::Object::$correct_case{$self->{mode}}"
                 ->new_from_list(
                     api_obj     => $self->{_api_obj},
                     object_list => $self->_get_object_list(
@@ -142,6 +151,8 @@ sub list {
                     ),
                     action => $self->{_opts}->{action},
                 )->list( output_format => $self->{output_format}, );
+            my %combined = (%$result, %{$self->{_result}});
+            %{$self->{_result}} = %combined;
         }
         else {
             print "Linode::CLI::Object::$correct_case{$self->{mode}}"
@@ -167,7 +178,7 @@ sub show {
 
     # Eventually, 'show' will have more comprehensive JSON output than 'list'
     if ( $self->{output_format} eq 'json' ) {
-        $self->{_result} = "Linode::CLI::Object::$correct_case{$self->{mode}}"
+        my $result = "Linode::CLI::Object::$correct_case{$self->{mode}}"
             ->new_from_list(
                 api_obj     => $self->{_api_obj},
                 object_list => $self->_get_object_list(
@@ -175,6 +186,8 @@ sub show {
                 ),
                 action => $self->{_opts}->{action},
             )->list( output_format => $self->{output_format}, );
+        my %combined = (%$result, %{$self->{_result}});
+        %{$self->{_result}} = %combined;
     }
     else {
         print "Linode::CLI::Object::$correct_case{$self->{mode}}"->new_from_list(
@@ -200,7 +213,9 @@ sub delete {
             action => $self->{_opts}->{action},
         );
 
-        $self->{_result} = $linode->delete( $self->{_distilled_options} );
+        my $result = $linode->delete( $self->{_distilled_options} );
+        my %combined = (%$result, %{$self->{_result}});
+        %{$self->{_result}} = %combined;
     };
 
     $self->{_result} = $self->fail(
