@@ -296,6 +296,7 @@ sub succeed {
 
     $result->{ $args{label} } = $args{payload};
     $result->{ $args{label} }{message} = $args{message} if ( $args{message} );
+    $result->{ $args{label} }{request_action} = $args{action} || '';
     $result->{ $args{label} }{request_error} = '';
 
     return $result;
@@ -317,6 +318,7 @@ sub fail {
     my $death_message = join( '. ', @death );
 
     $result->{ $args{label} } = $args{payload} || {};
+    $result->{ $args{label} }{request_action} = $args{action} || '';
     $result->{ $args{label} }{request_error} = $death_message;
 
     return $result;

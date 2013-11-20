@@ -62,6 +62,7 @@ sub update {
             object_list => $self->_get_object_list(
                 'linode', $self->{_distilled_options}{label}
             ),
+            action => $self->{_opts}->{action},
         );
 
         $self->{_result} = $linodes->update( $self->{_distilled_options} );
@@ -85,6 +86,7 @@ sub change_state {
             object_list => $self->_get_object_list(
                 'linode', $self->{_distilled_options}{label}
             ),
+            action => $self->{_opts}->{action},
         );
 
         $self->{_result} = $linodes->change_state(
@@ -110,6 +112,7 @@ sub resize {
             object_list => $self->_get_object_list(
                 'linode', $self->{_distilled_options}{label}
             ),
+            action => $self->{_opts}->{action},
         );
 
         $self->{_result} = $linodes->resize(
@@ -137,6 +140,7 @@ sub list {
                     object_list => $self->_get_object_list(
                         $self->{mode}, $self->{_distilled_options}{label}
                     ),
+                    action => $self->{_opts}->{action},
                 )->list( output_format => $self->{output_format}, );
         }
         else {
@@ -146,6 +150,7 @@ sub list {
                     object_list => $self->_get_object_list(
                         $self->{mode}, $self->{_distilled_options}{label}
                     ),
+                    action => $self->{_opts}->{action},
                 )->list( output_format => $self->{output_format}, );
         }
     };
@@ -168,6 +173,7 @@ sub show {
                 object_list => $self->_get_object_list(
                     $self->{mode}, $self->{_distilled_options}{label}
                 ),
+                action => $self->{_opts}->{action},
             )->list( output_format => $self->{output_format}, );
     }
     else {
@@ -177,6 +183,7 @@ sub show {
                 object_list   => $self->_get_object_list(
                     $self->{mode}, $self->{_distilled_options}{label}
                 ),
+                action => $self->{_opts}->{action},
             )->show;
     }
 }
@@ -190,6 +197,7 @@ sub delete {
             object_list => $self->_get_object_list(
                 'linode', $self->{_distilled_options}{label}
             ),
+            action => $self->{_opts}->{action},
         );
 
         $self->{_result} = $linode->delete( $self->{_distilled_options} );

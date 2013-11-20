@@ -23,6 +23,7 @@ sub new_from_list {
     my ( $class, %args ) = @_;
 
     my $api_obj = $args{api_obj};
+    my $action = $args{action} || '';
 
     my $account_info = $args{object_list};
     $account_info->{label} = 'info';
@@ -42,6 +43,7 @@ sub new_from_list {
 
     return $class->SUPER::new_from_list(
         api_obj       => $api_obj,
+        action        => $action,
         object_list   => $account_info,
         field_list    => $field_list,
         output_fields => $output_fields,
@@ -60,6 +62,7 @@ sub list {
     elsif ( $output_format eq 'json' ) {
         delete $self->{object}{info}{label};
         return $self->succeed(
+            action  => $self->{_action},
             label   => 'info',
             payload => $self->{object}{info},
         );

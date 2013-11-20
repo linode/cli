@@ -24,6 +24,7 @@ sub new_from_list {
     my ( $class, %args ) = @_;
 
     my $api_obj = $args{api_obj};
+    my $action = $args{action} || '';
 
     my $linode_list = $args{object_list};
     my $field_list
@@ -41,6 +42,7 @@ sub new_from_list {
 
     return $class->SUPER::new_from_list(
         api_obj       => $api_obj,
+        action        => $action,
         object_list   => $linode_list,
         field_list    => $field_list,
         output_fields => $output_fields,
@@ -136,6 +138,7 @@ sub list {
     elsif ( $output_format eq 'json' ) {
         for my $object ( keys %$out_hashref ) {
             $self->{_result} = $self->succeed(
+                action  => $self->{_action},
                 label   => $object,
                 payload => $out_hashref->{$object},
                 result  => $self->{_result},
@@ -244,6 +247,7 @@ sub create {
         )->{linodeid};
     };
     return $self->fail(
+        action  => 'create',
         label   => $params->{linode_update}{label},
         message => "Unable to create $options->{label}",
     ) unless $create_result;
@@ -258,6 +262,7 @@ sub create {
         $api->linode_update( %{ $params->{linode_update} } );
     };
     return $self->fail(
+        action  => 'create',
         label   => $params->{linode_update}{label},
         message => "Unable to update $options->{label} after initial creation",
     ) unless $update_result;
@@ -276,6 +281,7 @@ sub create {
             %{ $params->{linode_disk_createfromdistribution} } );
     };
     return $self->fail(
+        action  => 'create',
         label   => $params->{linode_update}{label},
         message => 'Unable to create primary disk image',
     ) unless $distribution_result;
@@ -288,6 +294,7 @@ sub create {
         $swap_disk = $api->linode_disk_create( %{ $params->{linode_disk_create} } );
     };
     return $self->fail(
+        action  => 'create',
         label   => $params->{linode_update}{label},
         message => 'Unable to create swap image',
     ) unless $swap_result;
@@ -301,6 +308,7 @@ sub create {
             %{ $params->{linode_config_create} } );
     };
     return $self->fail(
+        action  => 'create',
         label   => $params->{linode_update}{label},
         message => 'Unable to create configuration profile',
     ) unless $config_result;
@@ -312,6 +320,7 @@ sub create {
     };
 
     return $self->fail(
+        action  => 'create',
         label   => $params->{linode_update}{label},
         message => "Unable to issue boot job for $options->{label}",
     ) unless $boot_result;
@@ -321,6 +330,7 @@ sub create {
             = $self->_poll_and_wait( $api, $linode_id, $boot->{jobid},
             $format );
         return $self->fail(
+            action  => 'create',
             label   => $params->{linode_update}{label},
             message => "Timed out waiting for boot to complete for $params->{linode_update}{label}",
             payload => { jobid => $boot->{jobid}, job => 'start' },
@@ -328,6 +338,7 @@ sub create {
     }
 
     return $self->succeed(
+        action  => 'create',
         label   => $params->{linode_update}{label},
         message => "Creating and booting $options->{label}...",
         payload => { jobid => $boot->{jobid}, job => 'start' },
@@ -365,6 +376,7 @@ sub change_state {
 
         if ( !$state_change_result ) {
             $self->{_result} = $self->fail(
+                action  => $self->{_action},
                 label   => $linode_label,
                 message => "Unable to $state $linode_label",
                 result  => $self->{_result},
@@ -380,6 +392,7 @@ sub change_state {
         }
 
         $self->{_result} = $self->succeed(
+            action  => $self->{_action},
             label   => $linode_label,
             message => "$map->{$state}[0] $linode_label...",
             payload => { jobid => $state_change->{jobid}, job => $state },
@@ -400,6 +413,7 @@ sub change_state {
 
             if ( !$boot_job_result ) {
                 $self->{_result} = $self->fail(
+                    action  => $self->{_action},
                     label   => $linode_label,
                     message => "Unable to $state $linode_label",
                     payload => { jobid => $jobid, job => $state },
@@ -409,6 +423,7 @@ sub change_state {
             }
 
             $self->{_result} = $self->succeed(
+                action  => $self->{_action},
                 label   => $linode_label,
                 message => "$map->{$state}[1] $linode_label",
                 payload => { jobid => $jobid, job => $state },
@@ -446,6 +461,7 @@ sub resize {
 
         if ( !$resize_result ) {
             $self->{_result} = $self->fail(
+                action  => $self->{_action},
                 label   => $label,
                 message => "Unable to resize and boot $label",
                 result  => $self->{_result},
@@ -460,6 +476,7 @@ sub resize {
         }
 
         $self->{_result} = $self->succeed(
+            action  => $self->{_action},
             label   => $label,
             message => "Resizing and booting $label...",
             payload => { jobid => $resize->{jobid}, job => 'resize' },
@@ -479,6 +496,7 @@ sub resize {
 
             if ( !$job_result ) {
                 $self->{_result} = $self->fail(
+                    action  => $self->{_action},
                     label   => $label,
                     message => "Unable to resize and boot $label",
                     payload => { jobid => $jobid, job => 'resize' },
@@ -488,6 +506,7 @@ sub resize {
             }
 
             $self->{_result} = $self->succeed(
+                action  => $self->{_action},
                 label   => $label,
                 message => "Resized and booted $label",
                 payload => { jobid => $jobid, job => 'resize' },
@@ -519,6 +538,7 @@ sub update {
 
         if ($update_result) {
             $self->{_result} = $self->succeed(
+                action  => $self->{_action},
                 label   => $linode_label,
                 message => "Updated $linode_label",
                 payload => { action => 'update' },
@@ -527,6 +547,7 @@ sub update {
         }
         else {
             $self->{_result} = $self->{_result} = $self->fail(
+                action  => $self->{_action},
                 label   => $linode_label,
                 message => "Unable to update $linode_label",
             );
@@ -555,6 +576,7 @@ sub delete {
 
         if ($delete_result) {
             $self->{_result} = $self->succeed(
+                action  => $self->{_action},
                 label   => $linode_label,
                 message => "Deleted $linode_label",
                 payload => { action => 'delete' },
@@ -563,6 +585,7 @@ sub delete {
         }
         else {
             $self->{_result} = $self->{_result} = $self->fail(
+                action  => $self->{_action},
                 label   => $linode_label,
                 message => "Unable to delete $linode_label",
             );

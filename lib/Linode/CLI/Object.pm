@@ -38,6 +38,7 @@ sub new_from_list {
     }
 
     $self->{_api_obj}       = $args{api_obj};
+    $self->{_action}        = $args{action};
     $self->{_field_list}    = $args{field_list};
     $self->{_output_fields} = $args{output_fields};
     $self->{_result}        = {};
