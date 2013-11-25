@@ -136,6 +136,15 @@ transfer billable 0.00GB
     transfer used 1.00GB
 ```
 
+### Working with StackScripts
+
+Actions can be performed on StackScripts.
+
+```
+$ linode stackscript create --label "StackScript Name" --codefile "/path/myscript.sh" --distribution "Debian 7"
+$ linode stackscript show My-StackScript-Label
+```
+
 ### JSON output
 
 JSON output is available for actions.
@@ -188,7 +197,7 @@ Each action has a set of options that apply to it, which are outlined in the sec
 
 **-m**, **--man**: Full documentation.
 
-### Actions
+### Linode Actions
 
 #### Create
 
@@ -218,7 +227,7 @@ Change a Linode's label.
 
 **-l**, **--label**: A Linode to operate on.
 
-**--new-label**: New label to apply to this Linode.
+**-n**, **--new-label**: New label to apply to this Linode.
 
 #### Group
 
@@ -246,10 +255,64 @@ Delete a Linode, its disk image(s), and configuration profile(s).
 
 List information about one or more Linodes. Linodes are grouped by their display group.
 
-**-l**, **--label**: A Linode to list.
+**-l**, **--label**: Optional. A Linode to list.
 
 #### Show
 
-Display detailed information about a single Linode.
+Display detailed information about one or more Linodes
 
-**-l**, **--label**: Label of the Linode to show information about.
+**-l**, **--label**: Optional. Label of the Linode to show information about.
+
+### StackScript Actions
+
+#### Create
+
+Create a StackScript.
+
+**-l**, **--label**: The label (name) for the StackScript.
+
+**-d**, **--distribution**: Distribution name or DistributionID to deploy.
+
+**-c**, **--codefile**: The script file name (including the path) containing the source code.
+
+**-p**, **--ispublic**: Optional. Whether this StackScript is published in the Library, for everyone to use.   Options are yes, no, true, and false. Default is false.
+
+**-D**, **--description**: Optional. Notes describing details about the StackScript.
+
+**-r**, **--revnote**: Optional. Note for describing the version.
+
+#### Update
+
+Update a StackScript.
+
+**-l**, **--label**: The label (name) of the StackScript to update.
+
+**-n**, **--new-label**: Optional.  Renames the StackScript.
+
+**-d**, **--distribution**: Optional. Distribution name or DistributionID to deploy.
+
+**-c**, **--codefile**: Optional. The script file name (including the path) containing the source code.
+
+**-p**, **--ispublic**: Optional. Whether this StackScript is published in the Library, for everyone to use.   Options are yes, no, true, and false. Default is false.
+
+**-D**, **--description**: Optional. Notes describing details about the StackScript.
+
+**-r**, **--revnote**: Optional. Note for describing the version.
+
+#### Delete
+
+Delete a StackScript.
+
+**-l**, **--label**: The StackScript to delete.
+
+#### List
+
+List information about one or more StackScripts.
+
+**-l**, **--label**: Optional. A specific StackScript to list.
+
+#### Show
+
+Display detailed information about one or more StackScripts.
+
+**-l**, **--label**: Optional. A specific StackScript to show.

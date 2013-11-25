@@ -8,14 +8,14 @@ use Exporter 'import';
 our @EXPORT      = qw();
 our %EXPORT_TAGS = (
     basic => [(qw(
-        error load_config human_displaymemory succeed fail format_squish
+        error load_config human_displaymemory succeed fail format_squish format_tf
         %correct_case %humanstatus %humanyn %humandc @MODES
     ))],
     json => ['json_response'],
 );
 our @EXPORT_OK = (qw(
         json_response error load_config human_displaymemory succeed fail
-        format_squish %correct_case %humanstatus %humanyn %humandc
+        format_squish format_tf %correct_case %humanstatus %humanyn %humandc
         @MODES
 ));
 
@@ -28,7 +28,7 @@ our @MODES = (qw(
     linode stackscript domain nodebalancer longview account user
 ));
 
-our %correct_case = ( 'linode' => 'Linode', 'account' => 'Account' );
+our %correct_case = ( 'linode' => 'Linode', 'account' => 'Account', 'stackscript' => 'Stackscript' );
 
 our %humanstatus = (
     '-2' => 'boot failed',
@@ -113,6 +113,32 @@ my %paramsdef = (
     'account' => {
         'info'  => { 'alias' => 'show' },
         'show'  => { 'run' => 'show' }
+    },
+    'stackscript' => {
+        'create'  => {
+            'options' => {
+                'label'        => 'label|l=s',
+                'codefile'     => 'codefile|s=s',
+                'distribution' => 'distribution|d=s',
+                'ispublic'     => 'ispublic|p:s',
+                'revnote'      => 'revnote|r:s',
+                'description'  => 'description|D:s',
+            },
+         },
+        'update' => {
+            'options' => {
+                'label'        => 'label|l=s@',
+                'new-label'    => 'new-label|n:s',
+                'codefile'     => 'codefile|c:s',
+                'distribution' => 'distribution|d:s',
+                'ispublic'     => 'ispublic|p:s',
+                'revnote'      => 'revnote|r:s',
+                'description'  => 'description|D:s',
+            },
+         },
+        'delete' => { 'options' => { 'label' => 'label|l=s@' }, },
+        'list'   => { 'options' => { 'label' => 'label|l:s@' }, },
+        'show'   => { 'options' => { 'label' => 'label|l:s@' }, },
     },
 );
 
@@ -261,6 +287,16 @@ sub format_squish {
     my $cleanme = shift;
     $cleanme =~ s/\s//g; # goodbye spaces
     return lc($cleanme);
+}
+
+# handles true/false enties
+sub format_tf {
+    my $valin = shift;
+    if ( lc($valin) eq 'yes' || lc($valin) eq 'true' || lc($valin) eq '1') {
+        return 1;
+    } else {
+        return 0;
+    }
 }
 
 sub load_config {

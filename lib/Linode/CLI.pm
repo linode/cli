@@ -7,6 +7,7 @@ use 5.010;
 use Linode::CLI::Object;
 use Linode::CLI::Object::Linode;
 use Linode::CLI::Object::Account;
+use Linode::CLI::Object::Stackscript;
 use Linode::CLI::Util (qw(:basic :json));
 use Try::Tiny;
 use WebService::Linode;
@@ -37,6 +38,7 @@ sub new {
         $self->_warm_cache;
     }
 
+    $self->{_distilled_options} = $args{opts};
     $self->_distill_options;
 
     return $self;
@@ -45,7 +47,7 @@ sub new {
 sub create {
     my $self = shift;
 
-    my $result = Linode::CLI::Object::Linode->create(
+    my $result = "Linode::CLI::Object::$correct_case{$self->{mode}}"->create(
         api     => $self->{_api_obj},
         options => $self->{_distilled_options},
         format  => $self->{output_format},
@@ -59,16 +61,16 @@ sub update {
     my $self = shift;
 
     my $update_result = try {
-        my $linodes = Linode::CLI::Object::Linode->new_from_list(
+        my $uobj = "Linode::CLI::Object::$correct_case{$self->{mode}}"->new_from_list(
             api_obj     => $self->{_api_obj},
             object_list => $self->_get_object_list(
-                'linode', $self->{_distilled_options}{label}
+                $self->{mode}, $self->{_distilled_options}{label}
             ),
 
             action => $self->{_opts}->{action},
         );
 
-        my $result = $linodes->update( $self->{_distilled_options} );
+        my $result = $uobj->update( $self->{_distilled_options} );
         my %combined = (%$result, %{$self->{_result}});
         %{$self->{_result}} = %combined;
     };
@@ -205,15 +207,15 @@ sub delete {
     my $self   = shift;
 
     my $delete_result = try {
-        my $linode = Linode::CLI::Object::Linode->new_from_list(
+        my $dobj = "Linode::CLI::Object::$correct_case{$self->{mode}}"->new_from_list(
             api_obj     => $self->{_api_obj},
             object_list => $self->_get_object_list(
-                'linode', $self->{_distilled_options}{label}
+                $self->{mode}, $self->{_distilled_options}{label}
             ),
             action => $self->{_opts}->{action},
         );
 
-        my $result = $linode->delete( $self->{_distilled_options} );
+        my $result = $dobj->delete( $self->{_distilled_options} );
         my %combined = (%$result, %{$self->{_result}});
         %{$self->{_result}} = %combined;
     };
@@ -268,7 +270,6 @@ sub _warm_cache {
         api_obj     => $self->{_api_obj},
         object_list => $self->{_api_obj}->avail_linodeplans(),
     )->list( output_format => 'raw' );
-
     $self->{_cache}->{plan}->{$expire} = $plans;
 }
 
@@ -322,6 +323,32 @@ sub _get_object_list {
     }
     elsif ($self->{mode} eq 'account') {
         return $self->{_api_obj}->account_info();
+    }
+    elsif ($self->{mode} eq 'stackscript') {
+        my $stackscripts = $self->{_api_obj}->stackscript_list();
+
+        return $stackscripts if ( !$labels );
+
+        my $filtered = ();
+        my %targets = map { $_ => 1 } @$labels;
+
+        for my $ss (@$stackscripts) {
+            my $ss_label = $ss->{label};
+            if ( exists( $targets{$ss_label} ) ) {
+                push @$filtered, $ss;
+                delete $targets{$ss_label};
+            }
+        }
+
+        for my $mismatch ( keys %targets ) {
+            $self->{_result} = $self->fail(
+                label   => $mismatch,
+                message => "Couldn't find $mismatch",
+                result  => $self->{_result},
+            );
+        }
+
+        return $filtered;
     }
 }
 
