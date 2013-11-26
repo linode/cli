@@ -34,6 +34,7 @@ sub new {
 
     if (   $self->{_opts}->{action} eq 'create'
         || $self->{_opts}->{action} eq 'show'
+        || $self->{_opts}->{action} eq 'update'
         || $self->{_opts}->{action} eq 'resize' ) {
         $self->_warm_cache;
     }

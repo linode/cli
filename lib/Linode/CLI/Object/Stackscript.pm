@@ -148,7 +148,7 @@ sub create {
     my $format  = $args{format};
     my $wait    = $args{wait};
 
-    # Required Save parameters
+    # Required Create parameters
     # - label
     # - distributionidlist
     # - script
@@ -159,7 +159,7 @@ sub create {
     my $ss_scriptcontents = '';
     if ( -e $options->{codefile} ) {
         open my $fh, '<', $options->{codefile} or do {
-            die "CRITICAL: Unable to open $options->{codefile}.\n"; # prob permissions
+            die "CRITICAL: Unable to open $options->{codefile}.\n"; # permissions?
         };
         while ( my $eachline = <$fh> ) {
             $ss_scriptcontents .= $eachline;
@@ -177,7 +177,7 @@ sub create {
         }
     };
 
-    # Optional Saveparameters
+    # Optional Create parameters
     # - ispublic
     # - rev_note
     # - description
@@ -256,7 +256,7 @@ sub update {
             if ( exists $args->{codefile} ) {
                 if ( -e $args->{codefile} ) {
                     open my $fh, '<', $args->{codefile} or do {
-                        die "CRITICAL: Unable to open $args->{codefile}.\n"; # prob permissions
+                        die "CRITICAL: Unable to open $args->{codefile}.\n"; # permissions?
                     };
                     while ( my $eachline = <$fh> ) {
                         $ss_scriptcontents .= $eachline;
