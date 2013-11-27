@@ -11,10 +11,11 @@ our %EXPORT_TAGS = (
         error load_config human_displaymemory succeed fail format_squish format_tf
         %correct_case %humanstatus %humanyn %humandc %paramsdef @MODES
     ))],
+    config => ['write_config'],
     json => ['json_response'],
 );
 our @EXPORT_OK = (qw(
-        json_response error load_config human_displaymemory succeed fail
+        json_response error load_config write_config human_displaymemory succeed fail
         format_squish format_tf %correct_case %humanstatus %humanyn %humandc
         %paramsdef @MODES
 ));
@@ -114,6 +115,7 @@ our %paramsdef = (
             'warmcache' => [ 'datacenter' ],
          },
         'delete' => { 'options' => { 'label' => 'label|l=s@' }, },
+        'configure' => {'run' => 'configure'}
     },
     'account' => {
         'info'  => { 'alias' => 'show' },
@@ -325,6 +327,20 @@ sub load_config {
         $ret->{$key} = $value;
     }
     return $ret;
+}
+
+sub write_config {
+    my ($file, $options) = @_;
+
+    open my $fh, '>', $file or do {
+        die "Unable to open $file: $!";
+    };
+
+    for my $option (@$options) {
+        say $fh "$option->[0] $option->[2]";
+    }
+
+    close $fh;
 }
 
 sub json_response {

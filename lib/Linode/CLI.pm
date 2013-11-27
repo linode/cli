@@ -8,9 +8,11 @@ use Linode::CLI::Object;
 use Linode::CLI::Object::Linode;
 use Linode::CLI::Object::Account;
 use Linode::CLI::Object::Stackscript;
-use Linode::CLI::Util (qw(:basic :json));
+use Linode::CLI::Util (qw(:basic :config :json));
 use Try::Tiny;
 use WebService::Linode;
+
+use Data::Dumper;
 
 sub new {
     my ( $class, %args ) = @_;
@@ -220,6 +222,44 @@ sub delete {
         message => "Problem while trying to run '$self->{mode} delete'",
         result  => $self->{_result},
     ) unless $delete_result;
+}
+
+sub configure {
+    my $self = shift;
+
+    my @options = (
+        [
+            'api-key',
+            'API key for accessing the Linode API.'
+        ],
+        [
+            'distribution',
+            'Default distribution to deploy when creating a new Linode or'
+             . ' rebuilding an existing one.'
+        ],
+        [
+            'datacenter', 'Default datacenter to deploy new Linodes within.'
+        ],
+        [
+            'plan', 'Default plan when deploying a new Linode.'
+        ],
+        [
+            'paymentterm', 'Default payment term when deploying a new Linode.'
+        ],
+    );
+
+    say 'This will walk you through setting default values for common options.';
+
+    for my $i (0 .. $#options) {
+        say $options[$i][1];
+        print '>> ';
+        chop ( my $response = <STDIN> );
+        push $options[$i], $response;
+        say '';
+    }
+
+    my $home_directory = $ENV{HOME} || ( getpwuid($<) )[7];
+    write_config("$home_directory/.linodecli", \@options);
 }
 
 sub response {
