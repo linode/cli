@@ -9,14 +9,14 @@ our @EXPORT      = qw();
 our %EXPORT_TAGS = (
     basic => [(qw(
         error load_config human_displaymemory succeed fail format_squish format_tf
-        %correct_case %humanstatus %humanyn %humandc @MODES
+        %correct_case %humanstatus %humanyn %humandc %paramsdef @MODES
     ))],
     json => ['json_response'],
 );
 our @EXPORT_OK = (qw(
         json_response error load_config human_displaymemory succeed fail
         format_squish format_tf %correct_case %humanstatus %humanyn %humandc
-        @MODES
+        %paramsdef @MODES
 ));
 
 use Carp;
@@ -54,7 +54,7 @@ our %humandc = (
     '8' => 'tokyo',
 );
 
-my %paramsdef = (
+our %paramsdef = (
     'linode' => {
         'create' => {
             'options' => {
@@ -66,7 +66,8 @@ my %paramsdef = (
                 'quantity'     => 'quantity|q:i',
                 'group'        => 'group|g:s'
             },
-            'format' => { 'plan' => 'format_squish', 'datacenter'  => 'format_squish' }
+            'format'    => { 'plan' => 'format_squish', 'datacenter'  => 'format_squish' },
+            'warmcache' => [ 'plan', 'distribution', 'datacenter', 'kernel' ],
         },
         'boot'  => { 'alias' => 'start' },
         'start' => {
@@ -97,7 +98,8 @@ my %paramsdef = (
                 'plan'  => 'plan|p=i'
             },
             'format' => { 'plan' => 'format_squish' },
-            'seeknext' => 'plan'
+            'seeknext'  => 'plan',
+            'warmcache' => [ 'plan' ],
         },
         'group' => {
             'options' => {
@@ -107,7 +109,10 @@ my %paramsdef = (
             'run' => 'update',
         },
         'list'   => { 'options' => { 'label' => 'label|l:s@' }, },
-        'show'   => { 'options' => { 'label' => 'label|l:s@' }, },
+        'show'   => {
+            'options'   => { 'label' => 'label|l:s@' },
+            'warmcache' => [ 'datacenter' ],
+         },
         'delete' => { 'options' => { 'label' => 'label|l=s@' }, },
     },
     'account' => {
@@ -124,6 +129,7 @@ my %paramsdef = (
                 'revnote'      => 'revnote|r:s',
                 'description'  => 'description|D:s',
             },
+            'warmcache' => [ 'distribution' ],
          },
         'update' => {
             'options' => {
@@ -135,6 +141,7 @@ my %paramsdef = (
                 'revnote'      => 'revnote|r:s',
                 'description'  => 'description|D:s',
             },
+            'warmcache' => [ 'distribution' ],
          },
         'delete' => { 'options' => { 'label' => 'label|l=s@' }, },
         'list'   => { 'options' => { 'label' => 'label|l:s@' }, },

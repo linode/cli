@@ -31,13 +31,7 @@ sub new {
     );
 
     $self->_test_api;
-
-    if (   $self->{_opts}->{action} eq 'create'
-        || $self->{_opts}->{action} eq 'show'
-        || $self->{_opts}->{action} eq 'update'
-        || $self->{_opts}->{action} eq 'resize' ) {
-        $self->_warm_cache;
-    }
+    $self->_warm_cache;
 
     $self->{_distilled_options} = $args{opts};
     $self->_distill_options;
@@ -249,29 +243,35 @@ sub _warm_cache {
 
     $self->{_cache}->{$_} = {} foreach (@MODES);
 
-    my $datacenters = Linode::CLI::Object->new_from_list(
-        api_obj     => $self->{_api_obj},
-        object_list => $self->{_api_obj}->avail_datacenters(),
-    )->list( output_format => 'raw' );
-    $self->{_cache}->{datacenter}->{$expire} = $datacenters;
-
-    my $distributions = Linode::CLI::Object->new_from_list(
-        api_obj     => $self->{_api_obj},
-        object_list => $self->{_api_obj}->avail_distributions(),
-    )->list( output_format => 'raw' );
-    $self->{_cache}->{distribution}->{$expire} = $distributions;
-
-    my $kernels = Linode::CLI::Object->new_from_list(
-        api_obj     => $self->{_api_obj},
-        object_list => $self->{_api_obj}->avail_kernels(),
-    )->list( output_format => 'raw' );
-    $self->{_cache}->{kernel}->{$expire} = $kernels;
-
-    my $plans = Linode::CLI::Object->new_from_list(
-        api_obj     => $self->{_api_obj},
-        object_list => $self->{_api_obj}->avail_linodeplans(),
-    )->list( output_format => 'raw' );
-    $self->{_cache}->{plan}->{$expire} = $plans;
+    if ( exists $paramsdef{ $self->{mode} }{ $self->{_opts}->{action} }{'warmcache'} ) {
+        foreach ( @{$paramsdef{ $self->{mode} }{ $self->{_opts}->{action} }{'warmcache'}} ) {
+            if ( $_ eq 'datacenter' ) {
+                $self->{_cache}->{datacenter}->{$expire} =
+                    Linode::CLI::Object->new_from_list(
+                        api_obj     => $self->{_api_obj},
+                        object_list => $self->{_api_obj}->avail_datacenters(),
+                    )->list( output_format => 'raw' );
+            } elsif ( $_ eq 'distribution' ) {
+                $self->{_cache}->{distribution}->{$expire} =
+                    Linode::CLI::Object->new_from_list(
+                        api_obj     => $self->{_api_obj},
+                        object_list => $self->{_api_obj}->avail_distributions(),
+                    )->list( output_format => 'raw' );
+            } elsif ( $_ eq 'kernel' ) {
+                $self->{_cache}->{kernel}->{$expire} =
+                    Linode::CLI::Object->new_from_list(
+                        api_obj     => $self->{_api_obj},
+                        object_list => $self->{_api_obj}->avail_kernels(),
+                    )->list( output_format => 'raw' );
+            } elsif ( $_ eq 'plan' ) {
+                $self->{_cache}->{plan}->{$expire} =
+                    Linode::CLI::Object->new_from_list(
+                        api_obj     => $self->{_api_obj},
+                        object_list => $self->{_api_obj}->avail_linodeplans(),
+                    )->list( output_format => 'raw' );
+            }
+        }
+    }
 }
 
 sub _use_or_evict_cache {
@@ -372,7 +372,7 @@ sub _get_id_by_label {
 sub _distill_options {
     my $self = shift;
 
-    $self->_fuzzy_match($_) foreach (qw(datacenter distribution kernel plan));
+    $self->_fuzzy_match($_) foreach ( @{$paramsdef{ $self->{mode} }{ $self->{_opts}->{action} }{'warmcache'}} );
 
     $self->{_distilled_options}->{paymentterm}
         = $self->{_opts}->{'payment-term'} if ( $self->{_opts}->{'payment-term'} );
