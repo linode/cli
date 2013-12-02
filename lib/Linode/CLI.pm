@@ -12,8 +12,6 @@ use Linode::CLI::Util (qw(:basic :config :json));
 use Try::Tiny;
 use WebService::Linode;
 
-use Data::Dumper;
-
 sub new {
     my ( $class, %args ) = @_;
 

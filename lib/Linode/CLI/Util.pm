@@ -324,7 +324,7 @@ sub load_config {
             next;
         }
 
-        $ret->{$key} = $value;
+        chomp($ret->{$key} = $value);
     }
     return $ret;
 }
