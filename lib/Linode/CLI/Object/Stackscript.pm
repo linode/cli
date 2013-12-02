@@ -153,8 +153,8 @@ sub create {
     # - distributionidlist
     # - script
     my $ss_label = $options->{label};
-    # TODO: build Distribution ID List
-    my $ss_distidlist = $options->{distributionid};
+    # build Distribution ID List
+    my $ss_distidlist = join (",", values $options->{distributionid}); # x,y,z...
     # load in the source code from the file.
     my $ss_scriptcontents = '';
     if ( -e $options->{codefile} ) {
@@ -238,8 +238,9 @@ sub update {
             $params->{stackscript_update}{description} = $args->{description};
         }
         if ( exists $args->{distributionid} ) {
-            # TODO: build Distribution ID List
-            $params->{stackscript_update}{distributionidlist} = $args->{distributionid};
+            # x,y,z...
+            $params->{stackscript_update}{distributionidlist}
+                = join (",", values $args->{distributionid});
         }
         if ( exists $args->{ispublc} ) {
             $params->{stackscript_update}{ispublic} = format_tf($args->{ispublic});

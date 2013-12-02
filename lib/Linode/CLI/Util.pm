@@ -61,7 +61,7 @@ our %paramsdef = (
                 'label'        => 'label|l=s@',
                 'datacenter'   => 'datacenter|location|L=s',
                 'distribution' => 'distribution|d=s',
-                'plan'         => 'plan|p=i',
+                'plan'         => 'plan|p=s',
                 'payment-term' => 'payment-term|t=i',
                 'quantity'     => 'quantity|q:i',
                 'group'        => 'group|g:s'
@@ -95,7 +95,7 @@ our %paramsdef = (
         'resize' => {
             'options' => {
                 'label' => 'label|l=s@',
-                'plan'  => 'plan|p=i'
+                'plan'  => 'plan|p=s'
             },
             'format' => { 'plan' => 'format_squish' },
             'seeknext'  => 'plan',
@@ -124,7 +124,7 @@ our %paramsdef = (
             'options' => {
                 'label'        => 'label|l=s',
                 'codefile'     => 'codefile|s=s',
-                'distribution' => 'distribution|d=s',
+                'distribution' => 'distribution|d=s@',
                 'ispublic'     => 'ispublic|p:s',
                 'revnote'      => 'revnote|r:s',
                 'description'  => 'description|D:s',
@@ -136,7 +136,7 @@ our %paramsdef = (
                 'label'        => 'label|l=s@',
                 'new-label'    => 'new-label|n:s',
                 'codefile'     => 'codefile|c:s',
-                'distribution' => 'distribution|d:s',
+                'distribution' => 'distribution|d:s@',
                 'ispublic'     => 'ispublic|p:s',
                 'revnote'      => 'revnote|r:s',
                 'description'  => 'description|D:s',

@@ -400,48 +400,50 @@ sub _fuzzy_match {
     my $kernel = [ 137, 138 ];
 
     if ( $self->{_opts}->{$object} ) {
-        my $param = $self->{_opts}->{$object};
         my $cache = $self->_use_or_evict_cache($object);
+        my @params = [];
 
-        for my $object_label ( keys %$cache ) {
-            if ( $param =~ /^\d+$/ && $param == $cache->{$object_label}->{ $object . 'id' } ) {
-                $self->{_distilled_options}->{ $object . 'id' } = $param;
-                if ( $object eq 'distribution' ) {
-                    $self->{_distilled_options}->{kernelid}
-                        = $kernel->[ ( $cache->{$object_label}->{is64bit} ) ? 1 : 0 ];
-                }
-                last;
-            }
-            elsif ( lc( $object_label ) eq lc( $param ) ) {
-                $self->{_distilled_options}->{ $object . 'id' }
-                    = $cache->{$object_label}->{ $object . 'id' };
-                if ( $object eq 'distribution' ) {
-                    $self->{_distilled_options}->{kernelid}
-                        = $kernel->[ ( $cache->{$object_label}->{is64bit} ) ? 1 : 0 ];
-                }
-                last;
-            }
-            elsif ( format_squish( $object_label ) eq $param ) { # ex: Linode 1024 as linode1024
-                $self->{_distilled_options}->{ $object . 'id' }
-                    = $cache->{$object_label}->{ $object . 'id' };
-                if ( $object eq 'distribution' ) {
-                    $self->{_distilled_options}->{kernelid}
-                        = $kernel->[ ( $cache->{$object_label}->{is64bit} ) ? 1 : 0 ];
-                }
-                last;
-            }
-            elsif ( $object_label =~ /^$param/i ) {
-                $self->{_distilled_options}->{ $object . 'id' }
-                    = $cache->{$object_label}->{ $object . 'id' };
-                if ( $object eq 'distribution' ) {
-                    $self->{_distilled_options}->{kernelid}
-                        = $kernel->[ ( $cache->{$object_label}->{is64bit} ) ? 1 : 0 ];
-                }
-            }
+        if ( ref($self->{_opts}->{$object}) ne 'ARRAY' ) {
+            @params = $self->{_opts}->{$object};
+        } else {
+            @params = @{$self->{_opts}->{$object}};
         }
 
-        $self->{_distilled_options}->{ $object . 'id' }
-            || die "Unable to fuzzy match $object: $param\n";
+        foreach my $param (@params) {
+            my $found = '';
+
+            # look for an exact match
+            for my $object_label ( keys %$cache ) {
+                if ( ( $param =~ /^\d+$/ && $param == $cache->{$object_label}->{ $object . 'id' } ) || # numeric id
+                     ( lc( $object_label ) eq lc( $param ) ) ||       # lower case match
+                     ( format_squish( $object_label ) eq $param ) ) { # ex: Linode 1024 as linode1024
+                    $found = $object_label;
+                    last;
+                }
+            }
+            # not found yet, look for partial match
+            if ( $found eq '' ) {
+                for my $object_label ( keys %$cache ) {
+                    if ( $object_label =~ /^$param/i ) { # left partial match
+                        $found = $object_label;
+                        last;
+                    }
+                }
+            }
+
+           if ( $found ne '' ) {
+                if ( $self->{mode} eq 'stackscript' && $object eq 'distribution') {
+                    $self->{_distilled_options}->{ $object . 'id' }{ $found } = $cache->{ $found }->{ $object . 'id' };
+                } else {
+                    $self->{_distilled_options}->{ $object . 'id' } = $cache->{ $found }->{ $object . 'id' };
+                    if ( $object eq 'distribution' ) {
+                        $self->{_distilled_options}->{kernelid} = $kernel->[ ( $cache->{ $found }->{is64bit} ) ? 1 : 0 ];
+                    }
+                }
+            } else {
+                die "Unable to fuzzy match $object: $param\n";
+            }
+        }
     }
 }
 
