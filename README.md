@@ -42,19 +42,31 @@ $ tar xf linode-cli.tar.gz
 $ ./cli-master/linode
 ```
 
-## Examples
+## Initial configuration
 
-Before using linode-cli for the first time, you'll want to drop your API key in a `.linodecli` file in your user's home directory, with the following format:
+You can configure defaults, including your API key and common deployment options, by running the configuration helper:
+
+```
+$ linode configure
+This will walk you through setting default values for common options.
+API key for accessing the Linode API.
+>>
+...
+```
+
+This will write (or overwrite existing) options into a `.linodecli` file in your user's home directory.
+
+Options are in the format of `option value`, for example:
 
 ```
 api-key foobarbaz123456
 ```
 
-The API key can also be set using an environment variable (LINODE_API_KEY).
+The API key can also be set using an environment variable (LINODE_API_KEY). Alternatively, you can pass an `--api-key` option on the command line.
 
-Alternatively, you can pass an `--api-key` option on the command line.
+## Examples
 
-That's it! Now you're ready to start using linode-cli. If you didn't place linode-cli somewhere in your PATH, you'll need to call it directly: `/path/to/linode-cli/linode`. Otherwise, you can simply use `linode`.
+If you didn't place linode-cli somewhere in your PATH, you'll need to call it directly: `/path/to/linode-cli/linode`. Otherwise, you can simply use `linode`.
 
 ### Listing Linodes
 

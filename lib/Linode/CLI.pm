@@ -244,7 +244,7 @@ sub configure {
             'plan', 'Default plan when deploying a new Linode.'
         ],
         [
-            'paymentterm', 'Default payment term when deploying a new Linode.'
+            'payment-term', 'Default payment term when deploying a new Linode.'
         ],
     );
 

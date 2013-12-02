@@ -318,7 +318,7 @@ sub load_config {
     while ( my $line = <$fh> ) {
         next if $line =~ /^\s*#/;
         next if $line =~ /^\s*$/;
-        my ( $key, $value ) = $line =~ /^\s*(\S*)\s+(\S*)\s*$/;
+        my ( $key, $value ) = $line =~ /^\s*(\S*)\s([\w\s]+)$/;
         unless ( $key && $value ) {
             die "Unable to parse line in $file: '$line' does not conform to standard";
             next;
