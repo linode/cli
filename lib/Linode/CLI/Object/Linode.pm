@@ -228,7 +228,10 @@ sub create {
             kernelid        => delete $options->{kernelid},
             label           => "$options->{label}-config",
         },
-        linode_update       => $options,
+        linode_update       => {
+            label               => $options->{label},
+            lpm_displaygroup    => $options->{group} ? $options->{group} : '',
+        }
     };
 
     if ( !exists $params->{linode_disk_createfromdistribution}{rootpass} ) {
