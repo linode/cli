@@ -334,19 +334,29 @@ sub _use_or_evict_cache {
 sub _get_object_list {
     my ( $self, $object, $labels ) = @_;
 
-    if ($self->{mode} eq 'linode') {
-        my $linodes = $self->{_api_obj}->linode_list();
+    my $api = $self->{_api_obj};
+    my $mode = $self->{mode};
 
-        return $linodes if ( !$labels );
+    # These are objects that have labels and should be filtered based on the
+    # label(s) passed in. Other objects (account) are returned blindly, or need
+    # special treatment.
+    my @should_filter = ('linode', 'stackscript');
+
+    if (my @found = grep { $_ eq $mode } @should_filter) {
+        my $objects =
+              ($mode eq 'stackscript') ? $api->stackscript_list()
+            : $api->linode_list();
+
+        return $objects if ( !$labels );
 
         my $filtered = ();
         my %targets = map { $_ => 1 } @$labels;
 
-        for my $linode (@$linodes) {
-            my $linode_label = $linode->{label};
-            if ( exists( $targets{$linode_label} ) ) {
-                push @$filtered, $linode;
-                delete $targets{$linode_label};
+        for my $object (@$objects) {
+            my $object_label = $object->{label};
+            if ( exists( $targets{$object_label} ) ) {
+                push @$filtered, $object;
+                delete $targets{$object_label};
             }
         }
 
@@ -360,34 +370,8 @@ sub _get_object_list {
 
         return $filtered;
     }
-    elsif ($self->{mode} eq 'account') {
-        return $self->{_api_obj}->account_info();
-    }
-    elsif ($self->{mode} eq 'stackscript') {
-        my $stackscripts = $self->{_api_obj}->stackscript_list();
-
-        return $stackscripts if ( !$labels );
-
-        my $filtered = ();
-        my %targets = map { $_ => 1 } @$labels;
-
-        for my $ss (@$stackscripts) {
-            my $ss_label = $ss->{label};
-            if ( exists( $targets{$ss_label} ) ) {
-                push @$filtered, $ss;
-                delete $targets{$ss_label};
-            }
-        }
-
-        for my $mismatch ( keys %targets ) {
-            $self->{_result} = $self->fail(
-                label   => $mismatch,
-                message => "Couldn't find $mismatch",
-                result  => $self->{_result},
-            );
-        }
-
-        return $filtered;
+    elsif ($mode eq 'account') {
+        return $api->account_info();
     }
 }
 
