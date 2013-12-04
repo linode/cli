@@ -154,7 +154,7 @@ sub create {
     # - script
     my $ss_label = $options->{label};
     # build Distribution ID List
-    my $ss_distidlist = join (",", values $options->{distributionid}); # x,y,z...
+    my $ss_distidlist = join (",", values %{ $options->{distributionid} } ); # x,y,z...
     # load in the source code from the file.
     my $ss_scriptcontents = '';
     if ( -e $options->{codefile} ) {
@@ -240,7 +240,7 @@ sub update {
         if ( exists $args->{distributionid} ) {
             # x,y,z...
             $params->{stackscript_update}{distributionidlist}
-                = join (",", values $args->{distributionid});
+                = join (",", values %{ $args->{distributionid} });
         }
         if ( exists $args->{ispublc} ) {
             $params->{stackscript_update}{ispublic} = format_tf($args->{ispublic});
@@ -279,7 +279,7 @@ sub update {
             $self->{_result} = $self->succeed(
                 action  => $self->{_action},
                 label   => $self->{object}->{$object}->{label},
-                message => "Updated $self->{object}->{$object}->{label}",
+                message => "Updated StackScript $self->{object}->{$object}->{label}",
                 payload => { action => 'update' },
             );
         }
@@ -288,7 +288,7 @@ sub update {
                 action  => $self->{_action},
                 label   => $self->{object}->{$object}->{label},
                 message => "Unable to update StackScript $self->{object}->{$object}->{label}",
-                payload => { action => 'create' },
+                payload => { action => 'update' },
             );
         }
     }
