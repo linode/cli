@@ -252,7 +252,7 @@ sub configure {
         say $options[$i][1];
         print '>> ';
         chop ( my $response = <STDIN> );
-        push $options[$i], $response;
+        push @{$options[$i]}, $response;
         say '';
     }
 
