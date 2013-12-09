@@ -80,9 +80,14 @@ sub list {
             );
         }
         else {
-            $out_hashref->{$object}{label}   = $self->{object}{$object}{label};
-            $out_hashref->{$object}{id}      = $self->{object}{$object}{stackscriptid};
-            $out_hashref->{$object}{revnote} = $self->{object}{$object}{rev_note};
+            if ( $self->{_action} eq 'source' ) {
+                # source only lists the scripts source code
+                $out_hashref->{$object}{source}  = $self->{object}{$object}{script};
+            } else {
+                $out_hashref->{$object}{label}   = $self->{object}{$object}{label};
+                $out_hashref->{$object}{id}      = $self->{object}{$object}{stackscriptid};
+                $out_hashref->{$object}{revnote} = $self->{object}{$object}{rev_note};
+            }
         }
     }
 
@@ -118,19 +123,25 @@ sub show {
 
     for my $object_label ( keys %{ $self->{object} } ) {
         next if ( $label && $object_label ne $label );
-        for my $key ( keys %{ $self->{object}->{$object_label} } ) {
-            next unless ( my @found = grep { $_ eq $key } %{ $self->{_output_fields} } );
-            if ( $key eq 'ispublic' ) {
-                $return .= sprintf( "\n%12s %-32s",
-                    $self->{_output_fields}->{$key},
-                    $humanyn{ $self->{object}->{$object_label}->{$key} }
-                );
-            }
-            else {
-                if ( $self->{object}->{$object_label}->{$key} ne '' ) {
+
+        if ( $self->{_action} eq 'source' ) {
+            # source only lists the scripts source code
+            $return .= $self->{object}->{$object_label}->{script};
+        } else {
+            for my $key ( keys %{ $self->{object}->{$object_label} } ) {
+                next unless ( my @found = grep { $_ eq $key } %{ $self->{_output_fields} } );
+                if ( $key eq 'ispublic' ) {
                     $return .= sprintf( "\n%12s %-32s",
                         $self->{_output_fields}->{$key},
-                        $self->{object}->{$object_label}->{$key} );
+                        $humanyn{ $self->{object}->{$object_label}->{$key} }
+                    );
+                }
+                else {
+                    if ( $self->{object}->{$object_label}->{$key} ne '' ) {
+                        $return .= sprintf( "\n%12s %-32s",
+                            $self->{_output_fields}->{$key},
+                            $self->{object}->{$object_label}->{$key} );
+                    }
                 }
             }
         }

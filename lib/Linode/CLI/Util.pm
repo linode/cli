@@ -29,7 +29,7 @@ our @MODES = (qw(
     linode stackscript domain nodebalancer longview account user
 ));
 
-our %correct_case = ( 'linode' => 'Linode', 'account' => 'Account', 'stackscript' => 'Stackscript' );
+our %correct_case = ( 'linode' => 'Linode', 'account' => 'Account', 'stackscript' => 'Stackscript', 'domain' => 'Domain' );
 
 our %humanstatus = (
     '-2' => 'boot failed',
@@ -145,9 +145,13 @@ our %paramsdef = (
             },
             'warmcache' => [ 'distribution' ],
          },
-        'delete' => { 'options' => { 'label' => 'label|l=s@' }, },
-        'list'   => { 'options' => { 'label' => 'label|l:s@' }, },
-        'show'   => { 'options' => { 'label' => 'label|l:s@' }, },
+        'delete'     => { 'options' => { 'label' => 'label|l=s@' }, },
+        'list'       => { 'options' => { 'label' => 'label|l:s@' }, },
+        'show'       => { 'options' => { 'label' => 'label|l:s@' }, },
+        'source' => {
+            'options' => { 'label' => 'label|l:s@' },
+            'run'     => 'show',
+        },
     },
 );
 

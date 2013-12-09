@@ -36,7 +36,7 @@ linode-stackscript - command-line interface for Linode StackScripts
 
 B<linode-stackscript> [B<--api-key> API key] [B<-a> action] [action-options...] [options...]
 
-B<Actions> available: B<create>, B<update>, B<delete>, B<list>, B<show>.
+B<Actions> available: B<create>, B<update>, B<delete>, B<list>, B<show>, B<source>.
 
 =head1 OPTIONS
 
@@ -44,7 +44,7 @@ B<Actions> available: B<create>, B<update>, B<delete>, B<list>, B<show>.
 
 =item B<-a>, B<--action>
 
-An action to perform on Linode StackScript(s). One of: B<create>, B<update>, B<delete>, B<list>, B<show>.
+An action to perform on Linode StackScript(s). One of: B<create>, B<update>, B<delete>, B<list>, B<show>, B<source>.
 
 =item B<--api-key>
 
@@ -186,6 +186,22 @@ Display detailed information about one or more StackScripts.
 =item B<-l>, B<--label>
 
 Optional. A specific StackScript to show.
+
+=back
+
+=back
+
+=head2 SOURCE
+
+=over 8
+
+Display the source code for a StackScript.
+
+=over 8
+
+=item B<-l>, B<--label>
+
+Required. A specific StackScript to show.
 
 =back
 
