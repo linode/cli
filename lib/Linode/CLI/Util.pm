@@ -25,6 +25,8 @@ use JSON;
 use Pod::Usage;
 use Getopt::Long (qw(:config no_ignore_case bundling pass_through));
 
+my $VERSION = '0.1.0';
+
 our @MODES = (qw(
     linode stackscript domain nodebalancer longview account user
 ));
@@ -155,7 +157,7 @@ our %paramsdef = (
 sub eat_cmdargs {
     my $mode = shift || 'linode';
     my @paramsfirst = qw( action|a:s version|V|v help|h man ); # initial parse of args
-    my @paramscommon = qw( api-key|k=s json|j:s output:s wait|w ); # args needed for every action
+    my @paramscommon = qw( json|j:s output:s wait|w ); # args needed for every action
     my $cmdargs = {};
     $cmdargs->{output} = 'martian';
 
@@ -166,6 +168,11 @@ sub eat_cmdargs {
     }
     elsif ( exists $cmdargs->{version} ) {
         version_message();
+    }
+
+    if ( ( exists $cmdargs->{action} && $cmdargs->{action} ne 'configure' )
+          || ( defined $ARGV[0] && $ARGV[0] ne 'configure' ) ) {
+        push @paramscommon, 'api-key|k=s';
     }
 
     if ( !exists $cmdargs->{action} && defined( $ARGV[0] ) ) {
@@ -336,6 +343,8 @@ sub write_config {
         die "Unable to open $file: $!";
     };
 
+    chmod(0640, $fh);
+
     for my $option (@$options) {
         say $fh "$option->[0] $option->[2]";
     }
@@ -384,7 +393,7 @@ sub fail {
 }
 
 sub version_message {
-    say 'linode-cli';
+    say "linode-cli $VERSION";
     say 'Copyright (C) 2013 Linode, LLC';
     exit;
 }

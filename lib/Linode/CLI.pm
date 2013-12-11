@@ -30,7 +30,7 @@ sub new {
         fatal  => 1,
     );
 
-    $self->_test_api;
+    $self->_test_api unless $self->{_opts}{action} eq 'configure';
     $self->_warm_cache;
 
     $self->{_distilled_options} = $args{opts};
