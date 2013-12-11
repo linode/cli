@@ -328,3 +328,10 @@ List information about one or more StackScripts.
 Display detailed information about one or more StackScripts.
 
 **-l**, **--label**: Optional. A specific StackScript to show.
+
+#### Source
+
+Display the source code for a StackScript.
+
+**-l**, **--label**: Required. A specific StackScript to show.
+
