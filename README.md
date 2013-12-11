@@ -7,15 +7,15 @@ Linode CLI is a simple command-line interface to the Linode platform.
 
 ## Installation
 
-Final versions of linode-cli will be packaged up and very easy to install. For now, you'll need to grab a ZIP, tarball, or clone from source and install dependencies manually.
+Linode CLI is currently packaged for Debian and Ubuntu. Final versions of linode-cli will be packaged up and very easy to install for major distributions.
 
 ### Debian/Ubuntu
 
 ```
-$ curl -Lo linode-cli.tar.gz https://github.com/linode/cli/archive/master.tar.gz
-$ tar xf linode-cli.tar.gz
-$ apt-get install libjson-perl libcrypt-ssleay-perl ca-certificates libtry-tiny-perl libwww-perl
-$ ./cli-master/linode
+echo "deb http://apt.linode.com/ stable main" > /etc/apt/sources.list.d/linode.list
+wget -O- https://apt.linode.com/linode.gpg | apt-key add -
+apt-get update
+apt-get install linode-cli
 ```
 
 ### Mac OS X
@@ -25,10 +25,10 @@ Installing dependencies on OS X requires either XCode or Command Line Tools for 
 You'll first want to install cpanminus, either using cpan packaged with OS X (`$ cpan App::cpanminus`) or using a one-line install helper: https://github.com/miyagawa/cpanminus#installing-to-system-perl
 
 ```
-$ cpanm -S Crypt::SSLeay JSON LWP::UserAgent Mozilla::CA Try::Tiny
-$ curl -Lo linode-cli.tar.gz https://github.com/linode/cli/archive/master.tar.gz
-$ tar xf linode-cli.tar.gz
-$ ./cli-master/linode
+cpanm -S Crypt::SSLeay JSON LWP::UserAgent Mozilla::CA Try::Tiny
+curl -Lo linode-cli.tar.gz https://github.com/linode/cli/archive/master.tar.gz
+tar xf linode-cli.tar.gz
+./cli-master/linode
 ```
 
 ### Others
@@ -36,10 +36,10 @@ $ ./cli-master/linode
 You'll first want to install cpanminus, either using cpan packaged with your system (`$ cpan App::cpanminus`) or using a one-line install helper: https://github.com/miyagawa/cpanminus#installing-to-system-perl
 
 ```
-$ cpanm -S Crypt::SSLeay JSON LWP::UserAgent Mozilla::CA Try::Tiny
-$ curl -Lo linode-cli.tar.gz https://github.com/linode/cli/archive/master.tar.gz
-$ tar xf linode-cli.tar.gz
-$ ./cli-master/linode
+cpanm -S Crypt::SSLeay JSON LWP::UserAgent Mozilla::CA Try::Tiny
+curl -Lo linode-cli.tar.gz https://github.com/linode/cli/archive/master.tar.gz
+tar xf linode-cli.tar.gz
+./cli-master/linode
 ```
 
 ## Initial configuration
@@ -47,7 +47,7 @@ $ ./cli-master/linode
 You can configure defaults, including your API key and common deployment options, by running the configuration helper:
 
 ```
-$ linode configure
+linode configure
 This will walk you through setting default values for common options.
 API key for accessing the Linode API.
 >>
@@ -71,29 +71,29 @@ If you didn't place linode-cli somewhere in your PATH, you'll need to call it di
 ### Listing Linodes
 
 ```
-$ linode list
-$ linode list My-Linode-Label
-$ linode list My-Linode-Label1 My-Linode-Label2
+linode list
+linode list My-Linode-Label
+linode list My-Linode-Label1 My-Linode-Label2
 ```
 
 ### Showing details about a single Linode
 
 ```
-$ linode show My-Linode-Label
+linode show My-Linode-Label
 ```
 
 ### Starting, stopping, or restarting a Linode
 
 ```
-$ linode start My-Linode-Label
-$ linode stop My-Linode-Label
-$ linode restart My-Linode-Label
+linode start My-Linode-Label
+linode stop My-Linode-Label
+linode restart My-Linode-Label
 ```
 
 ### Renaming a Linode
 
 ```
-$ linode rename mylinodename mylinodenewname
+linode rename mylinodename mylinodenewname
 ```
 
 ### Creating a new Linode
@@ -101,7 +101,7 @@ $ linode rename mylinodename mylinodenewname
 **Warning:** This *will* attempt to charge the credit card on file, or use any account credit available, and spin up a new Linode 1GB.
 
 ```
-$ linode create New-Linode --location dallas --plan linode1024 --payment-term 1 --distribution 'Debian 7' --group Frontends
+linode create New-Linode --location dallas --plan linode1024 --payment-term 1 --distribution 'Debian 7' --group Frontends
 ```
 
 ### Resizing a Linode
@@ -111,7 +111,7 @@ $ linode create New-Linode --location dallas --plan linode1024 --payment-term 1 
 This example resizes a Linode 1024 to a Linode 2048.
 
 ```
-$ linode resize mylinode linode2048
+linode resize mylinode linode2048
 ```
 
 ### Deleting a Linode
@@ -119,7 +119,7 @@ $ linode resize mylinode linode2048
 **Warning:** This *will* permanently delete a Linode, its disk images and configuration profiles.
 
 ```
-$ linode delete New-Linode
+linode delete New-Linode
 ```
 
 ### Working with multiple Linodes
@@ -127,8 +127,8 @@ $ linode delete New-Linode
 Actions can be performed on multiple Linodes using their labels.  Using multiple --label arguments will accomplish the same thing.
 
 ```
-$ linode start My-Linode-Label1 My-Linode-Label2
-$ linode show --label My-Linode-Label1 --label My-Linode-Label2
+linode start My-Linode-Label1 My-Linode-Label2
+linode show --label My-Linode-Label1 --label My-Linode-Label2
 ```
 
 ### Displaying account information
@@ -136,7 +136,7 @@ $ linode show --label My-Linode-Label1 --label My-Linode-Label2
 Account information, including the current account balance and network transfer pool usage, can be queried with the `linode-account` tool.
 
 ```
-$ linode account show
+linode account show
 ```
 
 ```
@@ -153,8 +153,8 @@ transfer billable 0.00GB
 Actions can be performed on StackScripts.
 
 ```
-$ linode stackscript create --label "StackScript Name" --codefile "/path/myscript.sh" --distribution "Debian 7"
-$ linode stackscript show My-StackScript-Label
+linode stackscript create --label "StackScript Name" --codefile "/path/myscript.sh" --distribution "Debian 7"
+linode stackscript show My-StackScript-Label
 ```
 
 ### JSON output
@@ -162,8 +162,8 @@ $ linode stackscript show My-StackScript-Label
 JSON output is available for actions.
 
 ```
-$ linode list --output json
-$ linode list --json
+linode list --output json
+linode list --json
 ```
 
 ```
