@@ -1,0 +1,431 @@
+#!/usr/bin/env perl
+
+# linode-cli
+# Copyright (C) 2013 Linode, LLC
+
+use 5.010;
+use strict;
+use warnings;
+
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use Linode::CLI;
+use Linode::CLI::Util ':basic';
+my $mode    = 'domain';
+my $cmdargs = Linode::CLI::Util::eat_cmdargs($mode);
+
+my $cli = Linode::CLI->new(
+    api_key       => $cmdargs->{'api-key'},
+    mode          => $mode,
+    opts          => $cmdargs,
+    output_format => $cmdargs->{output},
+    wait          => $cmdargs->{wait},
+);
+
+my $runaction = $cmdargs->{run};
+$cli->$runaction;
+$cli->response;
+
+__END__
+
+=head1 NAME
+
+linode-domain - command-line interface for Linode Domains
+
+=head1 SYNOPSIS
+
+B<linode-domain> [B<--api-key> API key] [B<-a> action] [action-options...] [options...]
+
+B<Actions> available: B<create>, B<update>, B<delete>, B<list>, B<show>, B<record-create>, B<record-update>, B<record-delete>, B<record-list>, B<record-show>.
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-a>, B<--action>
+
+An action to perform on Linode Domains. One of: B<create>, B<update>, B<delete>, B<list>, B<show>, B<record-create>, B<record-update>, B<record-delete>, B<record-list>, B<record-show>.
+
+=item B<--api-key>
+
+API key to use when communicating with the Linode API. The API key can also be set using an environment variable (LINODE_API_KEY). Alternatively, you can specify the API key in a B<.linodecli> file in the working user's home directory, using the format `api-key foobar`.
+
+=item B<-j>, B<--json>:
+
+Optional. JSON output.
+
+=item B<-h>, B<--help>
+
+Brief help message.
+
+=item B<-m>, B<--man>
+
+Full documentation
+
+=back
+
+=head1 ACTIONS
+
+=head2 CREATE
+
+=over 8
+
+Create a Domain.
+
+=over 8
+
+=item B<-l> B<--label>
+
+The Domain (name). The zone's name.
+
+=item B<-t> B<--type>
+
+Either master or slave. Default: master
+
+=item B<-e> B<--email>
+
+SOA email address. Required for master domains.
+
+=item B<-D> B<--description>
+
+Optional. Notes describing details about the Domain.
+
+=item B<-R> B<--refresh>
+
+Optional. Default: 0
+
+=item B<-Y> B<--retry>
+
+Optional. Default: 0
+
+=item B<-E> B<--expire>
+
+Optional. Default: 0
+
+=item B<-T> B<--ttl>
+
+Optional. Default: 0
+
+=item B<-g> B<--group>
+
+Optional. Linode Manager display group to place this Domain under.
+
+=item B<-s> B<--status>
+
+Optional. Statuses are active, edit, or disabled. Default: active
+
+=item B<-m> B<--masterip>
+
+Optional. Accepts multiple entries. When the domain is a slave, this is the zone's master DNS servers list.
+
+=item B<-x> B<--axfrip>
+
+Optional. Accepts multiple entries. IP addresses allowed to AXFR the entire zone.
+
+=back
+
+=back
+
+=head2 UPDATE
+
+=over 8
+
+Update a Domain.
+
+=over 8
+
+=item B<-l> B<--label>
+
+The Domain (name). The zone's name.
+
+=item B<-n> B<--new-label>
+
+Optional.  Renames the Domain.
+
+=item B<-t> B<--type>
+
+Either master or slave. Default: master
+
+=item B<-e> B<--email>
+
+SOA email address. Required for master domains.
+
+=item B<-D> B<--description>
+
+Optional. Notes describing details about the Domain.
+
+=item B<-R> B<--refresh>
+
+Optional. Default: 0
+
+=item B<-Y> B<--retry>
+
+Optional. Default: 0
+
+=item B<-E> B<--expire>
+
+Optional. Default: 0
+
+=item B<-T> B<--ttl>
+
+Optional. Default: 0
+
+=item B<-g> B<--group>
+
+Optional. Linode Manager display group to place this Domain under.
+
+=item B<-s> B<--status>
+
+Optional. Statuses are active, edit, or disabled. Default: active
+
+=item B<-m> B<--masterip>
+
+Optional. Accepts multiple entries. When the domain is a slave, this is the zone's master DNS servers list.
+
+=item B<-x> B<--axfrip>
+
+Optional. Accepts multiple entries. IP addresses allowed to AXFR the entire zone.
+
+=back
+
+=back
+
+=head2 DELETE
+
+=over 8
+
+Update a Domain.
+
+=over 8
+
+=item B<-l> B<--label>
+
+The Domain to delete.
+
+=back
+
+=back
+
+=head2 LIST
+
+=over 8
+
+List information about one or more Domains.
+
+=over 8
+
+=item B<-l> B<--label>
+
+Optional. A specific Domain to list.
+
+=back
+
+=back
+
+=head2 SHOW
+
+=over 8
+
+Display detailed information about one or more Domains.
+
+=over 8
+
+=item B<-l> B<--label>
+
+Required. A specific Domain to list.
+
+=back
+
+=back
+
+=head2 RECORD-CREATE
+
+=over 8
+
+Create a Domain record.
+
+=over 8
+
+=item B<-l> B<--label>
+
+The Domain (name). The zone's name.
+
+=item B<-t> B<--type>
+
+One of: NS, MX, A, AAAA, CAME, TXT, or SRV
+
+=item B<-n> B<--name>
+
+Optional. The hostname or FQDN. When Type=MX the subdomain to delegate to the Target MX server. Default: blank.
+
+=item B<-p> B<--port>
+
+Optional. Default: 80
+
+=item B<-R> B<--target>
+
+Optional. When Type=MX the hostname. When Type=CNAME the target of the alias. When Type=TXT the value of the record. When Type=A or AAAA the token of '[remote_addr]' will be substituted with the IP address of the request.
+
+=item B<-P> B<--priority>
+
+Optional. Priority for MX and SRV records, 0-255 Default: 10
+
+=item B<-W> B<--weight>
+
+Optional. Default: 5
+
+=item B<-L> B<--protocol>
+
+Optional. The protocol to append to an SRV record. Ignored on other record types. Default: blank.
+
+=item B<-T> B<--ttl>
+
+Optional. Default: 0
+
+=back
+
+=back
+
+=head2 RECORD-UPDATE
+
+=over 8
+
+Update a Domain record.
+
+=over 8
+
+=item B<-l> B<--label>
+
+The Domain containing the record to update.
+
+=item B<-t> B<--type>
+
+The type of the record to delete. One of: NS, MX, A, AAAA, CAME, TXT, or SRV
+
+=item B<-m> B<--match>
+
+The match for the record to delete. Match to a name or target.
+
+=item B<-n> B<--name>
+
+Optional. The hostname or FQDN. When Type=MX the subdomain to delegate to the Target MX server. Default: blank.
+
+=item B<-p> B<--port>
+
+Optional. Default: 80
+
+=item B<-R> B<--target>
+
+Optional. When Type=MX the hostname. When Type=CNAME the target of the alias. When Type=TXT the value of the record. When Type=A or AAAA the token of '[remote_addr]' will be substituted with the IP address of the request.
+
+=item B<-P> B<--priority>
+
+Optional. Priority for MX and SRV records, 0-255 Default: 10
+
+=item B<-W> B<--weight>
+
+Optional. Default: 5
+
+=item B<-L> B<--protocol>
+
+Optional. The protocol to append to an SRV record. Ignored on other record types. Default: blank.
+
+=item B<-T> B<--ttl>
+
+Optional. Default: 0
+
+=back
+
+=back
+
+=head2 RECORD-DELETE
+
+=over 8
+
+Delete a Domain record.
+
+=over 8
+
+=item B<-l> B<--label>
+
+The Domain containing the record to delete.
+
+=item B<-t> B<--type>
+
+The type of the record to delete. One of: NS, MX, A, AAAA, CAME, TXT, or SRV
+
+=item B<-m> B<--match>
+
+The match for the record to delete. Match to a name or target.
+
+=back
+
+=back
+
+=head2 RECORD-LIST
+
+=over 8
+
+List Domain Record information for one or more Domains.
+
+=over 8
+
+=item B<-l> B<--label>
+
+Optional. A specific Domain to list.
+
+=item B<-t> B<--type>
+
+Optional. Allows domain record filtering by type. One of: NS, MX, A, AAAA, CAME, TXT, or SRV
+
+=back
+
+=back
+
+=head2 RECORD-SHOW
+
+=over 8
+
+Display detailed Domain Record information for one or more Domains.
+
+=over 8
+
+=item B<-l> B<--label>
+
+Required. A specific Domain to show.
+
+=item B<-t> B<--type>
+
+Optional. Allows domain record filtering by type. One of: NS, MX, A, AAAA, CAME, TXT, or SRV
+
+=back
+
+=back
+
+=head1 COPYRIGHT/LICENSE
+
+Copyright 2013 Linode, LLC.  Linode CLI is made available under the terms
+of the Perl Artistic License, or GPLv2 at the recipients discretion.
+
+=head2 Perl Artistic License
+
+Read it at L<http://dev.perl.org/licenses/artistic.html>.
+
+=head2 GNU General Public License (GPL) Version 2
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see http://www.gnu.org/licenses/
+
+See the full license at L<http://www.gnu.org/licenses/>.
+
+=cut

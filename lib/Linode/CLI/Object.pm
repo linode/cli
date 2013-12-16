@@ -33,7 +33,7 @@ sub new_from_list {
     : push @$object_list, $args{object_list};
 
     for my $object_item (@$object_list) {
-        my $object_label = $object_item->{label} || $object_item->{abbr};
+        my $object_label = $object_item->{label} || $object_item->{abbr} || $object_item->{domain};
         $self->{object}->{$object_label} = $object_item if ($object_label);
     }
 

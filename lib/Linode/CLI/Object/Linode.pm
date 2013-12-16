@@ -72,23 +72,22 @@ sub list {
         if ( $output_format eq 'human' ) {
             push @$out_arrayref, $group if $group;
             push @$out_arrayref, (
-                ( ' ' x 4 ) . '+ ' . ( '-' x 32 ) . ' + ' . ( '-' x 8 ) . ' + ' .
+                '+ ' . ( '-' x 32 ) . ' + ' . ( '-' x 8 ) . ' + ' .
                 ( '-' x 12 ) . ' + ' . ( '-' x 8 ) . ' + ' . ( '-' x 10 ) . ' + ' .
-                ( '-' x 10 ) . ' + ');
+                ( '-' x 10 ) . ' +');
             push @$out_arrayref, sprintf(
-                ( ' ' x 4 ) . "| %-32s | %-8s | %-12s | %-8s | %-10s | %-10s |",
+                "| %-32s | %-8s | %-12s | %-8s | %-10s | %-10s |",
                 'label', 'id', 'status', 'backups', 'disk', 'ram' );
             push @$out_arrayref, (
-                ( ' ' x 4 ) . '| ' . ( '-' x 32 ) . ' + ' . ( '-' x 8 ) . ' + ' .
+                '| ' . ( '-' x 32 ) . ' + ' . ( '-' x 8 ) . ' + ' .
                 ( '-' x 12 ) . ' + ' . ( '-' x 8 ) . ' + ' . ( '-' x 10 ) . ' + ' .
-                ( '-' x 10 ) . ' | ');
+                ( '-' x 10 ) . ' |');
         }
 
         for my $object ( keys %{ $grouped_objects->{$group} } ) {
             if ( $output_format eq 'human' ) {
                 push @$out_arrayref, sprintf(
-                    ( ' ' x 4 )
-                    . "| %-32s | %-8s | %-12s | %-8s | %-10s | %-10s |",
+                    "| %-32s | %-8s | %-12s | %-8s | %-10s | %-10s |",
                     $grouped_objects->{$group}{$object}{label},
                     $grouped_objects->{$group}{$object}{linodeid},
                     $humanstatus{ $grouped_objects->{$group}{$object}{status} },
@@ -127,7 +126,7 @@ sub list {
         }
 
 
-        push @$out_arrayref, ( ( ' ' x 4 ) . '+ ' . ( '-' x 32 ) . ' + ' .
+        push @$out_arrayref, ( '+ ' . ( '-' x 32 ) . ' + ' .
             ( '-' x 8 ) . ' + ' . ( '-' x 12 ) . ' + ' . ( '-' x 8 ) . ' + ' .
             ( '-' x 10 ) . ' + ' . ( '-' x 10 ) . " +\n" ) if ($output_format eq 'human');
     }
@@ -154,14 +153,26 @@ sub list {
 }
 
 sub show {
-    my ( $self, $label ) = @_;
-    $label ||= 0;
-
+    my ( $self, %args ) = @_;
     my $return = '';
+
+    my $show_fields = {
+        linodeid       => 'id',
+        status         => 'status',
+        datacenterid   => 'location',
+        backupsenabled => 'backups',
+        totalhd        => 'disk',
+        totalram       => 'ram',
+    };
+
     for my $object_label ( keys %{ $self->{object} } ) {
-        next if ( $label && $object_label ne $label );
+
+        $return .= sprintf( "\n%8s %-32s",
+            'label',
+            $self->{object}->{$object_label}->{label} );
+
         for my $key ( keys %{ $self->{object}->{$object_label} } ) {
-            next unless ( my @found = grep { $_ eq $key } %{ $self->{_output_fields} } );
+            next unless ( my @found = grep { $_ eq $key } %{ $show_fields } );
             if ( $key eq 'totalhd' || $key eq 'totalram' ) {
                 $return .= sprintf(
                     "\n%8s %-32s",
@@ -191,7 +202,6 @@ sub show {
                     $self->{object}->{$object_label}->{$key} );
             }
         }
-
         $return .= "\n";
     }
 

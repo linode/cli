@@ -8,6 +8,7 @@ use Linode::CLI::Object;
 use Linode::CLI::Object::Linode;
 use Linode::CLI::Object::Account;
 use Linode::CLI::Object::Stackscript;
+use Linode::CLI::Object::Domain;
 use Linode::CLI::Util (qw(:basic :config :json));
 use Try::Tiny;
 use WebService::Linode;
@@ -138,6 +139,11 @@ sub resize {
 sub list {
     my $self = shift;
 
+    my $sub = 'list';
+    if ($self->{mode} eq 'domain' && $self->{_opts}->{action} eq 'record-list') {
+        $sub  = 'recordlist';
+    }
+
     my $list_result = try {
         if ( $self->{output_format} eq 'json' ) {
             my $result = "Linode::CLI::Object::$correct_case{$self->{mode}}"
@@ -147,7 +153,8 @@ sub list {
                         $self->{mode}, $self->{_distilled_options}{label}
                     ),
                     action => $self->{_opts}->{action},
-                )->list( output_format => $self->{output_format}, );
+                )->$sub( output_format => $self->{output_format},
+                         options => $self->{_distilled_options});
             my %combined = (%$result, %{$self->{_result}});
             %{$self->{_result}} = %combined;
         }
@@ -159,7 +166,8 @@ sub list {
                         $self->{mode}, $self->{_distilled_options}{label}
                     ),
                     action => $self->{_opts}->{action},
-                )->list( output_format => $self->{output_format}, );
+                )->$sub( output_format => $self->{output_format},
+                         options => $self->{_distilled_options});
         }
     };
 
@@ -173,6 +181,13 @@ sub list {
 sub show {
     my $self = shift;
 
+    my $subhum  = 'show';
+    my $subjson = 'list';
+    if ($self->{mode} eq 'domain' && $self->{_opts}->{action} eq 'record-show') {
+        $subhum  = 'recordshow';
+        $subjson = 'recordlist';
+    }
+
     # Eventually, 'show' will have more comprehensive JSON output than 'list'
     if ( $self->{output_format} eq 'json' ) {
         my $result = "Linode::CLI::Object::$correct_case{$self->{mode}}"
@@ -182,7 +197,8 @@ sub show {
                     $self->{mode}, $self->{_distilled_options}{label}
                 ),
                 action => $self->{_opts}->{action},
-            )->list( output_format => $self->{output_format}, );
+            )->$subjson( output_format => $self->{output_format},
+                     options => $self->{_distilled_options});
         my %combined = (%$result, %{$self->{_result}});
         %{$self->{_result}} = %combined;
     }
@@ -194,7 +210,7 @@ sub show {
                     $self->{mode}, $self->{_distilled_options}{label}
                 ),
                 action => $self->{_opts}->{action},
-            )->show;
+            )->$subhum( options => $self->{_distilled_options} );
     }
 }
 
@@ -220,6 +236,30 @@ sub delete {
         message => "Problem while trying to run '$self->{mode} delete'",
         result  => $self->{_result},
     ) unless $delete_result;
+}
+
+sub domainrecord {
+    my $self = shift;
+
+    my $sub = 'recordcreate';
+    if ($self->{mode} eq 'domain' && $self->{_opts}->{action} eq 'record-update') {
+        $sub  = 'recordupdate';
+    } elsif ($self->{mode} eq 'domain' && $self->{_opts}->{action} eq 'record-delete') {
+        $sub  = 'recorddelete';
+    }
+
+    my $result = "Linode::CLI::Object::$correct_case{$self->{mode}}"->$sub(
+        api_obj    => $self->{_api_obj},
+        options    => $self->{_distilled_options},
+        # single domain object
+        domain_obj => @{ $self->_get_object_list(
+            $self->{mode}, $self->{_distilled_options}{label}
+        ) }[0],
+        format     => $self->{output_format},
+        wait       => $self->{wait},
+    );
+    my %combined = (%$result, %{$self->{_result}});
+    %{$self->{_result}} = %combined;
 }
 
 sub configure {
@@ -340,12 +380,21 @@ sub _get_object_list {
     # These are objects that have labels and should be filtered based on the
     # label(s) passed in. Other objects (account) are returned blindly, or need
     # special treatment.
-    my @should_filter = ('linode', 'stackscript');
+    my @should_filter = ('linode', 'stackscript', 'domain');
 
     if (my @found = grep { $_ eq $mode } @should_filter) {
-        my $objects =
-              ($mode eq 'stackscript') ? $api->stackscript_list()
-            : $api->linode_list();
+        my $objects = [];
+        my $objectunique = '';
+        if ( $mode eq 'stackscript' ) {
+            $objects = $api->stackscript_list();
+            $objectunique = 'label';
+        } elsif ( $mode eq 'domain' ) {
+            $objects = $api->domain_list();
+            $objectunique = 'domain';
+        } else {
+            $objects = $api->linode_list();
+            $objectunique = 'label';
+        }
 
         return $objects if ( !$labels );
 
@@ -353,7 +402,7 @@ sub _get_object_list {
         my %targets = map { $_ => 1 } @$labels;
 
         for my $object (@$objects) {
-            my $object_label = $object->{label};
+            my $object_label = $object->{ $objectunique };
             if ( exists( $targets{$object_label} ) ) {
                 push @$filtered, $object;
                 delete $targets{$object_label};

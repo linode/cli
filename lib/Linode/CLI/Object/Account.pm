@@ -29,7 +29,7 @@ sub new_from_list {
     $account_info->{label} = 'info';
     my $field_list = [qw(
         active_since transfer_pool transfer_used transfer_billable
-        manaaged balance
+        managed balance billing_method
     )];
 
     my $output_fields = {
@@ -39,6 +39,7 @@ sub new_from_list {
         transfer_billable => 'transfer billable',
         managed           => 'managed',
         balance           => 'balance',
+        billing_method    => 'billing method',
     };
 
     return $class->SUPER::new_from_list(
@@ -74,22 +75,25 @@ sub show {
     delete $self->{object}{info}{label};
 
     my $return;
+
     for my $key ( keys %{ $self->{object}{info} } ) {
-        if ( $self->{_output_fields}{$key} =~ m/^transfer/ ) {
-            $return .= sprintf( "%18s %-32s\n",
-                $self->{_output_fields}{$key},
-                human_displaymemory( $self->{object}{info}{$key} * 1024 ) );
-        }
-        elsif ( $self->{_output_fields}{$key} eq 'balance' ) {
-            $return .= sprintf(
-                "%18s \$ %-32.2f\n",
-                $self->{_output_fields}{$key},
-                $self->{object}{info}{$key} );
-        }
-        else {
-            $return .= sprintf( "%18s %-32s\n",
-                $self->{_output_fields}{$key},
-                $self->{object}{info}{$key} );
+        if ( exists $self->{_output_fields}{$key} ) {
+            if ( $self->{_output_fields}{$key} =~ m/^transfer/ ) {
+                $return .= sprintf( "%18s %-32s\n",
+                    $self->{_output_fields}{$key},
+                    human_displaymemory( $self->{object}{info}{$key} * 1024 ) );
+            }
+            elsif ( $self->{_output_fields}{$key} eq 'balance' ) {
+                $return .= sprintf(
+                    "%18s \$ %-32.2f\n",
+                    $self->{_output_fields}{$key},
+                    $self->{object}{info}{$key} );
+            }
+            else {
+                $return .= sprintf( "%18s %-32s\n",
+                    $self->{_output_fields}{$key},
+                    $self->{object}{info}{$key} );
+            }
         }
     }
 

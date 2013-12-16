@@ -93,7 +93,7 @@ our %paramsdef = (
                 'new-label' => 'new-label|n=s'
             },
             'run'      => 'update',
-            'seeknext' => 'new-label'
+            'seeknext' => [ 'new-label' ],
         },
         'resize' => {
             'options' => {
@@ -101,7 +101,7 @@ our %paramsdef = (
                 'plan'  => 'plan|p=s'
             },
             'format' => { 'plan' => 'format_squish' },
-            'seeknext'  => 'plan',
+            'seeknext'  => [ 'plan' ],
             'warmcache' => [ 'plan' ],
         },
         'group' => {
@@ -155,6 +155,107 @@ our %paramsdef = (
             'run'     => 'show',
         },
     },
+    'domain' => {
+        'create'  => {
+            'options' => {
+                'label'        => 'label|domain|l=s',
+                'type'         => 'type|t:s',
+                'email'        => 'email|soa|e:s',
+                'description'  => 'description|D:s',
+                'refresh'      => 'refresh|R:s',
+                'retry'        => 'retry|Y:s',
+                'expire'       => 'expire|E:s',
+                'ttl'          => 'ttl|T:s',
+                'group'        => 'group|g:s',
+                'status'       => 'status|s:s',
+                'masterip'     => 'masterip|m:s@',
+                'axfrip'       => 'axfrip|x:s@',
+            },
+            'seeknext' => [ 'email', 'masterip' ],
+         },
+        'update' => {
+            'options' => {
+                'label'        => 'label|domain|l=s@',
+                'new-label'    => 'new-label|n:s',
+                'type'         => 'type|t:s',
+                'email'        => 'email|soa|e:s',
+                'description'  => 'description|D:s',
+                'refresh'      => 'refresh|R:s',
+                'retry'        => 'retry|Y:s',
+                'expire'       => 'expire|E:s',
+                'ttl'          => 'ttl|T:s',
+                'group'        => 'group|g:s',
+                'status'       => 'status|s:s',
+                'masterip'     => 'masterip|m:s@',
+                'axfrip'       => 'axfrip|x:s@',
+            },
+         },
+        'delete' => { 'options' => { 'label' => 'label|domain|l=s@' }, },
+        'list'   => {
+            'options' => {
+                'label'     => 'label|domain|l:s@',
+            },
+        },
+        'show'   => {
+            'options' => {
+                'label'     => 'label|domain|l=s@',
+            },
+        },
+        'record-create'  => {
+            'options' => {
+                'label'        => 'label|domain|l=s',
+                'type'         => 'type|t=s',
+                'name'         => 'name|n:s',
+                'target'       => 'target|R:s',
+                'priority'     => 'priority|P:s',
+                'weight'       => 'weight|W:s',
+                'port'         => 'port|p:s',
+                'protocol'     => 'protocol|L:s',
+                'ttl'          => 'ttl|T:s',
+            },
+            'run'      => 'domainrecord',
+            'seeknext' => [ 'type', 'name', 'target' ],
+         },
+        'record-update'  => {
+            'options' => {
+                'label'        => 'label|domain|l=s',
+                'type'         => 'type|t=s',
+                'match'        => 'match|m=s',
+                'name'         => 'name|n:s',
+                'target'       => 'target|R:s',
+                'priority'     => 'priority|P:s',
+                'weight'       => 'weight|W:s',
+                'port'         => 'port|p:s',
+                'protocol'     => 'protocol|L:s',
+                'ttl'          => 'ttl|T:s',
+            },
+            'run'      => 'domainrecord',
+            'seeknext' => [ 'type', 'match' ],
+         },
+        'record-delete' => {
+            'options' => {
+                'label' => 'label|domain|l=s',
+                'type'  => 'type|t=s',
+                'match' => 'match|m=s',
+            },
+            'run'      => 'domainrecord',
+            'seeknext' => [ 'type', 'match' ],
+        },
+        'record-list'   => {
+            'options' => {
+                'label'     => 'label|domain|l=s@',
+                'type'      => 'type|t:s',
+            },
+            'run' => 'list',
+        },
+        'record-show'   => {
+            'options' => {
+                'label'     => 'label|domain|l=s@',
+                'type'      => 'type|t:s',
+            },
+            'run' => 'show',
+        },
+    },
 );
 
 # parses command line arguments, verifies action is valid and enforces required parameters
@@ -180,25 +281,28 @@ sub eat_cmdargs {
     }
 
     if ( !exists $cmdargs->{action} && defined( $ARGV[0] ) ) {
-
         # no action parsed, try using $ARGV
         $cmdargs->{action} = lc( $ARGV[0] );
         my ( $i, $parsing ) = ( 1, 1 );
         while ($parsing) {
             if ( defined( $ARGV[$i] ) && $ARGV[$i] !~ m/^\-/ ) {
-                if ( $i == 2 && exists $paramsdef{$mode}{ $cmdargs->{action} }{'seeknext'} ) {
-                    # some shortcuts have specific second parameters following the label
-                    $cmdargs->{ $paramsdef{$mode}{ $cmdargs->{action} }{'seeknext'} } = $ARGV[$i];
-                    $parsing = 0;
+                if ( $i >= 2 && exists $paramsdef{$mode}{ $cmdargs->{action} }{'seeknext'} ) {
+                    # some shortcuts have specific parameters following the label
+                    if ( (scalar(@{ $paramsdef{$mode}{ $cmdargs->{action} }{'seeknext'} }) + 1) >= $i) {
+                        $cmdargs->{ $paramsdef{$mode}{ $cmdargs->{action} }{'seeknext'}[$i-2] } = $ARGV[$i];
+                    } else {
+                        $parsing = 0;
+                    }
                 } else {
                     push( @{ $cmdargs->{label} }, $ARGV[$i] ); # assume this is the label
-                    $i++;
                 }
+                $i++;
             }
             else {
                 $parsing = 0;
             }
         }
+        $cmdargs = check_parse($mode, $cmdargs);
     }
 
     # action validation
@@ -294,6 +398,36 @@ sub eat_cmdargs {
         }
     }
 
+    return $cmdargs;
+}
+
+# handles special case argument entry cleanup
+sub check_parse {
+    my ( $mode, $cmdargs ) = @_;
+
+    if ( exists $cmdargs->{action} ) {
+        # domain - create
+        if ( $mode eq 'domain' && $cmdargs->{action} eq 'create' ) {
+            if (exists $cmdargs->{email} && $cmdargs->{email} eq 'slave' ) {
+                $cmdargs->{type} = 'slave';
+                delete $cmdargs->{email};
+            }
+        }
+        # domain - record-list / record-show
+        if ( $mode eq 'domain' && ( $cmdargs->{action} eq 'record-list' || $cmdargs->{action} eq 'record-show' ) ) {
+            # check if the caboose is really a type filter
+            if ( exists $cmdargs->{label} ) {
+                my $size = scalar( @{ $cmdargs->{label} } );
+                my @validtypes = ('ns', 'mx', 'a', 'aaaa', 'cname', 'txt', 'srv');
+                if (my @found = grep { $_ eq lc( @{ $cmdargs->{label} }[$size - 1] ) } @validtypes) {
+                    $cmdargs->{type} = lc( pop( @{ $cmdargs->{label} } ) );
+                    if ( $size == 1 ) {
+                        delete $cmdargs->{label};
+                    }
+                }
+            }
+        }
+    }
     return $cmdargs;
 }
 

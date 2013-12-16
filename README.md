@@ -155,6 +155,63 @@ Actions can be performed on StackScripts.
 ```
 linode stackscript create --label "StackScript Name" --codefile "/path/myscript.sh" --distribution "Debian 7"
 linode stackscript show My-StackScript-Label
+linode stackscript source mystackscript > myscript.sh
+```
+
+
+### Working with Domains
+
+Create a master domain (requires an SOA email address).
+
+```
+linode domain create example.com admin@example.com
+```
+
+Create a slave domain (requires a master DNS server ip).
+
+```
+linode domain create example.com slave X.X.X.X
+```
+
+Displaying domains.
+
+```
+linode domain list
+linode domain show example.com
+```
+
+Updating a domain.
+
+```
+linode domain update example.com --group main
+```
+
+Creating a domain records.
+
+```
+linode domain record-create example.com A www2 X.X.X.X
+linode domain record-create example.com MX subdomain mail.example.com
+```
+
+Updating a domain record.
+
+```
+linode domain record-update example.com MX mail.example.com --priority 20
+```
+
+Removing a domain record.
+
+```
+linode domain record-delete example.com A www2
+```
+
+Displaying domain records.
+
+```
+linode domain record-list example.com
+linode domain record-list example.com MX
+linode domain record-show example.com
+linode domain record-show example.com example.com MX
 ```
 
 ### JSON output
@@ -334,4 +391,156 @@ Display detailed information about one or more StackScripts.
 Display the source code for a StackScript.
 
 **-l**, **--label**: Required. A specific StackScript to show.
+
+### Domain Actions
+
+#### Create
+
+Create a Domain.
+
+**-l**, **--label**: The Domain (name). The zone's name.
+
+**-t**, **--type**: Either master or slave. Default: master
+
+**-e**, **--email**: SOA email address. Required for master domains.
+
+**-D**, **--description**: Optional. Notes describing details about the Domain.
+
+**-R**, **--refresh**: Optional. Default: 0
+
+**-Y**, **--retry**: Optional. Default: 0
+
+**-E**, **--expire**: Optional. Default: 0
+
+**-T**, **--ttl**: Optional. Default: 0
+
+**-g**, **--group**: Optional. Linode Manager display group to place this Domain under.
+
+**-s**, **--status**: Optional. Statuses are active, edit, or disabled. Default: active
+
+**-m**, **--masterip**: Optional. Accepts multiple entries. When the domain is a slave, this is the zone's master DNS servers list.
+
+**-x**, **--axfrip**: Optional. Accepts multiple entries. IP addresses allowed to AXFR the entire zone.
+
+#### Update
+
+Update a Domain.
+
+**-l**, **--label**: The Domain (name) to update.
+
+**-n**, **--new-label**: Optional.  Renames the Domain.
+
+**-t**, **--type**: Optional. Either master or slave. Default: master
+
+**-e**, **--email**: Optional. SOA email address. Required for master domains.
+
+**-D**, **--description**: Optional. Notes describing details about the Domain.
+
+**-R**, **--refresh**: Optional. Default: 0
+
+**-Y**, **--retry**: Optional. Default: 0
+
+**-E**, **--expire**: Optional. Default: 0
+
+**-T**, **--ttl**: Optional. Default: 0
+
+**-g**, **--group**: Optional. Linode Manager display group to place this Domain under.
+
+**-s**, **--status**: Optional. Statuses are active, edit, or disabled. Default: active
+
+**-m**, **--masterip**: Optional. Accepts multiple entries. When the domain is a slave, this is the zone's master DNS servers list.
+
+**-x**, **--axfrip**: Optional. Accepts multiple entries. IP addresses allowed to AXFR the entire zone.
+
+#### Delete
+
+Delete a Domain.
+
+**-l**, **--label**: The Domain to delete.
+
+#### List
+
+List information about one or more Domains.
+
+**-l**, **--label**: Optional. A specific Domain to list.
+
+#### Show
+
+Display detailed information about one or more Domains.
+
+**-l**, **--label**: Required. A specific Domain to show.
+
+
+#### Domain Record Create (record-create)
+
+Create a Domain record.
+
+**-l**, **--label**: The Domain (name). The zone's name.
+
+**-t**, **--type**: Required. One of: NS, MX, A, AAAA, CAME, TXT, or SRV
+
+**-n**, **--name**: Optional. The hostname or FQDN. When Type=MX the subdomain to delegate to the Target MX server. Default: blank.
+
+**-p**, **--port**: Optional. Default: 80
+
+**-R**, **--target**: Optional. When Type=MX the hostname. When Type=CNAME the target of the alias. When Type=TXT the value of the record. When Type=A or AAAA the token of '[remote_addr]' will be substituted with the IP address of the request.
+
+**-P**, **--priority**: Optional. Priority for MX and SRV records, 0-255 Default: 10
+
+**-W**, **--weight**: Optional. Default: 5
+
+**-L**, **--protocol**: Optional. The protocol to append to an SRV record. Ignored on other record types. Default: blank.
+
+**-T**, **--ttl**: Optional. Default: 0
+
+#### Domain Record Update (record-update)
+
+Update a Domain record.
+
+**-l**, **--label**: The Domain containing the record to update.
+
+**-t**, **--type**: Required. The type of the record to delete. One of: NS, MX, A, AAAA, CAME, TXT, or SRV
+
+**-m**, **--match**: Required. The match for the record to delete. Match to a name or target.
+
+**-n**, **--name**: Optional. The hostname or FQDN. When Type=MX the subdomain to delegate to the Target MX server. Default: blank.
+
+**-p**, **--port**: Optional. Default: 80
+
+**-R**, **--target**: Optional. When Type=MX the hostname. When Type=CNAME the target of the alias. When Type=TXT the value of the record. When Type=A or AAAA the token of '[remote_addr]' will be substituted with the IP address of the request.
+
+**-P**, **--priority**: Optional. Priority for MX and SRV records, 0-255 Default: 10
+
+**-W**, **--weight**: Optional. Default: 5
+
+**-L**, **--protocol**: Optional. The protocol to append to an SRV record. Ignored on other record types. Default: blank.
+
+**-T**, **--ttl**: Optional. Default: 0
+
+#### Domain Record Delete (record-delete)
+
+Delete a Domain record.
+
+**-l**, **--label**: The Domain containing the record to delete.
+
+**-t**, **--type**: Required. The type of the record to delete. One of: NS, MX, A, AAAA, CAME, TXT, or SRV
+
+**-m**, **--match**: Required. The match for the record to delete. Match to a name or target.
+
+#### Domain Record List (record-list)
+
+List Domain Record information for one or more Domains.
+
+**-l**, **--label**: Optional. A specific Domain to list.
+
+**-t**, **--type**: Optional. Allows domain record filtering by type. One of: NS, MX, A, AAAA, CAME, TXT, or SRV
+
+
+#### Domain Record Show (record-show)
+
+Display detailed Domain Record information for one or more Domains.
+
+**-l**, **--label**: Required. A specific Domain to show.
+
+**-t**, **--type**: Optional. Allows domain record filtering by type. One of: NS, MX, A, AAAA, CAME, TXT, or SRV
 

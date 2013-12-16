@@ -58,22 +58,21 @@ sub list {
 
     if ( $output_format eq 'human' ) {
         push @$out_arrayref, (
-            ( ' ' x 4 ) . '+ ' . ( '-' x 32 ) . ' + ' . ( '-' x 10 ) . ' + ' .
-            ( '-' x 10 ) . ' + ');
+            '+ ' . ( '-' x 32 ) . ' + ' . ( '-' x 10 ) . ' + ' .
+            ( '-' x 10 ) . ' +');
         push @$out_arrayref, sprintf(
-            ( ' ' x 4 ) . "| %-32s | %-10s | %-10s |",
+            "| %-32s | %-10s | %-10s |",
             'label', 'id', 'revision' );
 
         push @$out_arrayref, (
-            ( ' ' x 4 ) . '| ' . ( '-' x 32 ) . ' + ' . ( '-' x 10 ) . ' + ' .
-            ( '-' x 10 ) . ' | ');
+            '| ' . ( '-' x 32 ) . ' + ' . ( '-' x 10 ) . ' + ' .
+            ( '-' x 10 ) . ' |');
     }
 
     for my $object ( keys %{ $self->{object}} ) {
         if ( $output_format eq 'human' ) {
             push @$out_arrayref, sprintf(
-                ( ' ' x 4 )
-                . "| %-32s | %-10s | %-10s |",
+                "| %-32s | %-10s | %-10s |",
                 $self->{object}{$object}{label},
                 $self->{object}{$object}{stackscriptid},
                 $self->{object}{$object}{rev_note},
@@ -91,7 +90,7 @@ sub list {
         }
     }
 
-    push @$out_arrayref, ( ( ' ' x 4 ) . '+ ' . ( '-' x 32 ) . ' + ' .
+    push @$out_arrayref, ( '+ ' . ( '-' x 32 ) . ' + ' .
         ( '-' x 10 ) . ' + ' . ( '-' x 10 ) . " +\n" ) if ($output_format eq 'human');
 
     if ( $output_format eq 'raw' ) {
@@ -116,13 +115,10 @@ sub list {
 }
 
 sub show {
-    my ( $self, $label ) = @_;
-    $label ||= 0;
-
+    my ( $self, %args ) = @_;
     my $return = '';
 
     for my $object_label ( keys %{ $self->{object} } ) {
-        next if ( $label && $object_label ne $label );
 
         if ( $self->{_action} eq 'source' ) {
             # source only lists the scripts source code
