@@ -25,7 +25,7 @@ use JSON;
 use Pod::Usage;
 use Getopt::Long (qw(:config no_ignore_case bundling pass_through));
 
-my $VERSION = '0.2.0';
+my $VERSION = '0.2.1';
 
 our @MODES = (qw(
     linode stackscript domain nodebalancer longview account user
