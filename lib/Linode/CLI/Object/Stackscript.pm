@@ -28,23 +28,13 @@ sub new_from_list {
     my $action = $args{action} || '';
 
     my $stackscript_list = $args{object_list};
-    my $field_list = [qw(label description created ispublic revision stackscriptid)];
-
-    my $output_fields = {
-        label         => 'label',
-        description   => 'description',
-        create_dt     => 'created',
-        ispublic      => 'ispublic',
-        rev_note      => 'revision',
-        stackscriptid => 'id',
-    };
 
     return $class->SUPER::new_from_list(
         api_obj       => $api_obj,
         action        => $action,
         object_list   => $stackscript_list,
-        field_list    => $field_list,
-        output_fields => $output_fields,
+        field_list    => [],
+        output_fields => {},
     );
 }
 
@@ -55,26 +45,26 @@ sub list {
     my $output_format = $args{output_format} || 'human';
     my $out_arrayref = [];
     my $out_hashref = {};
+    my @colw = ( 32, 8, 14 );
 
     if ( $output_format eq 'human' ) {
         push @$out_arrayref, (
-            '+ ' . ( '-' x 32 ) . ' + ' . ( '-' x 10 ) . ' + ' .
-            ( '-' x 10 ) . ' +');
+            '+ ' . ( '-' x $colw[0] ) . ' + ' . ( '-' x $colw[1] ) . ' + ' .
+            ( '-' x $colw[2] ) . ' +');
         push @$out_arrayref, sprintf(
-            "| %-32s | %-10s | %-10s |",
-            'label', 'id', 'revision' );
-
+            "| %-${colw[0]}s | %-${colw[1]}s | %-${colw[2]}s |",
+            'label', 'public', 'revision note' );
         push @$out_arrayref, (
-            '| ' . ( '-' x 32 ) . ' + ' . ( '-' x 10 ) . ' + ' .
-            ( '-' x 10 ) . ' |');
+            '| ' . ( '-' x $colw[0] ) . ' + ' . ( '-' x $colw[1] ) . ' + ' .
+            ( '-' x $colw[2] ) . ' |');
     }
 
     for my $object ( keys %{ $self->{object}} ) {
         if ( $output_format eq 'human' ) {
             push @$out_arrayref, sprintf(
-                "| %-32s | %-10s | %-10s |",
-                $self->{object}{$object}{label},
-                $self->{object}{$object}{stackscriptid},
+                "| %-${colw[0]}s | %-${colw[1]}s | %-${colw[2]}s |",
+                format_len( $self->{object}{$object}{label}, $colw[0] ),
+                $humanyn{ $self->{object}{$object}{ispublic} },
                 $self->{object}{$object}{rev_note},
             );
         }
@@ -83,30 +73,46 @@ sub list {
                 # source only lists the scripts source code
                 $out_hashref->{$object}{source}  = $self->{object}{$object}{script};
             } else {
-                $out_hashref->{$object}{label}   = $self->{object}{$object}{label};
-                $out_hashref->{$object}{id}      = $self->{object}{$object}{stackscriptid};
-                $out_hashref->{$object}{revnote} = $self->{object}{$object}{rev_note};
+                $out_hashref->{$object}{label}             = $self->{object}{$object}{label};
+                $out_hashref->{$object}{deploymentstotal}  = $self->{object}{$object}{deploymentstotal};
+                $out_hashref->{$object}{latestrev}         = $self->{object}{$object}{latestrev};
+                $out_hashref->{$object}{deploymentsactive} = $self->{object}{$object}{deploymentsactive};
+                $out_hashref->{$object}{revnote}           = $self->{object}{$object}{rev_note};
+                $out_hashref->{$object}{revdt}             = $self->{object}{$object}{rev_dt};
+                $out_hashref->{$object}{ispublic}          = $self->{object}{$object}{ispublic};
             }
         }
     }
 
-    push @$out_arrayref, ( '+ ' . ( '-' x 32 ) . ' + ' .
-        ( '-' x 10 ) . ' + ' . ( '-' x 10 ) . " +\n" ) if ($output_format eq 'human');
+    push @$out_arrayref, ( '+ ' . ( '-' x $colw[0] ) . ' + ' .
+        ( '-' x $colw[1] ) . ' + ' . ( '-' x $colw[2] ) . " +\n" ) if ($output_format eq 'human');
 
     if ( $output_format eq 'raw' ) {
         return $out_hashref;
     }
     elsif ( $output_format eq 'json' ) {
-        for my $object ( keys %$out_hashref ) {
-            $self->{_result} = $self->succeed(
+        if (scalar( keys %{ $out_hashref }) > 0) {
+            for my $object ( keys %$out_hashref ) {
+                $self->{_result} = $self->succeed(
+                    action  => $self->{_action},
+                    label   => $object,
+                    payload => $out_hashref->{$object},
+                    result  => $self->{_result},
+                    format  => $self->{output_format},
+                );
+            }
+            return $self->{_result};
+        } else {
+            # empty
+            return $self->succeed(
                 action  => $self->{_action},
-                label   => $object,
-                payload => $out_hashref->{$object},
-                result  => $self->{_result},
+                label   => '',
+                payload => {},
+                result  => {},
+                message => "No StackScripts to list.",
                 format  => $self->{output_format},
             );
         }
-        return $self->{_result};
     }
     else {
         return join( "\n", @$out_arrayref );
@@ -118,30 +124,25 @@ sub show {
     my ( $self, %args ) = @_;
     my $return = '';
 
-    for my $object_label ( keys %{ $self->{object} } ) {
-
-        if ( $self->{_action} eq 'source' ) {
-            # source only lists the scripts source code
-            $return .= $self->{object}->{$object_label}->{script};
-        } else {
-            for my $key ( keys %{ $self->{object}->{$object_label} } ) {
-                next unless ( my @found = grep { $_ eq $key } %{ $self->{_output_fields} } );
-                if ( $key eq 'ispublic' ) {
-                    $return .= sprintf( "\n%12s %-32s",
-                        $self->{_output_fields}->{$key},
-                        $humanyn{ $self->{object}->{$object_label}->{$key} }
+    if ( scalar( keys %{ $self->{object} } ) > 0 ) {
+        for my $object_label ( keys %{ $self->{object} } ) {
+            if ( $self->{_action} eq 'source' ) {
+                # source only lists the scripts source code
+                $return .= $self->{object}->{$object_label}->{script};
+            } else {
+                $return .= sprintf( "%19s %-45s\n%19s %-45s\n%19s %-45s\n%19s %-45s\n%19s %-45s\n%19s %-45s\n",
+                        'label:', $self->{object}->{$object_label}->{label},
+                        'public:', $humanyn{ $self->{object}->{$object_label}->{ispublic} },
+                        'latest revision:', $self->{object}->{$object_label}->{latestrev},
+                        'revision note:', $self->{object}->{$object_label}->{rev_note},
+                        'total deployments:', $self->{object}->{$object_label}->{deploymentstotal},
+                        'active deployments:', $self->{object}->{$object_label}->{deploymentsactive}
                     );
-                }
-                else {
-                    if ( $self->{object}->{$object_label}->{$key} ne '' ) {
-                        $return .= sprintf( "\n%12s %-32s",
-                            $self->{_output_fields}->{$key},
-                            $self->{object}->{$object_label}->{$key} );
-                    }
-                }
             }
+            $return .= "\n";
         }
-        $return .= "\n";
+    } else {
+        $return = "No StackScripts to show.";
     }
 
     return $return . "\n";

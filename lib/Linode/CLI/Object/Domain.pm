@@ -28,9 +28,8 @@ sub new_from_list {
     my $action = $args{action} || '';
 
     my $domain_list = $args{object_list};
-    my $field_list = [qw(domain type soa status masterips axfrips)];
 
-    my $output_fields = {
+    my $output_fields = { # for json list
         domain        => 'domain',
         type          => 'type',
         soa_email     => 'soa',
@@ -43,7 +42,7 @@ sub new_from_list {
         api_obj       => $api_obj,
         action        => $action,
         object_list   => $domain_list,
-        field_list    => $field_list,
+        field_list    => [],
         output_fields => $output_fields,
     );
 }
@@ -53,10 +52,10 @@ sub list {
     my $label         = $args{label};
     my $output_format = $args{output_format} || 'human';
     my $out_arrayref = [];
-    my $out_recordsarrayref = [];
     my $out_hashref = {};
     my $api_obj = $self->{_api_obj};
     my $options = $args{options};
+    my @colw = ( 40, 8, 32 );
 
     my $grouped_objects = {};
 
@@ -73,50 +72,29 @@ sub list {
         $grouped_objects->{$display_group}{$object}
             = $self->{object}{$object};
     }
-    my $groupcount = scalar( keys %{ $grouped_objects } );
-    my $groupspacer = '';
-    if ( $groupcount > 1 ) {
-        $groupspacer = ' + ' . ( '-' x 24 );
-    }
-
-    if ( $output_format eq 'human' ) {
-        push @$out_arrayref, (
-            '+ ' . ( '-' x 32 ) . ' + ' . ( '-' x 8 ) . ' + ' .
-            ( '-' x 32 ) . $groupspacer . ' +');
-        if ( $groupcount > 1 ) {
-            push @$out_arrayref, sprintf(
-                "| %-32s | %-8s | %-32s | %-24s |",
-                'domain', 'type', 'soa', 'group');
-        } else {
-            push @$out_arrayref, sprintf(
-                "| %-32s | %-8s | %-32s |",
-                'domain', 'type', 'soa');
-        }
-        push @$out_arrayref, (
-            '| ' . ( '-' x 32 ) . ' + ' . ( '-' x 8 ) . ' + ' .
-            ( '-' x 32 ) . $groupspacer . ' |');
-    }
 
     for my $group ( keys %{ $grouped_objects } ) {
+        if ( $output_format eq 'human' ) {
+            push @$out_arrayref, $group if $group;
+            push @$out_arrayref, (
+                '+ ' . ( '-' x $colw[0] ) . ' + ' . ( '-' x $colw[1] ) . ' + ' .
+                ( '-' x $colw[2] ) . ' +');
+            push @$out_arrayref, sprintf(
+                "| %-${colw[0]}s | %-${colw[1]}s | %-${colw[2]}s |",
+                'domain', 'type', 'soa' );
+            push @$out_arrayref, (
+                '| ' . ( '-' x $colw[0] ) . ' + ' . ( '-' x $colw[1] ) . ' + ' .
+                ( '-' x $colw[2] ) . ' |');
+        }
 
         for my $object ( keys %{ $grouped_objects->{$group} } ) {
             if ( $output_format eq 'human' ) {
-                if ( $groupcount > 1 ) {
-                    push @$out_arrayref, sprintf(
-                        "| %-32s | %-8s | %-32s | %-24s |",
-                        $grouped_objects->{$group}{$object}{domain},
-                        $grouped_objects->{$group}{$object}{type},
-                        $grouped_objects->{$group}{$object}{soa_email},
-                        $group,
-                    );
-                } else {
-                    push @$out_arrayref, sprintf(
-                        "| %-32s | %-8s | %-32s |",
-                        $grouped_objects->{$group}{$object}{domain},
-                        $grouped_objects->{$group}{$object}{type},
-                        $grouped_objects->{$group}{$object}{soa_email},
-                    );
-                }
+                push @$out_arrayref, sprintf(
+                    "| %-${colw[0]}s | %-${colw[1]}s | %-${colw[2]}s |",
+                    format_len( $grouped_objects->{$group}{$object}{domain}, $colw[0] ),
+                    $grouped_objects->{$group}{$object}{type},
+                    format_len( $grouped_objects->{$group}{$object}{soa_email}, $colw[2] ),
+                );
             }
             else {
                 # json output
@@ -137,27 +115,52 @@ sub list {
             }
         }
 
+        push @$out_arrayref, ( '+ ' . ( '-' x $colw[0] ) . ' + ' .
+            ( '-' x $colw[1] ) . ' + ' . ( '-' x $colw[2] ) . " +\n") if ($output_format eq 'human');
     }
-    push @$out_arrayref, ( '+ ' . ( '-' x 32 ) . ' + ' . ( '-' x 8 ) . ' + ' .
-        ( '-' x 32 ) . $groupspacer . " +\n") if ($output_format eq 'human');
 
     if ( $output_format eq 'raw' ) {
         return $out_hashref;
     }
     elsif ( $output_format eq 'json' ) {
-        for my $object ( keys %$out_hashref ) {
-            $self->{_result} = $self->succeed(
+        if (scalar( keys %{ $out_hashref }) > 0) {
+            for my $object ( keys %$out_hashref ) {
+                $self->{_result} = $self->succeed(
+                    action  => $self->{_action},
+                    label   => $object,
+                    payload => $out_hashref->{$object},
+                    result  => $self->{_result},
+                    format  => $self->{output_format},
+                );
+            }
+            return $self->{_result};
+        } else {
+            # empty
+            return $self->succeed(
                 action  => $self->{_action},
-                label   => $object,
-                payload => $out_hashref->{$object},
-                result  => $self->{_result},
+                label   => '',
+                payload => {},
+                result  => {},
+                message => "No Domains to list.",
                 format  => $self->{output_format},
             );
         }
-        return $self->{_result};
-    }
-    else {
-        return join( "\n", @$out_arrayref, @$out_recordsarrayref);
+    } else {
+        if ( scalar( @$out_arrayref ) == 0 ) {
+            # no results, create empty table
+            push @$out_arrayref, (
+                '+ ' . ( '-' x $colw[0] ) . ' + ' . ( '-' x $colw[1] ) . ' + ' .
+                ( '-' x $colw[2] ) . ' +');
+            push @$out_arrayref, sprintf(
+                "| %-${colw[0]}s | %-${colw[1]}s | %-${colw[2]}s |",
+                'domain', 'type', 'soa' );
+            push @$out_arrayref, (
+                '| ' . ( '-' x $colw[0] ) . ' + ' . ( '-' x $colw[1] ) . ' + ' .
+                ( '-' x $colw[2] ) . ' |');
+            push @$out_arrayref, ( '+ ' . ( '-' x $colw[0] ) . ' + ' .
+                ( '-' x $colw[1] ) . ' + ' . ( '-' x $colw[2] ) . " +\n");
+        }
+        return join( "\n", @$out_arrayref);
     }
 
 }
@@ -716,11 +719,13 @@ sub recordlist {
     my $out_hashref = {};
     my $api_obj = $self->{_api_obj};
     my $options = $args{options};
+    my @colw = ( 8, 24, 32, 8 );
 
 
     for my $object_label ( keys %{ $self->{object} } ) {
         if ( $output_format eq 'human' ) {
 
+            push @$out_recordsarrayref, ("Domain records for $self->{object}{$object_label}->{domain}");
             # add records
             my $records = $api_obj->domain_resource_list( domainid => $self->{object}{$object_label}->{domainid} );
             if ( @$records != 0 ) {
@@ -730,47 +735,49 @@ sub recordlist {
                     for my $record ( @$records ) {
                         if ( lc($options->{type}) eq lc($record->{type}) ) {
                             push @$out_recordsfilteredarrayref, sprintf(
-                                "| %-8s | %-24s | %-32s | %-8s |",
+                                "| %-${colw[0]}s | %-${colw[1]}s | %-${colw[2]}s | %-${colw[3]}s |",
                                 uc($record->{type}),
-                                $record->{name},
-                                $record->{target},
+                                format_len( $record->{name}, $colw[1] ),
+                                format_len( $record->{target}, $colw[2] ),
                                 $record->{port});
                             $filterhits++;
                         }
                     }
                     if ( $filterhits > 0 ) {
                         push @$out_recordsarrayref, (
-                            "Domain records for $self->{object}{$object_label}->{domain}\n+ " .
-                             ( '-' x 8 ) . ' + ' . ( '-' x 24 ) . ' + ' . ( '-' x 32 ) . ' + ' . ( '-' x 8 ) . ' +');
+                            "+ " . ( '-' x $colw[0] ) . ' + ' . ( '-' x $colw[1] ) . ' + ' . ( '-' x $colw[2] ) . ' + ' . ( '-' x $colw[3] ) . ' +');
                         push @$out_recordsarrayref, sprintf(
-                            "| %-8s | %-24s | %-32s | %-8s |",
+                            "| %-${colw[0]}s | %-${colw[1]}s | %-${colw[2]}s | %-${colw[3]}s |",
                             'type', 'name', 'target', 'port' );
                         push @$out_recordsarrayref, (
-                            '| ' . ( '-' x 8 ) . ' + ' . ( '-' x 24 ) . ' + ' . ( '-' x 32 ) . ' + ' . ( '-' x 8 ) . ' |');
+                            '| ' . ( '-' x $colw[0] ) . ' + ' . ( '-' x $colw[1] ) . ' + ' . ( '-' x $colw[2] ) . ' + ' . ( '-' x $colw[3] ) . ' |');
                         map { push @$out_recordsarrayref, $_ } @$out_recordsfilteredarrayref;
                         push @$out_recordsarrayref, (
-                            '+ ' . ( '-' x 8 ) . ' + ' . ( '-' x 24 ) . ' + ' . ( '-' x 32 ) . ' + ' . ( '-' x 8 ) . " +\n");
+                            '+ ' . ( '-' x $colw[0] ) . ' + ' . ( '-' x $colw[1] ) . ' + ' . ( '-' x $colw[2] ) . ' + ' . ( '-' x $colw[3] ) . " +\n");
+                    } else {
+                        push @$out_recordsarrayref, ("No records match filter type.\n");
                     }
                 } else {
                     push @$out_recordsarrayref, (
-                        "Domain records for $self->{object}{$object_label}->{domain}\n+ " .
-                         ( '-' x 8 ) . ' + ' . ( '-' x 24 ) . ' + ' . ( '-' x 32 ) . ' + ' . ( '-' x 8 ) . ' +');
+                        "+ " . ( '-' x $colw[0] ) . ' + ' . ( '-' x $colw[1] ) . ' + ' . ( '-' x $colw[2] ) . ' + ' . ( '-' x $colw[3] ) . ' +');
                     push @$out_recordsarrayref, sprintf(
-                        "| %-8s | %-24s | %-32s | %-8s |",
+                        "| %-${colw[0]}s | %-${colw[1]}s | %-${colw[2]}s | %-${colw[3]}s |",
                         'type', 'name', 'target', 'port' );
                     push @$out_recordsarrayref, (
-                        '| ' . ( '-' x 8 ) . ' + ' . ( '-' x 24 ) . ' + ' . ( '-' x 32 ) . ' + ' . ( '-' x 8 ) . ' |');
+                        '| ' . ( '-' x $colw[0] ) . ' + ' . ( '-' x $colw[1] ) . ' + ' . ( '-' x $colw[2] ) . ' + ' . ( '-' x $colw[3] ) . ' |');
                     for my $record ( sort { uc($a->{type}) cmp uc($b->{type}) } @$records ) {
                         push @$out_recordsarrayref, sprintf(
-                            "| %-8s | %-24s | %-32s | %-8s |",
+                            "| %-${colw[0]}s | %-${colw[1]}s | %-${colw[2]}s | %-${colw[3]}s |",
                             uc($record->{type}),
-                            $record->{name},
-                            $record->{target},
+                            format_len( $record->{name}, $colw[1] ),
+                            format_len( $record->{target}, $colw[2] ),
                             $record->{port});
                     }
                     push @$out_recordsarrayref, (
-                    '+ ' . ( '-' x 8 ) . ' + ' . ( '-' x 24 ) . ' + ' . ( '-' x 32 ) . ' + ' . ( '-' x 8 ) . " +\n");
+                    '+ ' . ( '-' x $colw[0] ) . ' + ' . ( '-' x $colw[1] ) . ' + ' . ( '-' x $colw[2] ) . ' + ' . ( '-' x $colw[3] )  . " +\n");
                 }
+            } else {
+                push @$out_recordsarrayref, ("No records to list.\n");
             }
         }
         else {

@@ -186,7 +186,7 @@ Display detailed information about one or more StackScripts.
 
 =item B<-l>, B<--label>
 
-Optional. A specific StackScript to show.
+Required. A specific StackScript to show.
 
 =back
 

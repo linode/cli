@@ -231,7 +231,7 @@ Delete a Linode, its disk image(s), and configuration profile(s).
 
 =item B<-l>, B<--label>
 
-A Linode to operate on.
+The Linode to Delete.
 
 =back
 
@@ -247,7 +247,7 @@ List information about one or more Linodes. Linodes are grouped by their display
 
 =item B<-l>, B<--label>
 
-A Linode to list.
+Optional. A specific Linode to list.
 
 =back
 
@@ -257,13 +257,13 @@ A Linode to list.
 
 =over 8
 
-Display detailed information about a single Linode.
+Display detailed information about one or more Linodes.
 
 =over 8
 
 =item B<-l>, B<--label>
 
-Label of the Linode to show information about.
+Required. A specific Linode to show.
 
 =back
 

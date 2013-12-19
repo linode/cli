@@ -414,6 +414,7 @@ sub _get_object_list {
                 label   => $mismatch,
                 message => "Couldn't find $mismatch",
                 result  => $self->{_result},
+                action  => $self->{_distilled_options}->{action},
             );
         }
 

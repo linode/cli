@@ -55,6 +55,7 @@ sub list {
     my $output_format = $args{output_format} || 'human';
     my $out_arrayref = [];
     my $out_hashref = {};
+    my @colw = ( 32, 14, 10, 8, 10, 10 );
 
     my $grouped_objects = {};
 
@@ -66,34 +67,32 @@ sub list {
             = $self->{object}{$object};
     }
 
-
     for my $group ( keys %{ $grouped_objects } ) {
-        my ( $longestlabel, $longestid );
         if ( $output_format eq 'human' ) {
             push @$out_arrayref, $group if $group;
             push @$out_arrayref, (
-                '+ ' . ( '-' x 32 ) . ' + ' . ( '-' x 8 ) . ' + ' .
-                ( '-' x 12 ) . ' + ' . ( '-' x 8 ) . ' + ' . ( '-' x 10 ) . ' + ' .
-                ( '-' x 10 ) . ' +');
+                '+ ' . ( '-' x $colw[0] ) . ' + ' . ( '-' x $colw[1] ) . ' + ' .
+                ( '-' x $colw[2] ) . ' + ' . ( '-' x $colw[3] ) . ' + ' .
+                ( '-' x $colw[4] ) . ' + ' . ( '-' x $colw[5] ) . ' +');
             push @$out_arrayref, sprintf(
-                "| %-32s | %-8s | %-12s | %-8s | %-10s | %-10s |",
-                'label', 'id', 'status', 'backups', 'disk', 'ram' );
+                "| %-${colw[0]}s | %-${colw[1]}s | %-${colw[2]}s | %-${colw[3]}s | %-${colw[4]}s | %-${colw[5]}s |",
+                'label', 'status', 'location', 'backups', 'disk', 'ram' );
             push @$out_arrayref, (
-                '| ' . ( '-' x 32 ) . ' + ' . ( '-' x 8 ) . ' + ' .
-                ( '-' x 12 ) . ' + ' . ( '-' x 8 ) . ' + ' . ( '-' x 10 ) . ' + ' .
-                ( '-' x 10 ) . ' |');
+                '| ' . ( '-' x $colw[0] ) . ' + ' . ( '-' x $colw[1] ) . ' + ' .
+                ( '-' x $colw[2] ) . ' + ' . ( '-' x $colw[3] ) . ' + ' .
+                ( '-' x $colw[4] ) . ' + ' . ( '-' x $colw[5] ) . ' |');
         }
 
         for my $object ( keys %{ $grouped_objects->{$group} } ) {
             if ( $output_format eq 'human' ) {
                 push @$out_arrayref, sprintf(
-                    "| %-32s | %-8s | %-12s | %-8s | %-10s | %-10s |",
-                    $grouped_objects->{$group}{$object}{label},
-                    $grouped_objects->{$group}{$object}{linodeid},
+                    "| %-${colw[0]}s | %-${colw[1]}s | %-${colw[2]}s | %-${colw[3]}s | %-${colw[4]}s | %-${colw[5]}s |",
+                    format_len( $grouped_objects->{$group}{$object}{label}, $colw[0] ),
                     $humanstatus{ $grouped_objects->{$group}{$object}{status} },
+                    $humandc{ $grouped_objects->{$group}{$object}{datacenterid} },
                     $humanyn{ $grouped_objects->{$group}{$object}{backupsenabled} },
                     human_displaymemory( $grouped_objects->{$group}{$object}{totalhd} ),
-                    human_displaymemory( $grouped_objects->{$group}{$object}{totalram} ),
+                    human_displaymemory( $grouped_objects->{$group}{$object}{totalram} )
                 );
             }
             else {
@@ -125,28 +124,56 @@ sub list {
             }
         }
 
-
-        push @$out_arrayref, ( '+ ' . ( '-' x 32 ) . ' + ' .
-            ( '-' x 8 ) . ' + ' . ( '-' x 12 ) . ' + ' . ( '-' x 8 ) . ' + ' .
-            ( '-' x 10 ) . ' + ' . ( '-' x 10 ) . " +\n" ) if ($output_format eq 'human');
+        push @$out_arrayref, ( '+ ' . ( '-' x $colw[0] ) . ' + ' .
+            ( '-' x $colw[1] ) . ' + ' . ( '-' x $colw[2] ) . ' + ' . ( '-' x $colw[3] ) . ' + ' .
+            ( '-' x $colw[4] ) . ' + ' . ( '-' x $colw[5] ) . " +\n" ) if ($output_format eq 'human');
     }
 
     if ( $output_format eq 'raw' ) {
         return $out_hashref;
     }
     elsif ( $output_format eq 'json' ) {
-        for my $object ( keys %$out_hashref ) {
-            $self->{_result} = $self->succeed(
+        if (scalar( keys %{ $out_hashref }) > 0) {
+            for my $object ( keys %$out_hashref ) {
+                $self->{_result} = $self->succeed(
+                    action  => $self->{_action},
+                    label   => $object,
+                    payload => $out_hashref->{$object},
+                    result  => $self->{_result},
+                    format  => $self->{output_format},
+                );
+            }
+            return $self->{_result};
+        } else {
+            # empty
+            return $self->succeed(
                 action  => $self->{_action},
-                label   => $object,
-                payload => $out_hashref->{$object},
-                result  => $self->{_result},
+                label   => '',
+                payload => {},
+                result  => {},
+                message => "No Linodes to list.",
                 format  => $self->{output_format},
             );
         }
-        return $self->{_result};
     }
     else {
+        if ( scalar( @$out_arrayref ) == 0 ) {
+            # no results, create empty table
+            push @$out_arrayref, (
+                '+ ' . ( '-' x $colw[0] ) . ' + ' . ( '-' x $colw[1] ) . ' + ' .
+                ( '-' x $colw[2] ) . ' + ' . ( '-' x $colw[3] ) . ' + ' .
+                ( '-' x $colw[4] ) . ' + ' . ( '-' x $colw[5] ) . ' +');
+            push @$out_arrayref, sprintf(
+                "| %-${colw[0]}s | %-${colw[1]}s | %-${colw[2]}s | %-${colw[3]}s | %-${colw[4]}s | %-${colw[5]}s |",
+                'label', 'status', 'location', 'backups', 'disk', 'ram' );
+            push @$out_arrayref, (
+                '| ' . ( '-' x $colw[0] ) . ' + ' . ( '-' x $colw[1] ) . ' + ' .
+                ( '-' x $colw[2] ) . ' + ' . ( '-' x $colw[3] ) . ' + ' .
+                ( '-' x $colw[4] ) . ' + ' . ( '-' x $colw[5] ) . ' |');
+            push @$out_arrayref, ( '+ ' . ( '-' x $colw[0] ) . ' + ' .
+                ( '-' x $colw[1] ) . ' + ' . ( '-' x $colw[2] ) . ' + ' . ( '-' x $colw[3] ) . ' + ' .
+                ( '-' x $colw[4] ) . ' + ' . ( '-' x $colw[5] ) . " +\n" );
+        }
         return join( "\n", @$out_arrayref );
     }
 
@@ -156,53 +183,15 @@ sub show {
     my ( $self, %args ) = @_;
     my $return = '';
 
-    my $show_fields = {
-        linodeid       => 'id',
-        status         => 'status',
-        datacenterid   => 'location',
-        backupsenabled => 'backups',
-        totalhd        => 'disk',
-        totalram       => 'ram',
-    };
-
     for my $object_label ( keys %{ $self->{object} } ) {
-
-        $return .= sprintf( "\n%8s %-32s",
-            'label',
-            $self->{object}->{$object_label}->{label} );
-
-        for my $key ( keys %{ $self->{object}->{$object_label} } ) {
-            next unless ( my @found = grep { $_ eq $key } %{ $show_fields } );
-            if ( $key eq 'totalhd' || $key eq 'totalram' ) {
-                $return .= sprintf(
-                    "\n%8s %-32s",
-                    $self->{_output_fields}->{$key},
-                    human_displaymemory(
-                        $self->{object}->{$object_label}->{$key} ) );
-            }
-            elsif ( $key eq 'status' ) {
-                $return .= sprintf( "\n%8s %-32s",
-                    $self->{_output_fields}->{$key},
-                    $humanstatus{ $self->{object}->{$object_label}->{$key} }
-                );
-            }
-            elsif ( $key eq 'backupsenabled' ) {
-                $return .= sprintf( "\n%8s %-32s",
-                    $self->{_output_fields}->{$key},
-                    $humanyn{ $self->{object}->{$object_label}->{$key} } );
-            }
-            elsif ( $key eq 'datacenterid' ) {
-                $return .= sprintf( "\n%8s %-32s",
-                    $self->{_output_fields}->{$key},
-                    $humandc{ $self->{object}->{$object_label}->{$key} } );
-            }
-            else {
-                $return .= sprintf( "\n%8s %-32s",
-                    $self->{_output_fields}->{$key},
-                    $self->{object}->{$object_label}->{$key} );
-            }
-        }
-        $return .= "\n";
+       $return .= sprintf( "%9s %-45s\n%9s %-45s\n%9s %-45s\n%9s %-45s\n%9s %-45s\n%9s %-45s\n",
+                'label:', $self->{object}->{$object_label}->{label},
+                'status:', $humanstatus{ $self->{object}->{$object_label}->{status} },
+                'location:', $humandc{ $self->{object}->{$object_label}->{datacenterid} },
+                'backups:', $humanyn{ $self->{object}->{$object_label}->{backupsenabled} },
+                'disk:',human_displaymemory( $self->{object}->{$object_label}->{totalhd} ),
+                'ram:', human_displaymemory( $self->{object}->{$object_label}->{totalram} )
+            );
     }
 
     return $return . "\n";

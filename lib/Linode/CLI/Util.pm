@@ -9,14 +9,14 @@ our @EXPORT      = qw();
 our %EXPORT_TAGS = (
     basic => [(qw(
         error load_config human_displaymemory succeed fail format_squish format_tf
-        %correct_case %humanstatus %humanyn %humandc %paramsdef @MODES
+        format_len %correct_case %humanstatus %humanyn %humandc %paramsdef @MODES
     ))],
     config => ['write_config'],
     json => ['json_response'],
 );
 our @EXPORT_OK = (qw(
         json_response error load_config write_config human_displaymemory succeed fail
-        format_squish format_tf %correct_case %humanstatus %humanyn %humandc
+        format_squish format_tf format_len %correct_case %humanstatus %humanyn %humandc
         %paramsdef @MODES
 ));
 
@@ -113,7 +113,7 @@ our %paramsdef = (
         },
         'list'   => { 'options' => { 'label' => 'label|l:s@' }, },
         'show'   => {
-            'options'   => { 'label' => 'label|l:s@' },
+            'options'   => { 'label' => 'label|l=s@' },
             'warmcache' => [ 'datacenter' ],
          },
         'delete' => { 'options' => { 'label' => 'label|l=s@' }, },
@@ -121,7 +121,8 @@ our %paramsdef = (
     },
     'account' => {
         'info'  => { 'alias' => 'show' },
-        'show'  => { 'run' => 'show' }
+        'show'  => { 'run' => 'show' },
+        'list'  => { 'run' => 'list' }
     },
     'stackscript' => {
         'create'  => {
@@ -149,7 +150,7 @@ our %paramsdef = (
          },
         'delete'     => { 'options' => { 'label' => 'label|l=s@' }, },
         'list'       => { 'options' => { 'label' => 'label|l:s@' }, },
-        'show'       => { 'options' => { 'label' => 'label|l:s@' }, },
+        'show'       => { 'options' => { 'label' => 'label|l=s@' }, },
         'source' => {
             'options' => { 'label' => 'label|l:s@' },
             'run'     => 'show',
@@ -450,6 +451,16 @@ sub format_tf {
         return 1;
     } else {
         return 0;
+    }
+}
+
+# format length - shortens a string if needed and adds a ... at the end
+sub format_len {
+    my ( $checkme, $sizelimit ) = @_;
+    if ( length( $checkme ) > $sizelimit ) {
+        return substr( $checkme, 0, ($sizelimit - 3) ) . "...";
+    } else {
+        return $checkme;
     }
 }
 

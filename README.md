@@ -131,34 +131,6 @@ linode start My-Linode-Label1 My-Linode-Label2
 linode show --label My-Linode-Label1 --label My-Linode-Label2
 ```
 
-### Displaying account information
-
-Account information, including the current account balance and network transfer pool usage, can be queried with the `linode-account` tool.
-
-```
-linode account show
-```
-
-```
-          managed true
-          balance $ 0.00
-    transfer pool 7527.00GB
-transfer billable 0.00GB
-     active since 2013-09-10 14:44:27.0
-    transfer used 1.00GB
-```
-
-### Working with StackScripts
-
-Actions can be performed on StackScripts.
-
-```
-linode stackscript create --label "StackScript Name" --codefile "/path/myscript.sh" --distribution "Debian 7"
-linode stackscript show My-StackScript-Label
-linode stackscript source mystackscript > myscript.sh
-```
-
-
 ### Working with Domains
 
 Create a master domain (requires an SOA email address).
@@ -212,6 +184,33 @@ linode domain record-list example.com
 linode domain record-list example.com MX
 linode domain record-show example.com
 linode domain record-show example.com example.com MX
+```
+
+### Working with StackScripts
+
+Actions can be performed on StackScripts.
+
+```
+linode stackscript create --label "StackScript Name" --codefile "/path/myscript.sh" --distribution "Debian 7"
+linode stackscript show My-StackScript-Label
+linode stackscript source mystackscript > myscript.sh
+```
+
+### Displaying account information
+
+Account information, including the current account balance and network transfer pool usage, can be queried with the `linode-account` tool.
+
+```
+linode account show
+```
+
+```
+          managed true
+          balance $ 0.00
+    transfer pool 7527.00GB
+transfer billable 0.00GB
+     active since 2013-09-10 14:44:27.0
+    transfer used 1.00GB
 ```
 
 ### JSON output
@@ -324,73 +323,13 @@ Delete a Linode, its disk image(s), and configuration profile(s).
 
 List information about one or more Linodes. Linodes are grouped by their display group.
 
-**-l**, **--label**: Optional. A Linode to list.
+**-l**, **--label**: Optional. A specific Linode to list.
 
 #### Show
 
-Display detailed information about one or more Linodes
+Display detailed information about one or more Linodes.
 
-**-l**, **--label**: Optional. Label of the Linode to show information about.
-
-### StackScript Actions
-
-#### Create
-
-Create a StackScript.
-
-**-l**, **--label**: The label (name) for the StackScript.
-
-**-d**, **--distribution**: Distribution name or DistributionID to deploy.
-
-**-c**, **--codefile**: The script file name (including the path) containing the source code.
-
-**-p**, **--ispublic**: Optional. Whether this StackScript is published in the Library, for everyone to use.   Options are yes, no, true, and false. Default is false.
-
-**-D**, **--description**: Optional. Notes describing details about the StackScript.
-
-**-r**, **--revnote**: Optional. Note for describing the version.
-
-#### Update
-
-Update a StackScript.
-
-**-l**, **--label**: The label (name) of the StackScript to update.
-
-**-n**, **--new-label**: Optional.  Renames the StackScript.
-
-**-d**, **--distribution**: Optional. Distribution name or DistributionID to deploy.
-
-**-c**, **--codefile**: Optional. The script file name (including the path) containing the source code.
-
-**-p**, **--ispublic**: Optional. Whether this StackScript is published in the Library, for everyone to use.   Options are yes, no, true, and false. Default is false.
-
-**-D**, **--description**: Optional. Notes describing details about the StackScript.
-
-**-r**, **--revnote**: Optional. Note for describing the version.
-
-#### Delete
-
-Delete a StackScript.
-
-**-l**, **--label**: The StackScript to delete.
-
-#### List
-
-List information about one or more StackScripts.
-
-**-l**, **--label**: Optional. A specific StackScript to list.
-
-#### Show
-
-Display detailed information about one or more StackScripts.
-
-**-l**, **--label**: Optional. A specific StackScript to show.
-
-#### Source
-
-Display the source code for a StackScript.
-
-**-l**, **--label**: Required. A specific StackScript to show.
+**-l**, **--label**: Required. A specific Linode to show.
 
 ### Domain Actions
 
@@ -544,3 +483,63 @@ Display detailed Domain Record information for one or more Domains.
 
 **-t**, **--type**: Optional. Allows domain record filtering by type. One of: NS, MX, A, AAAA, CAME, TXT, or SRV
 
+
+### StackScript Actions
+
+#### Create
+
+Create a StackScript.
+
+**-l**, **--label**: The label (name) for the StackScript.
+
+**-d**, **--distribution**: Distribution name or DistributionID to deploy.
+
+**-c**, **--codefile**: The script file name (including the path) containing the source code.
+
+**-p**, **--ispublic**: Optional. Whether this StackScript is published in the Library, for everyone to use.   Options are yes, no, true, and false. Default is false.
+
+**-D**, **--description**: Optional. Notes describing details about the StackScript.
+
+**-r**, **--revnote**: Optional. Note for describing the version.
+
+#### Update
+
+Update a StackScript.
+
+**-l**, **--label**: The label (name) of the StackScript to update.
+
+**-n**, **--new-label**: Optional.  Renames the StackScript.
+
+**-d**, **--distribution**: Optional. Distribution name or DistributionID to deploy.
+
+**-c**, **--codefile**: Optional. The script file name (including the path) containing the source code.
+
+**-p**, **--ispublic**: Optional. Whether this StackScript is published in the Library, for everyone to use.   Options are yes, no, true, and false. Default is false.
+
+**-D**, **--description**: Optional. Notes describing details about the StackScript.
+
+**-r**, **--revnote**: Optional. Note for describing the version.
+
+#### Delete
+
+Delete a StackScript.
+
+**-l**, **--label**: The StackScript to delete.
+
+#### List
+
+List information about one or more StackScripts.
+
+**-l**, **--label**: Optional. A specific StackScript to list.
+
+#### Show
+
+Display detailed information about one or more StackScripts.
+
+**-l**, **--label**: Required. A specific StackScript to show.
+
+#### Source
+
+Display the source code for a StackScript.
+
+**-l**, **--label**: Required. A specific StackScript to show.
