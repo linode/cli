@@ -191,10 +191,10 @@ sub show {
                 'backups:', $humanyn{ $self->{object}->{$object_label}->{backupsenabled} },
                 'disk:',human_displaymemory( $self->{object}->{$object_label}->{totalhd} ),
                 'ram:', human_displaymemory( $self->{object}->{$object_label}->{totalram} )
-            );
+            ) . "\n";
     }
 
-    return $return . "\n";
+    return $return;
 }
 
 sub create {
