@@ -331,12 +331,20 @@ sub create {
         my $boot_job_result
             = $self->_poll_and_wait( $api, $linode_id, $boot->{jobid},
             $format );
+
+        return $self->succeed(
+            action  => 'create',
+            label   => $params->{linode_update}{label},
+            message => "Created and booted $options->{label}",
+            payload => { jobid => $boot->{jobid}, job => 'start' },
+        ) if $boot_job_result;
+
         return $self->fail(
             action  => 'create',
             label   => $params->{linode_update}{label},
             message => "Timed out waiting for boot to complete for $params->{linode_update}{label}",
             payload => { jobid => $boot->{jobid}, job => 'start' },
-        ) unless $boot_job_result;
+        );
     }
 
     return $self->succeed(
