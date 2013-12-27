@@ -401,11 +401,66 @@ sub _get_object_list {
         my $filtered = ();
         my %targets = map { $_ => 1 } @$labels;
 
-        for my $object (@$objects) {
-            my $object_label = $object->{ $objectunique };
-            if ( exists( $targets{$object_label} ) ) {
-                push @$filtered, $object;
-                delete $targets{$object_label};
+        # look for matches
+        for my $eachlabel (@$labels) {
+            if ( substr($eachlabel, length($eachlabel) - 1, 1) eq '*' && substr($eachlabel, 0, 1) ne '*' ) { # left match
+                my $findme = substr($eachlabel, 0, length($eachlabel) - 1); # remove *'s from *findme
+                # collect matches
+                for my $object (@$objects) {
+                    my $object_label = $object->{ $objectunique };
+                    if ( $object_label =~ /^${findme}/i ) { # left partial match
+                        unless (my @found = grep { $_ eq $object_label } @$filtered) {
+                            # new hit
+                            push @$filtered, $object;
+                            if ( exists( $targets{$eachlabel} ) ) {
+                                delete $targets{$eachlabel};
+                            }
+                        }
+                    }
+                }
+            } elsif ( substr($eachlabel, length($eachlabel) - 1, 1) ne '*' && substr($eachlabel, 0, 1) eq '*' ) { # right match
+                my $findme = substr($eachlabel, 1, length($eachlabel) - 1); # remove *'s from findme*
+                # collect matches
+                for my $object (@$objects) {
+                    my $object_label = $object->{ $objectunique };
+                    if ( $object_label =~ /${findme}$/i ) { # right partial match
+                        unless (my @found = grep { $_ eq $object_label } @$filtered) {
+                            # new hit
+                            push @$filtered, $object;
+                            if ( exists( $targets{$eachlabel} ) ) {
+                                delete $targets{$eachlabel};
+                            }
+                        }
+                    }
+                }
+            } elsif ( substr($eachlabel, length($eachlabel) - 1, 1) eq '*' && substr($eachlabel, 0, 1) eq '*' ) {
+                my $findme = substr($eachlabel, 1, length($eachlabel) - 2); # remove *'s from *findme*
+                # collect matches
+                for my $object (@$objects) {
+                    my $object_label = $object->{ $objectunique };
+                    if ( $object_label =~ /^\S*${findme}\S*$/i ) { # partial match
+                        unless (my @found = grep { $_ eq $object_label } @$filtered) {
+                            # new hit
+                            push @$filtered, $object;
+                            if ( exists( $targets{$eachlabel} ) ) {
+                                delete $targets{$eachlabel};
+                            }
+                        }
+                    }
+                }
+            } else {
+                # exact match check
+                for my $object (@$objects) {
+                    my $object_label = $object->{ $objectunique };
+                    if ( exists( $targets{$object_label} ) ) {
+                        unless (my @found = grep { $_ eq $object_label } @$filtered) {
+                            push @$filtered, $object;
+                            if ( exists( $targets{$eachlabel} ) ) {
+                                delete $targets{$eachlabel};
+                            }
+                        }
+                    }
+                }
             }
         }
 
