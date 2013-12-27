@@ -259,7 +259,6 @@ Each action has a set of options that apply to it, which are outlined in the sec
 
 **-j**, **--json**: Optional. JSON output.
 
-**-w**, **--wait**: Optional. Waits and provides feedback while the task(s) run.
 
 **-h**, **--help**: Brief help message.
 
@@ -283,11 +282,15 @@ Create and start a new Linode. This action prompts for a password which will be 
 
 **-t**, **--payment-term**: Optional. Payment term, one of 1, 12, or 24 (months). Default: 1.
 
+**-w**, **--wait**: Optional. Amount of time (in minutes) to wait for human output. Using the flag only, will use the default of 5.
+
 #### Start, stop, restart
 
 Stop, start, or restart a Linode.
 
 **-l**, **--label**: A Linode to operate on.
+
+**-w**, **--wait**: Optional. Amount of time (in minutes) to wait for human output. Using the flag only, will use the default of 5.
 
 #### Rename
 
@@ -312,6 +315,8 @@ Resize a Linode to a new plan size, and issue a boot job.
 **-l**, **--label**: A Linode to operate on.
 
 **-p**, **--plan**: The Plan to resize to. Plans are linode1024, linode2048, linode4096, linode8192, linode16384, linode24576, linode32768, and linode40960.
+
+**-w**, **--wait**: Optional. Amount of time (in minutes) to wait for human output. Using the flag only, will use the default of 20.
 
 #### Delete
 

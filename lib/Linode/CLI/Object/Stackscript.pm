@@ -154,7 +154,6 @@ sub create {
     my $api     = $args{api};
     my $options = $args{options};
     my $format  = $args{format};
-    my $wait    = $args{wait};
 
     # Required Create parameters
     # - label

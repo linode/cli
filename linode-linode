@@ -109,6 +109,10 @@ The Plan to deploy. Plans are linode1024, linode2048, linode4096, linode8192, li
 
 Optional. Payment term, one of 1, 12, or 24 (months). Default: 1.
 
+=item B<-w>, B<--wait>
+
+Optional. Amount of time (in minutes) to wait for human output. Using the flag only, will use the default of 5.
+
 =back
 
 =back
@@ -124,6 +128,10 @@ Starts (boots) a Linode.
 =item B<-l>, B<--label>
 
 A Linode to operate on.
+
+=item B<-w>, B<--wait>
+
+Optional. Amount of time (in minutes) to wait for human output. Using the flag only, will use the default of 5.
 
 =back
 
@@ -141,6 +149,10 @@ Stops (powers down) a Linode.
 
 A Linode to operate on.
 
+=item B<-w>, B<--wait>
+
+Optional. Amount of time (in minutes) to wait for human output. Using the flag only, will use the default of 5.
+
 =back
 
 =back
@@ -156,6 +168,10 @@ Restart (reboots) a Linode.
 =item B<-l>, B<--label>
 
 A Linode to operate on.
+
+=item B<-w>, B<--wait>
+
+Optional. Amount of time (in minutes) to wait for human output. Using the flag only, will use the default of 5.
 
 =back
 
@@ -216,6 +232,10 @@ A Linode to operate on.
 =item B<-p>, B<--plan>
 
 The Plan to resize to. Plans are linode1024, linode2048, linode4096, linode8192, linode16384, linode24576, linode32768, and linode40960.
+
+=item B<-w>, B<--wait>
+
+Optional. Amount of time (in minutes) to wait for human output. Using the flag only, will use the default of 20.
 
 =back
 
