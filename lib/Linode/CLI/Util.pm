@@ -67,24 +67,34 @@ our %paramsdef = (
                 'plan'         => 'plan|p=s',
                 'payment-term' => 'payment-term|t=i',
                 'quantity'     => 'quantity|q:i',
-                'group'        => 'group|g:s'
+                'group'        => 'group|g:s',
+                'wait'         => 'wait|w'
             },
             'format'    => { 'plan' => 'format_squish', 'datacenter'  => 'format_squish' },
             'warmcache' => [ 'plan', 'distribution', 'datacenter', 'kernel' ],
         },
         'boot'  => { 'alias' => 'start' },
         'start' => {
-            'options' => { 'label' => 'label|l=s@' },
+            'options' => { 
+                'label' => 'label|l=s@',
+                'wait'  => 'wait|w:i'
+            },
             'run'     => 'change_state'
         },
         'shutdown' => { 'alias' => 'stop' },
         'stop'     => {
-            'options' => { 'label' => 'label|l=s@' },
+            'options' => { 
+                'label' => 'label|l=s@',
+                'wait'  => 'wait|w:i'
+            },
             'run'     => 'change_state'
         },
         'reboot'  => { 'alias' => 'restart' },
         'restart' => {
-            'options' => { 'label' => 'label|l=s@' },
+            'options' => { 
+                'label' => 'label|l=s@',
+                'wait'  => 'wait|w:i'
+            },
             'run'     => 'change_state'
         },
         'rename' => {
@@ -98,7 +108,8 @@ our %paramsdef = (
         'resize' => {
             'options' => {
                 'label' => 'label|l=s@',
-                'plan'  => 'plan|p=s'
+                'plan'  => 'plan|p=s',
+                'wait'  => 'wait|w:i'
             },
             'format' => { 'plan' => 'format_squish' },
             'seeknext'  => [ 'plan' ],
@@ -263,7 +274,7 @@ our %paramsdef = (
 sub eat_cmdargs {
     my $mode = shift || 'linode';
     my @paramsfirst = qw( action|a:s version|V|v help|h man ); # initial parse of args
-    my @paramscommon = qw( json|j:s output:s wait|w ); # args needed for every action
+    my @paramscommon = qw( json|j:s output:s ); # args needed for every action
     my $cmdargs = {};
     $cmdargs->{output} = 'martian';
 
