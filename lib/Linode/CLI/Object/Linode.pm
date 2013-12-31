@@ -205,10 +205,11 @@ sub create {
     my $format  = $args{format};
     my $wait    = 0;
 
-    if ( exists $args{wait} ) {
-        if ( $args{wait} == 0 ) { # flag with no value
-            $wait = 5; # 5 x 12 = 60
-        }
+    if ( defined $args{wait} && $args{wait} == 0 ) {
+        $wait = 5;
+    }
+    elsif ( defined $args{wait} ) {
+        $wait = $args{wait};
     }
 
     # For now, only create one Linode at a time
@@ -336,7 +337,7 @@ sub create {
     if ($wait) {
         my $boot_job_result
             = $self->_poll_and_wait( $api, $linode_id, $boot->{jobid},
-            $format, ($wait * 12) );
+            $format, $wait );
 
         return $self->succeed(
             action  => 'create',
@@ -376,10 +377,11 @@ sub change_state {
     };
     my $queue = {};
 
-    if ( exists $args{wait} ) {
-        if ( $args{wait} == 0 ) { # flag with no value
-            $wait = 5; # 5 x 12 = 60
-        }
+    if ( defined $args{wait} && $args{wait} == 0 ) {
+        $wait = 5;
+    }
+    elsif ( defined $args{wait} ) {
+        $wait = $args{wait};
     }
 
     for my $object ( keys %{ $self->{object} } ) {
@@ -431,7 +433,7 @@ sub change_state {
             my $linode_id    = $queue->{$job}[0];
             my $linode_label = $queue->{$job}[1];
             my $boot_job_result
-                = $self->_poll_and_wait( $api, $linode_id, $jobid, $format, ($wait * 12) );
+                = $self->_poll_and_wait( $api, $linode_id, $jobid, $format, $wait );
 
             if ( !$boot_job_result ) {
                 $self->{_result} = $self->fail(
@@ -467,10 +469,11 @@ sub resize {
 
     my $queue = {};
 
-    if ( exists $args{wait} ) {
-        if ( $args{wait} == 0 ) { # flag with no value
-            $wait = 20; # 20 x 12 = 240
-        }
+    if ( defined $args{wait} && $args{wait} == 0 ) {
+        $wait = 20;
+    }
+    elsif ( defined $args{wait} ) {
+        $wait = $args{wait};
     }
 
     for my $object ( keys %{ $self->{object} } ) {
@@ -520,7 +523,7 @@ sub resize {
             my $id    = $queue->{$job}[0];
             my $label = $queue->{$job}[1];
             my $job_result
-                = $self->_poll_and_wait( $api, $id, $jobid, $format, ($wait * 12) );
+                = $self->_poll_and_wait( $api, $id, $jobid, $format, $wait);
 
             if ( !$job_result ) {
                 $self->{_result} = $self->fail(
@@ -625,7 +628,7 @@ sub delete {
 
 sub _poll_and_wait {
     my ( $self, $api_obj, $linode_id, $job_id, $output_format, $timeout ) = @_;
-    $timeout ||= 60;
+    $timeout = $timeout ? ($timeout * 12) : 12;
 
     my $poll_result = try {
         for ( my $i = 0; $i <= $timeout; $i++ ) {

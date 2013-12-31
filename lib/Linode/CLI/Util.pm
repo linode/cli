@@ -75,7 +75,7 @@ our %paramsdef = (
         },
         'boot'  => { 'alias' => 'start' },
         'start' => {
-            'options' => { 
+            'options' => {
                 'label' => 'label|l=s@',
                 'wait'  => 'wait|w:i'
             },
@@ -83,7 +83,7 @@ our %paramsdef = (
         },
         'shutdown' => { 'alias' => 'stop' },
         'stop'     => {
-            'options' => { 
+            'options' => {
                 'label' => 'label|l=s@',
                 'wait'  => 'wait|w:i'
             },
@@ -91,7 +91,7 @@ our %paramsdef = (
         },
         'reboot'  => { 'alias' => 'restart' },
         'restart' => {
-            'options' => { 
+            'options' => {
                 'label' => 'label|l=s@',
                 'wait'  => 'wait|w:i'
             },
