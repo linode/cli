@@ -158,7 +158,7 @@ Updating a domain.
 linode domain update example.com --group main
 ```
 
-Creating a domain records.
+Creating domain records.
 
 ```
 linode domain record-create example.com A www2 X.X.X.X
