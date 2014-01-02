@@ -215,6 +215,18 @@ sub create {
     # For now, only create one Linode at a time
     $options->{label} = pop @{ $options->{label} };
 
+    # check if this label is already in use
+    my $linodeobjects = $api->linode_list();
+    for my $lobject (@$linodeobjects) {
+        if ( $lobject->{label} eq $options->{label} ) {
+            return $self->fail(
+                action  => 'create',
+                label   => $options->{label},
+                message => "The name $options->{label} is already in use by another Linode.",
+            );
+        }
+    }
+
     my $params = {
         linode_create => {
             datacenterid    => delete $options->{datacenterid},
