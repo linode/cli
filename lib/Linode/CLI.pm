@@ -27,8 +27,9 @@ sub new {
     $self->{_opts} = $args{opts};
 
     $self->{_api_obj} = WebService::Linode->new(
-        apikey => $self->{api_key},
-        fatal  => 1,
+        apikey    => $self->{api_key},
+        fatal     => 1,
+        useragent => "linode-cli/$VERSION",
     );
 
     $self->_test_api unless $self->{_opts}{action} eq 'configure';

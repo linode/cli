@@ -10,6 +10,7 @@ our %EXPORT_TAGS = (
     basic => [(qw(
         error load_config human_displaymemory succeed fail format_squish format_tf
         format_len %correct_case %humanstatus %humanyn %humandc %paramsdef @MODES
+        $VERSION
     ))],
     config => ['write_config'],
     json => ['json_response'],
@@ -17,7 +18,7 @@ our %EXPORT_TAGS = (
 our @EXPORT_OK = (qw(
         json_response error load_config write_config human_displaymemory succeed fail
         format_squish format_tf format_len %correct_case %humanstatus %humanyn %humandc
-        %paramsdef @MODES
+        %paramsdef @MODES $VERSION
 ));
 
 use Carp;
@@ -25,7 +26,7 @@ use JSON;
 use Pod::Usage;
 use Getopt::Long (qw(:config no_ignore_case bundling pass_through));
 
-my $VERSION = '0.2.3';
+our $VERSION = '0.2.3';
 
 our @MODES = (qw(
     linode stackscript domain nodebalancer longview account user
