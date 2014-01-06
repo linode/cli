@@ -15,7 +15,7 @@ WebService::Linode::Base - Perl Interface to the Linode.com API.
 
 =cut
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 our $err;
 our $errstr;
 
@@ -33,6 +33,7 @@ sub new {
 
     $self->{_ua} = LWP::UserAgent->new;
     $self->{_ua}->agent("WebService::Linode::Base/$WebService::Linode::Base::VERSION ");
+    $self->{_ua}->agent($args{useragent}) if $args{useragent};
 
     bless $self, $package;
     return $self;
@@ -152,6 +153,9 @@ are currently error code -1.  By default, will warn on errors as well, pass
 a true value for fatal to die instead, or nowarn to prevent the warnings.
 
 verbose is 0-10 with 10 being the most and 0 being none
+
+useragent if passed gets passed on to the LWP::UserAgent agent method to set
+a custom user agent header on HTTP requests.
 
 =head2 send_request
 
