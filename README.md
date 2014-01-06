@@ -259,10 +259,7 @@ Each action has a set of options that apply to it, which are outlined in the sec
 
 **-j**, **--json**: Optional. JSON output.
 
-
-**-h**, **--help**: Brief help message.
-
-**-m**, **--man**: Full documentation.
+**-h**, **--help**: Displays help documentation.
 
 ### Linode Actions
 

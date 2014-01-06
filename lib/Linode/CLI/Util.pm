@@ -273,17 +273,14 @@ our %paramsdef = (
 # parses command line arguments, verifies action is valid and enforces required parameters
 sub eat_cmdargs {
     my $mode = shift || 'linode';
-    my @paramsfirst = qw( action|a:s version|V|v help|h man ); # initial parse of args
+    my @paramsfirst = qw( action|a:s version|V|v help|h ); # initial parse of args
     my @paramscommon = qw( json|j:s output:s ); # args needed for every action
     my $cmdargs = {};
     $cmdargs->{output} = 'martian';
 
     GetOptions( $cmdargs, @paramsfirst );
 
-    if ( exists $cmdargs->{man} ) {
-        pod2usage( -exitval => 0, -verbose => 2 );
-    }
-    elsif ( exists $cmdargs->{version} ) {
+    if ( exists $cmdargs->{version} ) {
         version_message();
     }
 
@@ -379,7 +376,7 @@ sub eat_cmdargs {
             if ( $eachp =~ m/=/ ) { # use GetOptions flag (=) to determine a required one
                 my @valuesp = split( /\|/, $eachp );
                 if ( !exists $cmdargs->{ $valuesp[0] } ) {
-                    die "The '$cmdargs->{action}' command requires a --${valuesp[0]} parameter.  Run --help or --man for usage.\n";
+                    die "The '$cmdargs->{action}' command requires a --${valuesp[0]} parameter.  Run --help or for usage.\n";
                 }
             }
         }
@@ -406,7 +403,7 @@ sub eat_cmdargs {
             # they asked for help
             pod2usage();
         } else {
-            die "Unknown command.  Run --help or --man for usage.\n";
+            die "Unknown command.  Run --help for usage.\n";
         }
     }
 
