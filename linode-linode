@@ -61,17 +61,9 @@ API key to use when communicating with the Linode API. The API key can also be s
 
 Optional. JSON output.
 
-=item B<-w>, B<--wait>
-
-Optional. Waits and provides feedback while the task(s) run.
-
 =item B<-h>, B<--help>
 
-Brief help message.
-
-=item B<-m>, B<--man>
-
-Full documentation
+Displays help documentation.
 
 =back
 

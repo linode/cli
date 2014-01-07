@@ -57,11 +57,7 @@ Optional. JSON output.
 
 =item B<-h>, B<--help>
 
-Brief help message.
-
-=item B<-m>, B<--man>
-
-Full documentation
+Displays help documentation.
 
 =back
 
