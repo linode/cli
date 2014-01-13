@@ -1,0 +1,14 @@
+.*\._.*
+.*\.DS_Store.*
+.*\.git.*
+.*\.perltidyrc.*
+
+# Makemaker generated files and dirs.
+^MANIFEST\.bak
+^Makefile$
+^blib/
+^MakeMaker-\d
+pm_to_blib
+\.tar\.gz
+\.tar
+\.tmp

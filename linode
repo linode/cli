@@ -26,3 +26,46 @@ $object = 'linode'
     unless ( defined($object) && ( my @found = grep { $_ eq $object } @MODES ) );
 
 exec( $FindBin::RealBin . "/linode-$object", @ARGV );
+
+__END__
+
+=head1 NAME
+
+linode - command-line interface to the Linode platform
+
+=head1 SYNOPSIS
+
+B<linode> [B<--object> object] [object-options...]
+
+This is a wrapper utility to the suite of Linode command line tools.
+
+=head2 Objects
+
+The following command line tools are available, and can be called directly or
+with B<linode object>.
+
+=over 8
+
+=item B<linode-account>
+
+Interface to Linode account information. Use B<man linode-account> or
+B<linode-account --help> for more information.
+
+=item B<linode-domain>
+
+Interface to Linode domains and DNS records. Use B<man linode-domain> or
+B<linode-domain --help> for more information.
+
+=item B<linode-linode>
+
+Interface to Linode instances. Use B<man linode-linode> or
+B<linode-linode --help> for more information.
+
+=item B<linode-stackscript>
+
+Interface to StackScripts. Use B<man linode-stackscript> or
+B<linode-stackscript --help> for more information.
+
+=back
+
+=cut
