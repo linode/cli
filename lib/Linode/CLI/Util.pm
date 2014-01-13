@@ -13,7 +13,7 @@ our %EXPORT_TAGS = (
         %paramsdef @MODES $VERSION
     ))],
     config => ['write_config'],
-    json => ['json_response'],
+    json   => ['json_response'],
 );
 our @EXPORT_OK = (qw(
         json_response error load_config write_config human_displaymemory succeed fail
@@ -28,12 +28,16 @@ use Getopt::Long (qw(:config no_ignore_case bundling pass_through));
 use Term::ANSIColor ':constants';
 
 our $VERSION = '0.2.4';
-
-our @MODES = (qw(
+our @MODES   = (qw(
     linode stackscript domain nodebalancer longview account user
 ));
 
-our %correct_case = ( 'linode' => 'Linode', 'account' => 'Account', 'stackscript' => 'Stackscript', 'domain' => 'Domain' );
+our %correct_case = (
+    'linode' => 'Linode',
+    'account' => 'Account',
+    'stackscript' => 'Stackscript',
+    'domain' => 'Domain',
+);
 
 our %humanstatus = (
     '-2' => 'boot failed',
@@ -134,8 +138,8 @@ our %paramsdef = (
     },
     'account' => {
         'info'  => { 'alias' => 'show' },
-        'show'  => { 'run' => 'show' },
-        'list'  => { 'run' => 'list' }
+        'show'  => { 'run'   => 'show' },
+        'list'  => { 'run'   => 'list' }
     },
     'stackscript' => {
         'create'  => {
@@ -148,7 +152,7 @@ our %paramsdef = (
                 'description'  => 'description|D:s',
             },
             'warmcache' => [ 'distribution' ],
-         },
+        },
         'update' => {
             'options' => {
                 'label'        => 'label|l=s@',
@@ -160,10 +164,10 @@ our %paramsdef = (
                 'description'  => 'description|D:s',
             },
             'warmcache' => [ 'distribution' ],
-         },
-        'delete'     => { 'options' => { 'label' => 'label|l=s@' }, },
-        'list'       => { 'options' => { 'label' => 'label|l:s@' }, },
-        'show'       => { 'options' => { 'label' => 'label|l=s@' }, },
+        },
+        'delete' => { 'options' => { 'label' => 'label|l=s@' }, },
+        'list'   => { 'options' => { 'label' => 'label|l:s@' }, },
+        'show'   => { 'options' => { 'label' => 'label|l=s@' }, },
         'source' => {
             'options' => { 'label' => 'label|l:s@' },
             'run'     => 'show',
@@ -172,80 +176,72 @@ our %paramsdef = (
     'domain' => {
         'create'  => {
             'options' => {
-                'label'        => 'label|domain|l=s',
-                'type'         => 'type|t:s',
-                'email'        => 'email|soa|e:s',
-                'description'  => 'description|D:s',
-                'refresh'      => 'refresh|R:s',
-                'retry'        => 'retry|Y:s',
-                'expire'       => 'expire|E:s',
-                'ttl'          => 'ttl|T:s',
-                'group'        => 'group|g:s',
-                'status'       => 'status|s:s',
-                'masterip'     => 'masterip|m:s@',
-                'axfrip'       => 'axfrip|x:s@',
+                'label'       => 'label|domain|l=s',
+                'type'        => 'type|t:s',
+                'email'       => 'email|soa|e:s',
+                'description' => 'description|D:s',
+                'refresh'     => 'refresh|R:s',
+                'retry'       => 'retry|Y:s',
+                'expire'      => 'expire|E:s',
+                'ttl'         => 'ttl|T:s',
+                'group'       => 'group|g:s',
+                'status'      => 'status|s:s',
+                'masterip'    => 'masterip|m:s@',
+                'axfrip'      => 'axfrip|x:s@',
             },
             'seeknext' => [ 'email', 'masterip' ],
-         },
+        },
         'update' => {
             'options' => {
-                'label'        => 'label|domain|l=s@',
-                'new-label'    => 'new-label|n:s',
-                'type'         => 'type|t:s',
-                'email'        => 'email|soa|e:s',
-                'description'  => 'description|D:s',
-                'refresh'      => 'refresh|R:s',
-                'retry'        => 'retry|Y:s',
-                'expire'       => 'expire|E:s',
-                'ttl'          => 'ttl|T:s',
-                'group'        => 'group|g:s',
-                'status'       => 'status|s:s',
-                'masterip'     => 'masterip|m:s@',
-                'axfrip'       => 'axfrip|x:s@',
-            },
-         },
-        'delete' => { 'options' => { 'label' => 'label|domain|l=s@' }, },
-        'list'   => {
-            'options' => {
-                'label'     => 'label|domain|l:s@',
+                'label'       => 'label|domain|l=s@',
+                'new-label'   => 'new-label|n:s',
+                'type'        => 'type|t:s',
+                'email'       => 'email|soa|e:s',
+                'description' => 'description|D:s',
+                'refresh'     => 'refresh|R:s',
+                'retry'       => 'retry|Y:s',
+                'expire'      => 'expire|E:s',
+                'ttl'         => 'ttl|T:s',
+                'group'       => 'group|g:s',
+                'status'      => 'status|s:s',
+                'masterip'    => 'masterip|m:s@',
+                'axfrip'      => 'axfrip|x:s@',
             },
         },
-        'show'   => {
+        'delete' => { 'options' => { 'label' => 'label|domain|l=s@' } },
+        'list'   => { 'options' => { 'label' => 'label|domain|l:s@' } },
+        'show'   => { 'options' => { 'label' => 'label|domain|l=s@' } },
+        'record-create' => {
             'options' => {
-                'label'     => 'label|domain|l=s@',
-            },
-        },
-        'record-create'  => {
-            'options' => {
-                'label'        => 'label|domain|l=s',
-                'type'         => 'type|t=s',
-                'name'         => 'name|n:s',
-                'target'       => 'target|R:s',
-                'priority'     => 'priority|P:s',
-                'weight'       => 'weight|W:s',
-                'port'         => 'port|p:s',
-                'protocol'     => 'protocol|L:s',
-                'ttl'          => 'ttl|T:s',
+                'label'    => 'label|domain|l=s',
+                'type'     => 'type|t=s',
+                'name'     => 'name|n:s',
+                'target'   => 'target|R:s',
+                'priority' => 'priority|P:s',
+                'weight'   => 'weight|W:s',
+                'port'     => 'port|p:s',
+                'protocol' => 'protocol|L:s',
+                'ttl'      => 'ttl|T:s',
             },
             'run'      => 'domainrecord',
             'seeknext' => [ 'type', 'name', 'target' ],
-         },
-        'record-update'  => {
+        },
+        'record-update' => {
             'options' => {
-                'label'        => 'label|domain|l=s',
-                'type'         => 'type|t=s',
-                'match'        => 'match|m=s',
-                'name'         => 'name|n:s',
-                'target'       => 'target|R:s',
-                'priority'     => 'priority|P:s',
-                'weight'       => 'weight|W:s',
-                'port'         => 'port|p:s',
-                'protocol'     => 'protocol|L:s',
-                'ttl'          => 'ttl|T:s',
+                'label'    => 'label|domain|l=s',
+                'type'     => 'type|t=s',
+                'match'    => 'match|m=s',
+                'name'     => 'name|n:s',
+                'target'   => 'target|R:s',
+                'priority' => 'priority|P:s',
+                'weight'   => 'weight|W:s',
+                'port'     => 'port|p:s',
+                'protocol' => 'protocol|L:s',
+                'ttl'      => 'ttl|T:s',
             },
             'run'      => 'domainrecord',
             'seeknext' => [ 'type', 'match' ],
-         },
+        },
         'record-delete' => {
             'options' => {
                 'label' => 'label|domain|l=s',
@@ -255,17 +251,17 @@ our %paramsdef = (
             'run'      => 'domainrecord',
             'seeknext' => [ 'type', 'match' ],
         },
-        'record-list'   => {
+        'record-list' => {
             'options' => {
-                'label'     => 'label|domain|l=s@',
-                'type'      => 'type|t:s',
+                'label' => 'label|domain|l=s@',
+                'type'  => 'type|t:s',
             },
             'run' => 'list',
         },
-        'record-show'   => {
+        'record-show' => {
             'options' => {
-                'label'     => 'label|domain|l=s@',
-                'type'      => 'type|t:s',
+                'label' => 'label|domain|l=s@',
+                'type'  => 'type|t:s',
             },
             'run' => 'show',
         },

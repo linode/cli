@@ -328,7 +328,7 @@ sub delete {
             );
         }
         else {
-            $self->{_result} = $self->{_result} = $self->fail(
+            $self->{_result} = $self->fail(
                 action  => $self->{_action},
                 label   => $ss_label,
                 message => "Unable to delete $ss_label",
