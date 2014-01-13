@@ -9,22 +9,23 @@ our @EXPORT      = qw();
 our %EXPORT_TAGS = (
     basic => [(qw(
         error load_config human_displaymemory succeed fail format_squish format_tf
-        format_len %correct_case %humanstatus %humanyn %humandc %paramsdef @MODES
-        $VERSION
+        format_len colorize %correct_case %humanstatus %humanyn %humandc
+        %paramsdef @MODES $VERSION
     ))],
     config => ['write_config'],
     json => ['json_response'],
 );
 our @EXPORT_OK = (qw(
         json_response error load_config write_config human_displaymemory succeed fail
-        format_squish format_tf format_len %correct_case %humanstatus %humanyn %humandc
-        %paramsdef @MODES $VERSION
+        format_squish format_tf format_len colorize %correct_case %humanstatus
+        %humanyn %humandc %paramsdef @MODES $VERSION
 ));
 
 use Carp;
 use JSON;
 use Pod::Usage;
 use Getopt::Long (qw(:config no_ignore_case bundling pass_through));
+use Term::ANSIColor ':constants';
 
 our $VERSION = '0.2.4';
 
@@ -548,6 +549,28 @@ sub fail {
     $result->{ $args{label} }{request_error} = $death_message;
 
     return $result;
+}
+
+sub colorize {
+    my $text = shift;
+
+    my $reset = RESET;
+    my $word_map = {
+        'running'     => GREEN,
+        'yes'         => GREEN,
+        'master'      => GREEN,
+        'powered off' => RED,
+        'no'          => RED,
+        'brand new'   => YELLOW,
+        'slave'       => YELLOW,
+    };
+
+    for my $word ( keys %{$word_map} ) {
+        my $color = $word_map->{$word};
+        $text =~ s/\b$word\b/$color$word$reset/gi;
+    };
+
+    return $text;
 }
 
 sub version_message {

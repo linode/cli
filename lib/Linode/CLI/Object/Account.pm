@@ -82,7 +82,7 @@ sub show {
     my ( $self, %args ) = @_;
 
     return sprintf( "%18s %-45s\n%18s \$ %-43.2f\n%18s %-45s\n%18s %-45s\n%18s %-45s\n%18s %-45s\n",
-            'managed:', $humanyn{ $self->{object}{info}{managed} },
+            'managed:', $humanyn{ format_tf( $self->{object}{info}{managed} ) },
             'balance:', $self->{object}{info}{balance},
             'transfer pool:', human_displaymemory( $self->{object}{info}{transfer_pool} * 1024 ),
             'transfer used:', human_displaymemory( $self->{object}{info}{transfer_used} * 1024 ),

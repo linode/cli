@@ -89,12 +89,14 @@ sub list {
 
         for my $object ( keys %{ $grouped_objects->{$group} } ) {
             if ( $output_format eq 'human' ) {
-                push @$out_arrayref, sprintf(
+                my $line = sprintf(
                     "| %-${colw[0]}s | %-${colw[1]}s | %-${colw[2]}s |",
                     format_len( $grouped_objects->{$group}{$object}{domain}, $colw[0] ),
                     $grouped_objects->{$group}{$object}{type},
                     format_len( $grouped_objects->{$group}{$object}{soa_email}, $colw[2] ),
                 );
+
+                push @$out_arrayref, colorize( $line );
             }
             else {
                 # json output

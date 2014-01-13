@@ -85,7 +85,7 @@ sub list {
 
         for my $object ( keys %{ $grouped_objects->{$group} } ) {
             if ( $output_format eq 'human' ) {
-                push @$out_arrayref, sprintf(
+                my $line = sprintf(
                     "| %-${colw[0]}s | %-${colw[1]}s | %-${colw[2]}s | %-${colw[3]}s | %-${colw[4]}s | %-${colw[5]}s |",
                     format_len( $grouped_objects->{$group}{$object}{label}, $colw[0] ),
                     $humanstatus{ $grouped_objects->{$group}{$object}{status} },
@@ -94,6 +94,8 @@ sub list {
                     human_displaymemory( $grouped_objects->{$group}{$object}{totalhd} ),
                     human_displaymemory( $grouped_objects->{$group}{$object}{totalram} )
                 );
+
+                push @$out_arrayref, colorize( $line );
             }
             else {
                 for my $key ( keys %{ $grouped_objects->{$group}{$object} } ) {
