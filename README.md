@@ -7,7 +7,7 @@ Linode CLI is a simple command-line interface to the Linode platform.
 
 ## Installation
 
-Linode CLI is currently packaged for Debian and Ubuntu. Final versions of linode-cli will be packaged up and very easy to install for major distributions.
+Linode CLI is currently packaged for Debian, Ubuntu, and through Homebrew on Mac OS X. Final versions of linode-cli will be packaged up and very easy to install for major distributions.
 
 ### Debian/Ubuntu
 
@@ -20,15 +20,11 @@ apt-get install linode-cli
 
 ### Mac OS X
 
-Installing dependencies on OS X requires either XCode or Command Line Tools for XCode, available from [Apple](https://developer.apple.com/xcode/).
-
-You'll first want to install cpanminus, either using cpan packaged with OS X (`$ cpan App::cpanminus`) or using a one-line install helper: https://github.com/miyagawa/cpanminus#installing-to-system-perl
+Installing the packaged version of Linode CLI on Mac OS X requires Homebrew: http://brew.sh
 
 ```
-cpanm -S Crypt::SSLeay JSON LWP::UserAgent Mozilla::CA Try::Tiny
-curl -Lo linode-cli.tar.gz https://github.com/linode/cli/archive/master.tar.gz
-tar xf linode-cli.tar.gz
-./cli-master/linode
+brew tap linode/cli
+brew install linode-cli
 ```
 
 ### Others
@@ -205,7 +201,7 @@ linode account show
 ```
 
 ```
-          managed true
+          managed yes
           balance $ 0.00
     transfer pool 7527.00GB
 transfer billable 0.00GB
