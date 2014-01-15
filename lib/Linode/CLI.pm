@@ -265,21 +265,46 @@ sub domainrecord {
 
 sub configure {
     my $self = shift;
-
     my $api_key;
+
+    say "This will walk you through setting default values for common options.\n";
+
+    say 'Linode Manager user name';
+    print '>> ';
+    chop ( my $lpm_username = <STDIN> );
+
+    my $lpm_login_retry = 1;
+    while ( $lpm_login_retry > 0 && $lpm_login_retry < 4 ) {
+        say "\nLinode Manager password";
+        print '>> ';
+        system( 'stty', '-echo' );
+        chop ( my $lpm_password = <STDIN> );
+        system( 'stty', 'echo' );
+        say "\n";
+
+        try {
+            $api_key = WebService::Linode->new(
+                fatal     => 1,
+                useragent => "linode-cli/$VERSION",
+            )->user_getapikey(
+                username => $lpm_username,
+                password => $lpm_password,
+            )->{api_key};
+
+            $lpm_login_retry = 0;
+        }
+        catch {
+            say STDERR "Invalid password for $lpm_username\n";
+            $lpm_login_retry++;
+        };
+    }
+
+    if ( $lpm_login_retry ) {
+        say STDERR "Three failed attempts for $lpm_username";
+        exit 1;
+    }
+
     my @options = (
-        [
-            'api-key',
-            'API key for accessing the Linode API.',
-            sub {
-                $api_key = shift;
-                my $cli = Linode::CLI->new(
-                    api_key => $api_key,
-                    mode    => 'linode',
-                    opts    => {action => 'list'},
-                );
-            }
-        ],
         [
             'distribution',
             'Default distribution to deploy when creating a new Linode or'
@@ -319,8 +344,6 @@ sub configure {
         ],
     );
 
-    say 'This will walk you through setting default values for common options.';
-
     for my $i ( 0 .. $#options ) {
         my $retry = 1;
         while ( $retry ) {
@@ -341,8 +364,12 @@ sub configure {
         }
     }
 
+    push @options, ['api-key', '', '', $api_key];
+
     my $home_directory = $ENV{HOME} || ( getpwuid($<) )[7];
     write_config( "$home_directory/.linodecli", \@options );
+
+    say "Config written to $home_directory/.linodecli";
 }
 
 sub response {
