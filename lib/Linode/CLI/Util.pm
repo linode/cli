@@ -501,7 +501,8 @@ sub write_config {
     chmod(0640, $fh);
 
     for my $option (@$options) {
-        say $fh "$option->[0] $option->[2]";
+        next if ( $option->[3] eq '' );
+        say $fh "$option->[0] $option->[3]";
     }
 
     close $fh;

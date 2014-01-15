@@ -266,35 +266,79 @@ sub domainrecord {
 sub configure {
     my $self = shift;
 
+    my $api_key;
     my @options = (
         [
             'api-key',
-            'API key for accessing the Linode API.'
+            'API key for accessing the Linode API.',
+            sub {
+                $api_key = shift;
+                my $cli = Linode::CLI->new(
+                    api_key => $api_key,
+                    mode    => 'linode',
+                    opts    => {action => 'list'},
+                );
+            }
         ],
         [
             'distribution',
             'Default distribution to deploy when creating a new Linode or'
-             . ' rebuilding an existing one.'
+             . ' rebuilding an existing one.',
+             sub {
+                my $distro = shift;
+                my $cli = Linode::CLI->new(
+                    api_key => $api_key,
+                    mode    => 'linode',
+                    opts    => { action => 'create', distribution => $distro }
+                );
+             }
         ],
         [
-            'datacenter', 'Default datacenter to deploy new Linodes within.'
+            'datacenter',
+            'Default datacenter to deploy new Linodes within.',
+            sub {
+                my $datacenter = shift;
+                my $cli = Linode::CLI->new(
+                    api_key => $api_key,
+                    mode    => 'linode',
+                    opts    => { action => 'create', datacenter => $datacenter }
+                );
+            }
         ],
         [
-            'plan', 'Default plan when deploying a new Linode.'
-        ],
-        [
-            'payment-term', 'Default payment term when deploying a new Linode.'
+            'plan',
+            'Default plan when deploying a new Linode.',
+            sub {
+                my $plan = shift;
+                my $cli = Linode::CLI->new(
+                    api_key => $api_key,
+                    mode    => 'linode',
+                    opts    => { action => 'create', plan => $plan }
+                );
+            }
         ],
     );
 
     say 'This will walk you through setting default values for common options.';
 
     for my $i ( 0 .. $#options ) {
-        say $options[$i][1];
-        print '>> ';
-        chop ( my $response = <STDIN> );
-        push @{ $options[$i] }, $response;
-        say '';
+        my $retry = 1;
+        while ( $retry ) {
+            say $options[$i][1];
+            print '>> ';
+            chop ( my $response = <STDIN> );
+
+            try {
+                if ( $options[$i][2]->($response) ) {
+                    push @{ $options[$i] }, $response;
+                    say '';
+                    $retry = 0;
+                }
+            }
+            catch {
+                say STDERR "\nBad $options[$i][0]: $response\n";
+            };
+        }
     }
 
     my $home_directory = $ENV{HOME} || ( getpwuid($<) )[7];
