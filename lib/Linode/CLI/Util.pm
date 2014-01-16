@@ -71,10 +71,11 @@ our %paramsdef = (
                 'datacenter'   => 'datacenter|location|L=s',
                 'distribution' => 'distribution|d=s',
                 'plan'         => 'plan|p=s',
-                'payment-term' => 'payment-term|t=i',
+                'payment-term' => 'payment-term|t:i',
                 'quantity'     => 'quantity|q:i',
                 'group'        => 'group|g:s',
-                'wait'         => 'wait|w'
+                'wait'         => 'wait|w',
+                'pubkey-file'  => 'pubkey-file|K:s'
             },
             'format'    => { 'plan' => 'format_squish', 'datacenter'  => 'format_squish' },
             'warmcache' => [ 'plan', 'distribution', 'datacenter', 'kernel' ],
@@ -480,7 +481,7 @@ sub load_config {
     while ( my $line = <$fh> ) {
         next if $line =~ /^\s*#/;
         next if $line =~ /^\s*$/;
-        my ( $key, $value ) = $line =~ /^\s*(\S*)\s([\w\s]+)$/;
+        my ( $key, $value ) = $line =~ /^\s*(\S*)\s(.+)$/;
         unless ( $key && $value ) {
             die "Unable to parse line in $file: '$line' does not conform to standard";
             next;

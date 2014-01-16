@@ -267,6 +267,8 @@ Create and start a new Linode. This action prompts for a password which will be 
 
 **-g**, **--group**: Optional. Linode Manager display group to place this Linode under. Default: none.
 
+**-K**, **--pubkey-file**: Optional. A public key file to install at `/root/.ssh/authorized_keys` when creating this Linode.
+
 **-L**, **--location**: City name or DatacenterID to deploy to.
 
 **-l**, **--label**: A Linode to operate on.

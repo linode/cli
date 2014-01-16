@@ -85,6 +85,10 @@ Distribution name or DistributionID to deploy.
 
 Optional. Linode Manager display group to place this Linode under. Default: none.
 
+=item B<-K>, B<--pubkey-file>
+
+Optional. A public key file to install at B</root/.ssh/authorized_keys> when creating this Linode.
+
 =item B<-L>, B<--location>
 
 City name or DatacenterID to deploy to.

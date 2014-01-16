@@ -308,7 +308,7 @@ sub configure {
         [
             'distribution',
             'Default distribution to deploy when creating a new Linode or'
-             . ' rebuilding an existing one.',
+             . ' rebuilding an existing one. (Optional)',
              sub {
                 my $distro = shift;
                 my $cli = Linode::CLI->new(
@@ -320,7 +320,7 @@ sub configure {
         ],
         [
             'datacenter',
-            'Default datacenter to deploy new Linodes within.',
+            'Default datacenter to deploy new Linodes within. (Optional)',
             sub {
                 my $datacenter = shift;
                 my $cli = Linode::CLI->new(
@@ -332,7 +332,7 @@ sub configure {
         ],
         [
             'plan',
-            'Default plan when deploying a new Linode.',
+            'Default plan when deploying a new Linode. (Optional)',
             sub {
                 my $plan = shift;
                 my $cli = Linode::CLI->new(
@@ -340,6 +340,15 @@ sub configure {
                     mode    => 'linode',
                     opts    => { action => 'create', plan => $plan }
                 );
+            }
+        ],
+        [
+            'pubkey-file',
+            'Path to an SSH public key to install when creating a new Linode.'
+             . ' (Optional)',
+            sub {
+                my $file = shift;
+                die unless ( $file && -f $file );
             }
         ],
     );
@@ -585,6 +594,8 @@ sub _distill_options {
         $self->_fuzzy_match($_);
     }
 
+    $self->{_distilled_options}{pubkeyfile}
+        = $self->{_opts}{'pubkey-file'} if ( $self->{_opts}{'pubkey-file'} );
     $self->{_distilled_options}{paymentterm}
         = $self->{_opts}{'payment-term'} if ( $self->{_opts}{'payment-term'} );
     $self->{_distilled_options}{label}

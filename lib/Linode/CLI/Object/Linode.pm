@@ -232,7 +232,7 @@ sub create {
     my $params = {
         linode_create => {
             datacenterid    => delete $options->{datacenterid},
-            paymentterm     => delete $options->{paymentterm},
+            paymentterm     => delete $options->{paymentterm} || 1,
             planid          => delete $options->{planid},
         },
         linode_disk_createfromdistribution => {
@@ -300,6 +300,19 @@ sub create {
 
         $params->{linode_disk_createfromdistribution}->{size}
             = ( $linode_hd_space - $params->{linode_disk_create}{size} );
+
+        if ( $options->{pubkeyfile} && -f $options->{pubkeyfile} ) {
+            $params->{linode_disk_createfromdistribution}->{rootsshkey} = do {
+                local $/ = undef;
+                open my $fh, '<', $options->{pubkeyfile}
+                    or die "CRITICAL: Unable to open $options->{pubkeyfile}.\n";
+                <$fh>;
+            };
+        }
+        elsif ( $options->{pubkeyfile} ) {
+            die "CRITICAL: Unable to open $options->{pubkeyfile}.\n";
+        }
+
         $disk = $api->linode_disk_createfromdistribution(
             %{ $params->{linode_disk_createfromdistribution} } );
     };
