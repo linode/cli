@@ -38,6 +38,7 @@ sub new_from_list {
         backupsenabled => 'backups',
         totalhd        => 'disk',
         totalram       => 'ram',
+        ips            => 'ips',
     };
 
     return $class->SUPER::new_from_list(
@@ -51,6 +52,7 @@ sub new_from_list {
 
 sub list {
     my ( $self, %args ) = @_;
+    my $api           = $self->{_api_obj};
     my $label         = $args{label};
     my $output_format = $args{output_format} || 'human';
     my $out_arrayref = [];
@@ -62,6 +64,12 @@ sub list {
     # Group into display groups
     for my $object ( keys %{ $self->{object} } ) {
         next if ( $label && $object ne $label );
+        if ( $output_format eq 'json' ) {
+            my $linodeid = $self->{object}{$object}{linodeid};
+            my @ips = map { $_->{ipaddress} } @{$api->linode_ip_list(linodeid => $linodeid)};
+            $self->{object}{$object}{ips} = \@ips;
+        }
+
         my $display_group = $self->{object}{$object}->{lpm_displaygroup};
         $grouped_objects->{$display_group}{$object}
             = $self->{object}{$object};
@@ -183,16 +191,20 @@ sub list {
 
 sub show {
     my ( $self, %args ) = @_;
+    my $api    = $self->{_api_obj};
     my $return = '';
 
     for my $object_label ( keys %{ $self->{object} } ) {
-       $return .= sprintf( "%9s %-45s\n%9s %-45s\n%9s %-45s\n%9s %-45s\n%9s %-45s\n%9s %-45s\n",
+        my $linodeid = $self->{object}{$object_label}{linodeid};
+        my @ips = map { $_->{ipaddress} } @{$api->linode_ip_list(linodeid => $linodeid)};
+       $return .= sprintf( "%9s %-45s\n%9s %-45s\n%9s %-45s\n%9s %-45s\n%9s %-45s\n%9s %-45s\n%9s %-45s\n",
                 'label:', $self->{object}->{$object_label}->{label},
                 'status:', $humanstatus{ $self->{object}->{$object_label}->{status} },
                 'location:', $humandc{ $self->{object}->{$object_label}->{datacenterid} },
                 'backups:', $humanyn{ $self->{object}->{$object_label}->{backupsenabled} },
                 'disk:',human_displaymemory( $self->{object}->{$object_label}->{totalhd} ),
-                'ram:', human_displaymemory( $self->{object}->{$object_label}->{totalram} )
+                'ram:', human_displaymemory( $self->{object}->{$object_label}->{totalram} ),
+                'ips:', join(' ', @ips)
             ) . "\n";
     }
 
