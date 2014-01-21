@@ -136,7 +136,7 @@ sub update {
             }
         };
 
-        if ( $self->{_action} eq 'rename') {
+        if ( $self->{_action} eq 'rename' ) {
             # check if this label is already in use
             my $nbobjects = $api_obj->nodebalancer_list();
             for my $nbobject (@$nbobjects) {
@@ -151,8 +151,8 @@ sub update {
             $params->{set}{label} = $options->{'new-label'};
         }
 
-        if ( $self->{_action} eq 'throttle') {
-            if ( $options->{connections} >= 0 && $options->{connections} <= 20) {
+        if ( $self->{_action} eq 'throttle' ) {
+            if ( $options->{connections} >= 0 && $options->{connections} <= 20 ) {
                 $params->{set}{clientconnthrottle} = $options->{connections};
                 $params->{set}{label} = $nb_label; # label required
             } else {
@@ -269,7 +269,7 @@ sub list {
         return $out_hashref;
     }
     elsif ( $output_format eq 'json' ) {
-        if (scalar( keys %{ $out_hashref }) > 0) {
+        if ( scalar( keys %{ $out_hashref }) > 0 ) {
             for my $object ( keys %$out_hashref ) {
                 $self->{_result} = $self->succeed(
                     action  => $self->{_action},
@@ -503,7 +503,7 @@ sub configupdate {
     # - port (to get the configid)
 
     # load the configs, look for the matching port to get the id
-    my $configs = $api_obj->nodebalancer_config_list( nodebalancerid => $nb_id);
+    my $configs = $api_obj->nodebalancer_config_list(nodebalancerid => $nb_id);
     if ( @$configs != 0 ) {
         for my $config ( @$configs ) {
             if ( $options->{port} eq $config->{port} ) {
@@ -685,7 +685,7 @@ sub configdelete {
     my $config_id = 0;
 
     # load the configs, look for the matching port to get the id
-    my $configs = $api_obj->nodebalancer_config_list( nodebalancerid => $nb_id);
+    my $configs = $api_obj->nodebalancer_config_list( nodebalancerid => $nb_id );
     if ( @$configs != 0 ) {
         for my $config ( @$configs ) {
             if ( $options->{port} eq $config->{port} ) {
@@ -732,7 +732,7 @@ sub configlist {
     my $out_hashref = {};
     my $api_obj = $self->{_api_obj};
     my $options = $args{options};
-    my @colw = ( 6, 8, 10, 11, 10); # port, protocol, algorithm, stickiness, check
+    my @colw = (6, 8, 10, 11, 10); # port, protocol, algorithm, stickiness, check
 
     for my $object_label ( keys %{ $self->{object} } ) {
 
@@ -822,7 +822,7 @@ sub configlist {
         return $self->{_result};
     }
     else {
-        return join( "\n", @$out_arrayref, @$out_recordsarrayref);
+        return join("\n", @$out_arrayref, @$out_recordsarrayref);
     }
 
 }
@@ -982,7 +982,7 @@ sub nodeupdate {
     my $nodes;
 
     # load the configs, look for the matching port to get the configid
-    my $configs = $api_obj->nodebalancer_config_list( nodebalancerid => $nb_id);
+    my $configs = $api_obj->nodebalancer_config_list(nodebalancerid => $nb_id);
     if ( @$configs != 0 ) {
         for my $config ( @$configs ) {
             if ( $options->{port} eq $config->{port} ) {
@@ -1098,7 +1098,7 @@ sub nodedelete {
     my $node_id  = 0;
 
     # load the configs, look for the matching port to get the id
-    my $configs = $api_obj->nodebalancer_config_list( nodebalancerid => $nb_id);
+    my $configs = $api_obj->nodebalancer_config_list(nodebalancerid => $nb_id);
     if ( @$configs != 0 ) {
         for my $config ( @$configs ) {
             if ( $options->{port} eq $config->{port} ) {
@@ -1237,7 +1237,7 @@ sub nodelist {
         return $self->{_result};
     }
     else {
-        return join( "\n", @$out_arrayref, @$out_recordsarrayref);
+        return join("\n", @$out_arrayref, @$out_recordsarrayref);
     }
 
 }

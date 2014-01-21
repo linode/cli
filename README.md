@@ -216,7 +216,6 @@ Displaying the Nodes, which will list the Linodes handing traffic on the port re
 linode nodebalancer node-list mynodebalancer 80
 ```
 
-
 ### Working with StackScripts
 
 Actions can be performed on StackScripts.
@@ -448,7 +447,6 @@ Display detailed information about one or more Domains.
 
 **-l**, **--label**: Required. A specific Domain to show.
 
-
 #### Domain Record Create (record-create)
 
 Create a Domain record.
@@ -513,7 +511,6 @@ List Domain Record information for one or more Domains.
 
 **-t**, **--type**: Optional. Allows domain record filtering by type. One of: NS, MX, A, AAAA, CAME, TXT, or SRV
 
-
 #### Domain Record Show (record-show)
 
 Display detailed Domain Record information for one or more Domains.
@@ -570,7 +567,6 @@ Display detailed information about one or more NodeBalancers.
 
 **-l**, **--label**: Required. A specific NodeBalancer to show.
 
-
 ### NodeBalancer Config Actions
 
 #### Create NodeBalancer Config/Port (config-create)
@@ -602,7 +598,6 @@ Create a NodeBalancer config (port).
 **-C**, **--ssl-cert**: Optional. SSL certificate served by the NodeBalancer when the protocol is 'https'.
 
 **-K**, **--ssl-key**: Optional. Unpassphrased private key for the SSL certificate when protocol is 'https'.
-
 
 #### Update NodeBalancer Config/Port (config-update)
 
@@ -658,7 +653,6 @@ Display detailed information about a specific NodeBalancer config/port.
 
 **-p**, **--port**: Required. The NodeBalancer config port to show.
 
-
 ### NodeBalancer Node Actions
 
 #### Create NodeBalancer Node (node-create)
@@ -704,7 +698,6 @@ Delete a NodeBalancer Node.
 **-p**, **--port**: The NodeBalancer port or config port.
 
 **-n**, **--name**: The specific Node name to delete.
-
 
 #### List NodeBalancer Node (node-list)
 
@@ -785,4 +778,3 @@ Display detailed information about one or more StackScripts.
 Display the source code for a StackScript.
 
 **-l**, **--label**: Required. A specific StackScript to show.
-

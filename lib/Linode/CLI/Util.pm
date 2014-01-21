@@ -33,10 +33,10 @@ our @MODES   = (qw(
 ));
 
 our %correct_case = (
-    'linode' => 'Linode',
-    'account' => 'Account',
-    'stackscript' => 'Stackscript',
-    'domain' => 'Domain',
+    'linode'       => 'Linode',
+    'account'      => 'Account',
+    'stackscript'  => 'Stackscript',
+    'domain'       => 'Domain',
     'nodebalancer' => 'Nodebalancer',
 );
 

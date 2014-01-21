@@ -520,7 +520,7 @@ sub _get_object_list {
             $objectunique = 'domain';
         }
         elsif ( $mode eq 'nodebalancer' ) {
-            $objects = $api->nodebalancer_list();
+            $objects      = $api->nodebalancer_list();
             $objectunique = 'label';
         }
         else {
