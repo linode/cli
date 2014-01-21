@@ -37,6 +37,7 @@ our %correct_case = (
     'account' => 'Account',
     'stackscript' => 'Stackscript',
     'domain' => 'Domain',
+    'nodebalancer' => 'Nodebalancer',
 );
 
 our %humanstatus = (
@@ -265,6 +266,149 @@ our %paramsdef = (
                 'type'  => 'type|t:s',
             },
             'run' => 'show',
+        },
+    },
+    'nodebalancer' => {
+        'create'  => {
+            'options' => {
+                'label'        => 'label|l=s@',
+                'datacenter'   => 'datacenter|location|L=s',
+                'payment-term' => 'payment-term|t:i',
+            },
+            'format'    => { 'datacenter'  => 'format_squish' },
+            'warmcache' => [ 'datacenter' ],
+            'seeknext' => [ 'datacenter', 'payment-term' ],
+        },
+        'rename' => {
+            'options' => {
+                'label'     => 'label|l=s',
+                'new-label' => 'new-label|n=s',
+            },
+            'run'      => 'update',
+            'seeknext' => [ 'new-label' ],
+        },
+        'throttle' => {
+            'options' => {
+                'label'       => 'label|l=s',
+                'connections' => 'connections|c=i',
+            },
+            'run'      => 'update',
+            'seeknext' => [ 'connections' ],
+        },
+        'delete' => { 'options' => { 'label' => 'label|l=s@' }, },
+        'list'   => { 'options' => { 'label' => 'label|l:s@' }, },
+        'show'   => { 'options' => { 'label' => 'label|l=s@' }, },
+        'config-create'  => {
+            'options' => {
+            'label'          => 'label|nodebalancer|l=s@',
+            'port'           => 'port|config|p:i',
+            'protocol'       => 'protocol|L:s',
+            'algorithm'      => 'algorithm|A:s',
+            'stickiness'     => 'stickiness|S:s',
+            'check-health'   => 'check-health|H:s',
+            'check-interval' => 'check-interval|I:i',
+            'check-timeout'  => 'check-timeout|T:i',
+            'check-attempts' => 'check-attempts|X:i',
+            'check-path'     => 'check-path|P:s',
+            'check-body'     => 'check-body|B:s',
+            'ssl-cert'       => 'ssl-cert|C:s',
+            'ssl-key'        => 'ssl-key|K:s',
+            },
+            'run'      => 'nodebalancer',
+            'seeknext' => [ 'port' ],
+         },
+        'config-update'  => {
+            'options' => {
+            'label'          => 'label|nodebalancer|l=s@',
+            'port'           => 'port|config|p=i',
+            'new-port'       => 'new-port|N:i',
+            'protocol'       => 'protocol|L:s',
+            'algorithm'      => 'algorithm|A:s',
+            'stickiness'     => 'stickiness|S:s',
+            'check-health'   => 'check-health|H:s',
+            'check-interval' => 'check-interval|I:i',
+            'check-timeout'  => 'check-timeout|T:i',
+            'check-attempts' => 'check-attempts|X:i',
+            'check-path'     => 'check-path|P:s',
+            'check-body'     => 'check-body|B:s',
+            'ssl-cert'       => 'ssl-cert|C:s',
+            'ssl-key'        => 'ssl-key|K:s',
+            },
+            'run'      => 'nodebalancer',
+            'seeknext' => [ 'port' ],
+         },
+        'config-delete' => {
+            'options' => {
+                'label' => 'label|nodebalancer|l=s@',
+                'port'  => 'port|config|p=i',
+            },
+            'run'      => 'nodebalancer',
+            'seeknext' => [ 'port'],
+        },
+        'config-list'   => {
+            'options' => {
+                'label' => 'label|nodebalancer|l=s@',
+            },
+            'run' => 'list',
+        },
+        'config-show'   => {
+            'options' => {
+                'label' => 'label|nodebalancer|l=s@',
+                'port'  => 'port|config|p=i',
+            },
+            'run' => 'show',
+            'seeknext' => [ 'port' ],
+        },
+        'node-create'  => {
+            'options' => {
+                'label'   => 'label|nodebalancer|l=s@',
+                'port'    => 'port|config|p=i',
+                'name'    => 'name|n=s',
+                'address' => 'address|A=s',
+                'weight'  => 'weight|W:s',
+                'mode'    => 'mode|M:s',
+            },
+            'run'      => 'nodebalancer',
+            'seeknext' => [ 'port', 'name', 'address' ],
+         },
+        'node-update'  => {
+            'options' => {
+                'label'    => 'label|nodebalancer|l=s@',
+                'port'     => 'port|config|p=i',
+                'name'     => 'name|n=s',
+                'new-name' => 'new-name|N:s',
+                'address'  => 'address|A:s',
+                'weight'   => 'weight|W:s',
+                'mode'     => 'mode|M:s',
+            },
+            'run'      => 'nodebalancer',
+            'seeknext' => [ 'port', 'name' ],
+         },
+        'node-delete' => {
+            'options' => {
+                'label' => 'label|nodebalancer|l=s@',
+                'port'  => 'port|config|p=i',
+                'name'  => 'name|n=s',
+            },
+            'run'      => 'nodebalancer',
+            'seeknext' => [ 'port', 'name' ],
+        },
+        'node-list'   => {
+            'options' => {
+                'label' => 'label|nodebalancer|l=s@',
+                'port'  => 'port|config|p=i',
+            },
+            'run' => 'list',
+            'seeknext' => [ 'port' ],
+        },
+        'node-show'   => {
+            'options' => {
+                'label' => 'label|nodebalancer|l=s@',
+                'port'  => 'port|config|p=i',
+                'name'  => 'name|n=s',
+            },
+            'run' => 'show',
+            'seeknext' => [ 'port', 'name' ],
         },
     },
 );

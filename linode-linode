@@ -91,7 +91,7 @@ Optional. A public key file to install at B</root/.ssh/authorized_keys> when cre
 
 =item B<-L>, B<--location>
 
-City name or DatacenterID to deploy to.
+The datacenter to use for deployment.
 
 =item B<-l>, B<--label>
 

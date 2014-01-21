@@ -191,7 +191,7 @@ Optional. Accepts multiple entries. IP addresses allowed to AXFR the entire zone
 
 =over 8
 
-Update a Domain.
+Delete a Domain.
 
 =over 8
 

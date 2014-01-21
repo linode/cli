@@ -182,6 +182,41 @@ linode domain record-show example.com
 linode domain record-show example.com example.com MX
 ```
 
+### Working with NodeBalancers
+
+Create a NodeBalancer in your datacenter of choice.
+
+```
+linode nodebalancer create mynodebalancer dallas
+```
+
+Set the NodeBalancer up to handle traffic on a port (configuration).
+
+```
+linode nodebalancer config-create mynodebalancer 80
+```
+
+Create NodeBlanacer Nodes, balancing the incoming traffic between your Linodes.
+
+```
+linode nodebalancer node-create mynodebalancer 80 mylinode1 xx.xx.xx.1:80
+linode nodebalancer node-create mynodebalancer 80 mylinode2 xx.xx.xx.2:80
+linode nodebalancer node-create mynodebalancer 80 mylinode3 xx.xx.xx.3:80
+```
+
+Displaying NodeBalancers.
+
+```
+linode nodebalancer list
+```
+
+Displaying the Nodes, which will list the Linodes handing traffic on the port requested.
+
+```
+linode nodebalancer node-list mynodebalancer 80
+```
+
+
 ### Working with StackScripts
 
 Actions can be performed on StackScripts.
@@ -257,6 +292,8 @@ Each action has a set of options that apply to it, which are outlined in the sec
 
 **-h**, **--help**: Displays help documentation.
 
+---
+
 ### Linode Actions
 
 #### Create
@@ -269,7 +306,7 @@ Create and start a new Linode. This action prompts for a password which will be 
 
 **-K**, **--pubkey-file**: Optional. A public key file to install at `/root/.ssh/authorized_keys` when creating this Linode.
 
-**-L**, **--location**: City name or DatacenterID to deploy to.
+**-L**, **--location**: The datacenter to use for deployment.
 
 **-l**, **--label**: A Linode to operate on.
 
@@ -330,6 +367,8 @@ List information about one or more Linodes. Linodes are grouped by their display
 Display detailed information about one or more Linodes.
 
 **-l**, **--label**: Required. A specific Linode to show.
+
+---
 
 ### Domain Actions
 
@@ -483,6 +522,209 @@ Display detailed Domain Record information for one or more Domains.
 
 **-t**, **--type**: Optional. Allows domain record filtering by type. One of: NS, MX, A, AAAA, CAME, TXT, or SRV
 
+---
+
+### NodeBalancer Actions
+
+#### Create
+
+Create a NodeBalancer.
+
+**-l**, **--label**: Required. The name of the NodeBalancer.
+
+**-L**, **--location**: Required. The datacenter to use for deployment.
+
+**-t**, **--payment-term**: Optional. Payment term, one of 1, 12, or 24 (months). Default: 1.
+
+#### Rename
+
+Rename a NodeBalancer.
+
+**-l**, **--label**: Required. The name of the NodeBalancer.
+
+**-n**, **--new-label**: Required. The new name for the NodeBalancer.
+
+#### Throttle
+
+Adjust the connections per second allowed per client IP for a NodeBalancer, to help mitigate abuse.
+
+**-l**, **--label**: Required. The name of the NodeBalancer.
+
+**-c**, **--connections**: Required. To help mitigate abuse, throttle connections per second, per client IP. 0 to disable. Max of 20.
+
+#### Delete
+
+Delete a NodeBalancer.
+
+**-l**, **--label**: Required. The NodeBalancer to delete.
+
+#### List
+
+List information about one or more NodeBalancers.
+
+**-l**, **--label**: Optional. A specific NodeBalancer to list.
+
+#### Show
+
+Display detailed information about one or more NodeBalancers.
+
+**-l**, **--label**: Required. A specific NodeBalancer to show.
+
+
+### NodeBalancer Config Actions
+
+#### Create NodeBalancer Config/Port (config-create)
+
+Create a NodeBalancer config (port).
+
+**-l**, **--label**: Required. The NodeBalancer name to add the config/port.
+
+**-p**, **--port**: Optional. The NodeBalancer config port to bind on (1-65534). Default is 80.
+
+**-L**, **--protocol**: Optional. Options are 'tcp', 'http', and 'https'. Default is 'http'.
+
+**-A**, **--algorithm**: Optional. Balancing algorithm. Options are 'roundrobin', 'leastconn', and 'source'. Default is 'roundrobin'.
+
+**-S**, **--stickiness**: Optional. Session persistence. Options are 'none', 'table', and 'http_cookie'. Default is 'table'.
+
+**-H**, **--check-health**: Optional. Perform active health checks on the backend nodes. One of 'connection', 'http', 'http_body'. Default is 'connection'.
+
+**-I**, **--check-interval**: Optional. Seconds between health check probes (2-3600). Default is 5.
+
+**-T**, **--check-timeout**: Optional. Seconds to wait before considering the probe a failure (1-30). Must be less than check_interval. Default is 3.
+
+**-X**, **--check-attempts**: Optional. Number of failed probes before taking a node out of rotation (1-30). Default is 2.
+
+**-P**, **--check-path**: Optional. When check-health='http', the path to request. Default is '/'.
+
+**-B**, **--check-body**: Optional. When check-health='http_body', a regex against the expected result body.
+
+**-C**, **--ssl-cert**: Optional. SSL certificate served by the NodeBalancer when the protocol is 'https'.
+
+**-K**, **--ssl-key**: Optional. Unpassphrased private key for the SSL certificate when protocol is 'https'.
+
+
+#### Update NodeBalancer Config/Port (config-update)
+
+Update a NodeBalancer config (port).
+
+**-l**, **--label**: Required. The NodeBalancer name.
+
+**-p**, **--port**: Required. The NodeBalancer config port.
+
+**-N**, **--new-port**: Optional. Changes the config port to bind on (1-65534).
+
+**-L**, **--protocol**: Optional. Protocol. Options are 'tcp', 'http', and 'https'.
+
+**-A**, **--algorithm**: Optional. Balancing algorithm. Options are 'roundrobin', 'leastconn', and 'source'.
+
+**-S**, **--stickiness**: Optional. Session persistence. Options are 'none', 'table', and 'http_cookie'.
+
+**-H**, **--check-health**: Optional. Perform active health checks on the backend nodes. One of 'connection', 'http', 'http_body'.
+
+**-I**, **--check-interval**: Optional. Seconds between health check probes (2-3600).
+
+**-T**, **--check-timeout**: Optional. Seconds to wait before considering the probe a failure (1-30). Must be less than check_interval.
+
+**-X**, **--check-attempts**: Optional. Number of failed probes before taking a node out of rotation (1-30).
+
+**-P**, **--check-path**: Optional. When check-health='http', the path to request.
+
+**-B**, **--check-body**: Optional. When check-health='http_body', a regex against the expected result body.
+
+**-C**, **--ssl-cert**: Optional. SSL certificate served by the NodeBalancer when the protocol is 'https'.
+
+**-K**, **--ssl-key**: Optional. Unpassphrased private key for the SSL certificate when protocol is 'https'.
+
+#### Delete NodeBalancer Config/Port (config-delete)
+
+Delete a NodeBalancer config (port).
+
+**-l**, **--label**: The NodeBalancer name.
+
+**-p**, **--port**: The NodeBalancer config port to delete.
+
+#### List NodeBalancer Config/Port (config-list)
+
+List all configs (ports) for a specific NodeBalancer.
+
+**-l**, **--label**: Required. A specific NodeBalancer to list.
+
+#### Show NodeBalancer Config/Port (config-show)
+
+Display detailed information about a specific NodeBalancer config/port.
+
+**-l**, **--label**: Required. A specific NodeBalancer to show.
+
+**-p**, **--port**: Required. The NodeBalancer config port to show.
+
+
+### NodeBalancer Node Actions
+
+#### Create NodeBalancer Node (node-create)
+
+Create a NodeBalancer Node.
+
+**-l**, **--label**: Required. The label (name) of the NodeBalancer.
+
+**-p**, **--port**: Required. The NodeBalancer port or config port.
+
+**-n**, **--name**: Required. The Node name to update.
+
+**-A**, **--address**: Required. The address:port combination used to communicate with this Node.
+
+**-W**, **--weight**: Optional. Load balancing weight, 1-255. Higher means more connections. Default is 100.
+
+**-M**, **--mode**: Optional. The connections mode to use. Options are 'accept', 'reject', and 'drain'. Default is 'accept'.
+
+#### Update NodeBalancer Node (node-update)
+
+Update a NodeBalancer Node.
+
+**-l**, **--label**: Required. The label (name) of the NodeBalancer.
+
+**-p**, **--port**: Required. The NodeBalancer port or config port.
+
+**-n**, **--name**: Required. The Node name to update.
+
+**-N**, **--new-name**: Optional. New name for the Node (rename).
+
+**-A**, **--address**: Optional. The address:port combination used to communicate with this Node.
+
+**-W**, **--weight**: Optional. Load balancing weight, 1-255. Higher means more connections.
+
+**-M**, **--mode**: Optional. The connections mode to use. Options are 'accept', 'reject', and 'drain'.
+
+#### Delete NodeBalancer Node (node-delete)
+
+Delete a NodeBalancer Node.
+
+**-l**, **--label**: The NodeBalancer name.
+
+**-p**, **--port**: The NodeBalancer port or config port.
+
+**-n**, **--name**: The specific Node name to delete.
+
+
+#### List NodeBalancer Node (node-list)
+
+List all Nodes for a specific NodeBalancer port.
+
+**-l**, **--label**: Required. A specific NodeBalancer.
+
+**-p**, **--port**: Required. The NodeBalancer port or config port.
+
+#### Show NodeBalancer Node (node-show)
+
+Show detailed information about a specific Node for a specific NodeBalancer port.
+
+**-l**, **--label**: Required. A specific NodeBalancer.
+
+**-p**, **--port**: Required. The NodeBalancer port or config port.
+
+**-n**, **--name**: Required. The name of the Node to show.
+
+---
 
 ### StackScript Actions
 
@@ -543,3 +785,4 @@ Display detailed information about one or more StackScripts.
 Display the source code for a StackScript.
 
 **-l**, **--label**: Required. A specific StackScript to show.
+

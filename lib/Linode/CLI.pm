@@ -9,6 +9,7 @@ use Linode::CLI::Object::Linode;
 use Linode::CLI::Object::Account;
 use Linode::CLI::Object::Stackscript;
 use Linode::CLI::Object::Domain;
+use Linode::CLI::Object::Nodebalancer;
 use Linode::CLI::Util (qw(:basic :config :json));
 use Try::Tiny;
 use WebService::Linode;
@@ -142,6 +143,10 @@ sub list {
     my $sub = 'list';
     if ( $self->{mode} eq 'domain' && $self->{_opts}{action} eq 'record-list' ) {
         $sub  = 'recordlist';
+    } elsif ($self->{mode} eq 'nodebalancer' && $self->{_opts}->{action} eq 'config-list') {
+        $sub = 'configlist';
+    } elsif ($self->{mode} eq 'nodebalancer' && $self->{_opts}->{action} eq 'node-list') {
+        $sub = 'nodelist';
     }
 
     my $list_result = try {
@@ -186,6 +191,12 @@ sub show {
     if ( $self->{mode} eq 'domain' && $self->{_opts}{action} eq 'record-show' ) {
         $subhum  = 'recordshow';
         $subjson = 'recordlist';
+    } elsif ($self->{mode} eq 'nodebalancer' && $self->{_opts}->{action} eq 'config-show') {
+        $subhum  = 'configshow';
+        $subjson = 'configlist';
+    } elsif ($self->{mode} eq 'nodebalancer' && $self->{_opts}->{action} eq 'node-show') {
+        $subhum  = 'nodeshow';
+        $subjson = 'nodelist';
     }
 
     # Eventually, 'show' will have more comprehensive JSON output than 'list'
@@ -261,6 +272,36 @@ sub domainrecord {
     );
     my %combined = ( %$result, %{ $self->{_result} } );
     %{ $self->{_result} } = %combined;
+}
+
+sub nodebalancer {
+    my $self = shift;
+
+    my $sub = 'configcreate';
+    if ($self->{mode} eq 'nodebalancer' && $self->{_opts}->{action} eq 'config-update') {
+        $sub  = 'configupdate';
+    } elsif ($self->{mode} eq 'nodebalancer' && $self->{_opts}->{action} eq 'config-delete') {
+        $sub  = 'configdelete';
+    } elsif ($self->{mode} eq 'nodebalancer' && $self->{_opts}->{action} eq 'node-create') {
+        $sub  = 'nodecreate';
+    } elsif ($self->{mode} eq 'nodebalancer' && $self->{_opts}->{action} eq 'node-update') {
+        $sub  = 'nodeupdate';
+    } elsif ($self->{mode} eq 'nodebalancer' && $self->{_opts}->{action} eq 'node-delete') {
+        $sub  = 'nodedelete';
+    }
+
+    my $result = "Linode::CLI::Object::$correct_case{$self->{mode}}"->$sub(
+        api_obj    => $self->{_api_obj},
+        options    => $self->{_distilled_options},
+        # single object
+        set_obj => @{ $self->_get_object_list(
+            $self->{mode}, $self->{_distilled_options}{label}
+        ) }[0],
+        format     => $self->{output_format},
+        wait       => $self->{wait},
+    );
+    my %combined = (%$result, %{$self->{_result}});
+    %{$self->{_result}} = %combined;
 }
 
 sub configure {
@@ -464,7 +505,8 @@ sub _get_object_list {
     # These are objects that have labels and should be filtered based on the
     # label(s) passed in. Other objects (account) are returned blindly, or need
     # special treatment.
-    my @should_filter = (qw(linode stackscript domain));
+
+    my @should_filter = (qw(linode stackscript domain nodebalancer));
 
     if ( my @found = grep { $_ eq $mode } @should_filter ) {
         my $objects = [];
@@ -476,6 +518,10 @@ sub _get_object_list {
         elsif ( $mode eq 'domain' ) {
             $objects      = $api->domain_list();
             $objectunique = 'domain';
+        }
+        elsif ( $mode eq 'nodebalancer' ) {
+            $objects = $api->nodebalancer_list();
+            $objectunique = 'label';
         }
         else {
             $objects      = $api->linode_list();

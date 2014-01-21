@@ -1,0 +1,536 @@
+#!/usr/bin/env perl
+
+# linode-cli
+# Copyright (C) 2014 Linode, LLC
+
+use 5.010;
+use strict;
+use warnings;
+
+use FindBin;
+use lib "$FindBin::RealBin/lib";
+use lib '/usr/lib/linode-cli';
+use Linode::CLI;
+use Linode::CLI::Util ':basic';
+my $mode    = 'nodebalancer';
+my $cmdargs = Linode::CLI::Util::eat_cmdargs($mode);
+
+my $cli = Linode::CLI->new(
+    api_key       => $cmdargs->{'api-key'},
+    mode          => $mode,
+    opts          => $cmdargs,
+    output_format => $cmdargs->{output},
+    wait          => $cmdargs->{wait},
+);
+
+my $runaction = $cmdargs->{run};
+$cli->$runaction;
+$cli->response;
+
+__END__
+
+=head1 NAME
+
+linode-nodebalancer - command-line interface for Linode NodeBalancers
+
+=head1 SYNOPSIS
+
+B<linode-nodebalancer> [B<--api-key> API key] [B<-a> action] [action-options...] [options...]
+
+B<Actions> available: B<create>, B<rename>, B<throttle>, B<delete>, B<list>, B<show>, B<config-create>, B<config-update>, B<config-delete>, B<config-list>, B<config-show>, B<node-create>, B<node-update>, B<node-delete>, B<node-list>, B<node-show>.
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-a>, B<--action>
+
+An action to perform on Linode NodeBalancers. One of: B<create>, B<rename>, B<throttle>, B<delete>, B<list>, B<show>, B<config-create>, B<config-update>, B<config-delete>, B<config-list>, B<config-show>, B<node-create>, B<node-update>, B<node-delete>, B<node-list>, B<node-show>.
+
+=item B<--api-key>
+
+API key to use when communicating with the Linode API. The API key can also be set using an environment variable (LINODE_API_KEY). Alternatively, you can specify the API key in a B<.linodecli> file in the working user's home directory, using the format `api-key foobar`.
+
+=item B<-j>, B<--json>:
+
+Optional. JSON output.
+
+=item B<-h>, B<--help>
+
+Displays help documentation.
+
+=back
+
+=head1 ACTIONS
+
+=head2 CREATE
+
+=over 8
+
+Create a NodeBalancer.
+
+=over 8
+
+=item B<-l> B<--label>
+
+Required. The name of the NodeBalancer.
+
+=item B<-L> B<--location>
+
+Required. The datacenter to use for deployment.
+
+=item B<-t> B<--payment-term>
+
+Optional. Payment term, one of 1, 12, or 24 (months). Default: 1.
+
+=back
+
+=back
+
+=head2 RENAME
+
+=over 8
+
+Rename a NodeBalancer.
+
+=over 8
+
+=item B<-l> B<--label>
+
+Required. The name of the NodeBalancer.
+
+=item B<-n> B<--new-label>
+
+Required. The new name for the NodeBalancer.
+
+=back
+
+=back
+
+=head2 THROTTLE
+
+=over 8
+
+Adjust the connections per second allowed per client IP for a NodeBalancer, to help mitigate abuse.
+
+=over 8
+
+=item B<-l> B<--label>
+
+Required. The name of the NodeBalancer.
+
+=item B<-c> B<--connections>
+
+Required. To help mitigate abuse, throttle connections per second, per client IP. 0 to disable. Max of 20.
+
+=back
+
+=back
+
+=head2 DELETE
+
+=over 8
+
+Delete a NodeBalancer.
+
+=over 8
+
+=item B<-l> B<--label>
+
+Required. The NodeBalancer to delete.
+
+=back
+
+=back
+
+=head2 LIST
+
+=over 8
+
+List information about one or more NodeBalancers.
+
+=over 8
+
+=item B<-l> B<--label>
+
+Optional. A specific NodeBalancer to list.
+
+=back
+
+=back
+
+=head2 SHOW
+
+=over 8
+
+Display detailed information about one or more NodeBalancers.
+
+=over 8
+
+=item B<-l> B<--label>
+
+Required. A specific NodeBalancer to list.
+
+=back
+
+=back
+
+=head2 CONFIG-CREATE
+
+=over 8
+
+Create a NodeBalancer config (port).
+
+=over 8
+
+=item B<-l> B<--label>
+
+Required. The NodeBalancer name to add the config/port.
+
+=item B<-p> B<--port>
+
+Optional. The NodeBalancer config port to bind on (1-65534). Default is 80.
+
+=item B<-L> B<--protocol>
+
+Optional. Options are 'tcp', 'http', and 'https'. Default is 'http'.
+
+=item B<-A> B<--algorithm>
+
+Optional. Balancing algorithm. Options are 'roundrobin', 'leastconn', and 'source'. Default is 'roundrobin'.
+
+=item B<-S> B<--stickiness>
+
+Optional. Session persistence. Options are 'none', 'table', and 'http_cookie'. Default is 'table'.
+
+=item B<-H> B<--check-health>
+
+Optional. Perform active health checks on the backend nodes. One of 'connection', 'http', 'http_body'. Default is 'connection'.
+
+=item B<-I> B<--check-interval>
+
+Optional. Seconds between health check probes (2-3600). Default is 5.
+
+=item B<-T> B<--check-timeout>
+
+Optional. Seconds to wait before considering the probe a failure (1-30). Must be less than check_interval. Default is 3.
+
+=item B<-X> B<--check-attempts>
+
+Optional. Number of failed probes before taking a node out of rotation (1-30). Default is 2.
+
+=item B<-P> B<--check-path>
+
+Optional. When check-health='http', the path to request. Default is '/'.
+
+=item B<-B> B<--check-body>
+
+Optional. When check-health='http_body', a regex against the expected result body.
+
+=item B<-C> B<--ssl-cert>
+
+Optional. SSL certificate served by the NodeBalancer when the protocol is 'https'.
+
+=item B<-K> B<--ssl-key>
+
+Optional. Unpassphrased private key for the SSL certificate when protocol is 'https'.
+
+=back
+
+=back
+
+=head2 CONFIG-UPDATE
+
+=over 8
+
+Update a NodeBalancer config (port).
+
+=over 8
+
+=item B<-l> B<--label>
+
+Required. The NodeBalancer name.
+
+=item B<-p> B<--port>
+
+Required. The NodeBalancer config port.
+
+=item B<-N> B<--new-port>
+
+Optional. Changes the config port to bind on (1-65534).
+
+=item B<-L> B<--protocol>
+
+Optional. Protocol. Options are 'tcp', 'http', and 'https'.
+
+=item B<-A> B<--algorithm>
+
+Optional. Balancing algorithm. Options are 'roundrobin', 'leastconn', and 'source'.
+
+=item B<-S> B<--stickiness>
+
+Optional. Session persistence. Options are 'none', 'table', and 'http_cookie'.
+
+=item B<-H> B<--check-health>
+
+Optional. Perform active health checks on the backend nodes. One of 'connection', 'http', 'http_body'.
+
+=item B<-I> B<--check-interval>
+
+Optional. Seconds between health check probes (2-3600).
+
+=item B<-T> B<--check-timeout>
+
+Optional. Seconds to wait before considering the probe a failure (1-30). Must be less than check_interval.
+
+=item B<-X> B<--check-attempts>
+
+Optional. Number of failed probes before taking a node out of rotation (1-30).
+
+=item B<-P> B<--check-path>
+
+Optional. When check-health='http', the path to request.
+
+=item B<-B> B<--check-body>
+
+Optional. When check-health='http_body', a regex against the expected result body.
+
+=item B<-C> B<--ssl-cert>
+
+Optional. SSL certificate served by the NodeBalancer when the protocol is 'https'.
+
+=item B<-K> B<--ssl-key>
+
+Optional. Unpassphrased private key for the SSL certificate when protocol is 'https'.
+
+=back
+
+=back
+
+=head2 CONFIG-DELETE
+
+=over 8
+
+Delete a NodeBalancer config (port).
+
+=over 8
+
+=item B<-l> B<--label>
+
+The NodeBalancer name.
+
+=item B<-p> B<--port>
+
+The NodeBalancer config port to delete.
+
+=back
+
+=back
+
+=head2 CONFIG-LIST
+
+=over 8
+
+List all configs (ports) for a specific NodeBalancer.
+
+=over 8
+
+=item B<-l> B<--label>
+
+Required. A specific NodeBalancer to list.
+
+=back
+
+=back
+
+=head2 CONFIG-SHOW
+
+=over 8
+
+Display detailed information about a specific NodeBalancer config/port.
+
+=over 8
+
+=item B<-l> B<--label>
+
+Required. A specific NodeBalancer to show.
+
+=item B<-p> B<--port>
+
+Required. The NodeBalancer port or config port to show.
+
+=back
+
+=back
+
+=head2 NODE-CREATE
+
+=over 8
+
+Create a NodeBalancer Node.
+
+=over 8
+
+=item B<-l> B<--label>
+
+Required. The label (name) of the NodeBalancer.
+
+=item B<-p> B<--port>
+
+Required. The NodeBalancer port or config port.
+
+=item B<-n> B<--name>
+
+Required. The Node name to update.
+
+=item B<-A> B<--address>
+
+Required. The address:port combination used to communicate with this Node.
+
+=item B<-W> B<--weight>
+
+Optional. Load balancing weight, 1-255. Higher means more connections. Default is 100.
+
+=item B<-M> B<--mode>
+
+Optional. The connections mode to use. Options are 'accept', 'reject', and 'drain'. Default is 'accept'.
+
+=back
+
+=back
+
+=head2 NODE-UPDATE
+
+=over 8
+
+Update a NodeBalancer Node.
+
+=over 8
+
+=item B<-l> B<--label>
+
+Required. The label (name) of the NodeBalancer.
+
+=item B<-p> B<--port>
+
+Required. The NodeBalancer port or config port.
+
+=item B<-n> B<--name>
+
+Required. The Node name to update.
+
+=item B<-N> B<--new-name>
+
+Optional. New name for the Node (rename).
+
+=item B<-A> B<--address>
+
+Optional. The address:port combination used to communicate with this Node.
+
+=item B<-W> B<--weight>
+
+Optional. Load balancing weight, 1-255. Higher means more connections.
+
+=item B<-M> B<--mode>
+
+Optional. The connections mode to use. Options are 'accept', 'reject', and 'drain'.
+
+=back
+
+=back
+
+=head2 NODE-DELETE
+
+=over 8
+
+Delete a NodeBalancer Node.
+
+=over 8
+
+=item B<-l> B<--label>
+
+The NodeBalancer name.
+
+=item B<-p> B<--port>
+
+The NodeBalancer port or config port.
+
+=item B<-n> B<--name>
+
+The specific Node name to delete.
+
+=back
+
+=back
+
+=head2 NODE-LIST
+
+=over 8
+
+List all Nodes for a specific NodeBalancer port.
+
+=over 8
+
+=item B<-l> B<--label>
+
+Required. A specific NodeBalancer.
+
+=item B<-p> B<--port>
+
+Required. The NodeBalancer port or config port.
+
+=back
+
+=back
+
+=head2 NODE-SHOW
+
+=over 8
+
+Show detailed information about a specific Node for a specific NodeBalancer port.
+
+=over 8
+
+=item B<-l> B<--label>
+
+Required. A specific NodeBalancer.
+
+=item B<-p> B<--port>
+
+Required. The NodeBalancer port or config port.
+
+=item B<-n> B<--name>
+
+Required. The name of the Node to show.
+
+=back
+
+=back
+
+=head1 COPYRIGHT/LICENSE
+
+Copyright 2014 Linode, LLC.  Linode CLI is made available under the terms
+of the Perl Artistic License, or GPLv2 at the recipients discretion.
+
+=head2 Perl Artistic License
+
+Read it at L<http://dev.perl.org/licenses/artistic.html>.
+
+=head2 GNU General Public License (GPL) Version 2
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see http://www.gnu.org/licenses/
+
+See the full license at L<http://www.gnu.org/licenses/>.
+
+=cut
