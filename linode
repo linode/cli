@@ -61,6 +61,11 @@ B<linode-domain --help> for more information.
 Interface to Linode instances. Use B<man linode-linode> or
 B<linode-linode --help> for more information.
 
+=item B<linode-nodebalancer>
+
+Interface to NodeBalancers. Use B<man linode-nodebalancer> or
+B<linode-nodebalancer --help> for more information.
+
 =item B<linode-stackscript>
 
 Interface to StackScripts. Use B<man linode-stackscript> or

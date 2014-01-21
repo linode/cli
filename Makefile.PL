@@ -23,6 +23,7 @@ WriteMakefile(
         'linode-account',
         'linode-domain',
         'linode-linode',
+        'linode-nodebalancer',
         'linode-stackscript',
     ],
 );
