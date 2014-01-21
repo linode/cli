@@ -590,7 +590,7 @@ sub _get_object_list {
                 # exact match check
                 for my $object ( @$objects ) {
                     my $object_label = $object->{ $objectunique };
-                    if ( exists $targets{$object_label} ) {
+                    if ( $object_label eq $eachlabel ) {
                         unless ( my @found = grep { $_ eq $object_label } @$filtered ) {
                             push @$filtered, $object;
                             if ( exists $targets{$eachlabel} ) {
