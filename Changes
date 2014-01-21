@@ -1,0 +1,43 @@
+0.3.0  2014-01-21
+  - NodeBalancer support
+  - More robust configuration helper
+  - SSH key support when creating a Linode
+  - Support listing IP addresses on Linodes
+  - Fix a bug with listing multiple objects
+
+0.2.5  2014-01-14
+  - Colorized output data
+  - Updated documentation
+  - Fix a minor issue with account info
+
+0.2.4  2014-01-07
+  - Ensure label is unique when creating Linode
+  - Update packaged-in WebService::Linode module
+  - Fix minor documentation typo
+
+0.2.3  2013-12-31
+  - Improved label handling with partial matching
+  - Customizable wait timeout for long-running calls
+
+0.2.2  2013-12-24
+  - Linode account list command
+  - Adjustments to show, list, and JSON output
+  - List table width improvements
+  - Fix message ordering when creating a Linode
+
+0.2.1  2013-12-18
+  - Fix an issue with library paths
+
+0.2.0  2013-12-18
+  - Domain and domain record management support
+  - Improvements to list display output
+  - Improved argument parsing
+  - Patched issue with account info
+
+0.1.1  2013-12-11
+  - StackScript source output command
+  - Configure method now creates .linodecli with correct perms
+  - Configure method no longer requires an API key before running
+
+0.1.0  2013-12-05
+  - Initial packaging release
