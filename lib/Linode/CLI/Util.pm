@@ -9,16 +9,16 @@ our @EXPORT      = qw();
 our %EXPORT_TAGS = (
     basic => [(qw(
         error load_config human_displaymemory succeed fail format_squish format_tf
-        format_len colorize %correct_case %humanstatus %humanyn %humandc
-        %paramsdef @MODES $VERSION
+        format_len colorize glob_tilde %correct_case %humanstatus %humanyn
+        %humandc %paramsdef @MODES $VERSION
     ))],
     config => ['write_config'],
     json   => ['json_response'],
 );
 our @EXPORT_OK = (qw(
         json_response error load_config write_config human_displaymemory succeed fail
-        format_squish format_tf format_len colorize %correct_case %humanstatus
-        %humanyn %humandc %paramsdef @MODES $VERSION
+        format_squish format_tf format_len colorize glob_tilde %correct_case
+        %humanstatus %humanyn %humandc %paramsdef @MODES $VERSION
 ));
 
 use Carp;
@@ -646,7 +646,7 @@ sub write_config {
     chmod(0640, $fh);
 
     for my $option (@$options) {
-        next if ( $option->[3] eq '' );
+        next if ( !defined $option->[3] || $option->[3] eq '' );
         say $fh "$option->[0] $option->[3]";
     }
 
@@ -691,6 +691,19 @@ sub fail {
     $result->{ $args{label} }{request_error} = $death_message;
 
     return $result;
+}
+
+sub glob_tilde {
+    my $path = shift;
+    # http://perldoc.perl.org/perlfaq5.html#How-can-I-translate-tildes-(~)-in-a-filename%3f
+    $path =~ s{
+        ^ ~([^/]*)
+    }{
+        $1
+        ? (getpwnam($1))[7]
+        : ( $ENV{HOME} || $ENV{LOGDIR} )
+    }ex;
+    return $path;
 }
 
 sub colorize {

@@ -389,7 +389,9 @@ sub configure {
              . ' (Optional)',
             sub {
                 my $file = shift;
-                die unless ( $file && -f $file );
+                $file = glob_tilde($file);
+                die if ( $file ne '' && ! -f $file );
+                return 1;
             }
         ],
     );
@@ -405,8 +407,9 @@ sub configure {
                 if ( $options[$i][2]->($response) ) {
                     push @{ $options[$i] }, $response;
                     say '';
-                    $retry = 0;
                 }
+
+                $retry = 0;
             }
             catch {
                 say STDERR "\nBad $options[$i][0]: $response\n";

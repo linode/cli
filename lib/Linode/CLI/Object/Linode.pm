@@ -313,6 +313,9 @@ sub create {
         $params->{linode_disk_createfromdistribution}->{size}
             = ( $linode_hd_space - $params->{linode_disk_create}{size} );
 
+        $options->{pubkeyfile}
+            = glob_tilde($options->{pubkeyfile}) if $options->{pubkeyfile};
+
         if ( $options->{pubkeyfile} && -f $options->{pubkeyfile} ) {
             $params->{linode_disk_createfromdistribution}->{rootsshkey} = do {
                 local $/ = undef;
