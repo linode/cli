@@ -453,7 +453,7 @@ Create a Domain record.
 
 **-l**, **--label**: The Domain (name). The zone's name.
 
-**-t**, **--type**: Required. One of: NS, MX, A, AAAA, CAME, TXT, or SRV
+**-t**, **--type**: Required. One of: NS, MX, A, AAAA, CNAME, TXT, or SRV
 
 **-n**, **--name**: Optional. The hostname or FQDN. When Type=MX the subdomain to delegate to the Target MX server. Default: blank.
 
@@ -475,7 +475,7 @@ Update a Domain record.
 
 **-l**, **--label**: The Domain containing the record to update.
 
-**-t**, **--type**: Required. The type of the record to delete. One of: NS, MX, A, AAAA, CAME, TXT, or SRV
+**-t**, **--type**: Required. The type of the record to delete. One of: NS, MX, A, AAAA, CNAME, TXT, or SRV
 
 **-m**, **--match**: Required. The match for the record to delete. Match to a name or target.
 
@@ -499,7 +499,7 @@ Delete a Domain record.
 
 **-l**, **--label**: The Domain containing the record to delete.
 
-**-t**, **--type**: Required. The type of the record to delete. One of: NS, MX, A, AAAA, CAME, TXT, or SRV
+**-t**, **--type**: Required. The type of the record to delete. One of: NS, MX, A, AAAA, CNAME, TXT, or SRV
 
 **-m**, **--match**: Required. The match for the record to delete. Match to a name or target.
 
@@ -509,7 +509,7 @@ List Domain Record information for one or more Domains.
 
 **-l**, **--label**: Optional. A specific Domain to list.
 
-**-t**, **--type**: Optional. Allows domain record filtering by type. One of: NS, MX, A, AAAA, CAME, TXT, or SRV
+**-t**, **--type**: Optional. Allows domain record filtering by type. One of: NS, MX, A, AAAA, CNAME, TXT, or SRV
 
 #### Domain Record Show (record-show)
 
@@ -517,7 +517,7 @@ Display detailed Domain Record information for one or more Domains.
 
 **-l**, **--label**: Required. A specific Domain to show.
 
-**-t**, **--type**: Optional. Allows domain record filtering by type. One of: NS, MX, A, AAAA, CAME, TXT, or SRV
+**-t**, **--type**: Optional. Allows domain record filtering by type. One of: NS, MX, A, AAAA, CNAME, TXT, or SRV
 
 ---
 

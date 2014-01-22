@@ -249,7 +249,7 @@ The Domain (name). The zone's name.
 
 =item B<-t> B<--type>
 
-One of: NS, MX, A, AAAA, CAME, TXT, or SRV
+One of: NS, MX, A, AAAA, CNAME, TXT, or SRV
 
 =item B<-n> B<--name>
 
@@ -297,7 +297,7 @@ The Domain containing the record to update.
 
 =item B<-t> B<--type>
 
-The type of the record to delete. One of: NS, MX, A, AAAA, CAME, TXT, or SRV
+The type of the record to delete. One of: NS, MX, A, AAAA, CNAME, TXT, or SRV
 
 =item B<-m> B<--match>
 
@@ -349,7 +349,7 @@ The Domain containing the record to delete.
 
 =item B<-t> B<--type>
 
-The type of the record to delete. One of: NS, MX, A, AAAA, CAME, TXT, or SRV
+The type of the record to delete. One of: NS, MX, A, AAAA, CNAME, TXT, or SRV
 
 =item B<-m> B<--match>
 
@@ -373,7 +373,7 @@ Optional. A specific Domain to list.
 
 =item B<-t> B<--type>
 
-Optional. Allows domain record filtering by type. One of: NS, MX, A, AAAA, CAME, TXT, or SRV
+Optional. Allows domain record filtering by type. One of: NS, MX, A, AAAA, CNAME, TXT, or SRV
 
 =back
 
@@ -393,7 +393,7 @@ Required. A specific Domain to show.
 
 =item B<-t> B<--type>
 
-Optional. Allows domain record filtering by type. One of: NS, MX, A, AAAA, CAME, TXT, or SRV
+Optional. Allows domain record filtering by type. One of: NS, MX, A, AAAA, CNAME, TXT, or SRV
 
 =back
 
