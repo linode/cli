@@ -730,7 +730,7 @@ sub colorize {
 
 sub version_message {
     say "linode-cli $VERSION";
-    say 'Copyright (C) 2013 Linode, LLC';
+    say 'Copyright (C) 2014 Linode, LLC';
     exit;
 }
 

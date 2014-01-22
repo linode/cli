@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 # linode-cli
-# Copyright (C) 2013 Linode, LLC
+# Copyright (C) 2014 Linode, LLC
 
 use 5.010;
 use strict;
@@ -206,7 +206,7 @@ Required. A specific StackScript to show.
 
 =head1 COPYRIGHT/LICENSE
 
-Copyright 2013 Linode, LLC.  Linode CLI is made available under the terms
+Copyright 2014 Linode, LLC.  Linode CLI is made available under the terms
 of the Perl Artistic License, or GPLv2 at the recipients discretion.
 
 =head2 Perl Artistic License

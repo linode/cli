@@ -1,4 +1,4 @@
-Copyright 2013 Linode, LLC.  Linode CLI is made available under the terms
+Copyright 2014 Linode, LLC.  Linode CLI is made available under the terms
 of the Perl Artistic License, or GPLv2 at the recipients discretion.
 
 =======================================================================
@@ -296,7 +296,7 @@ convey the exclusion of warranty; and each file should have at least
 the "copyright" line and a pointer to where the full notice is found.
 
     Linode CLI
-    Copyright (C) 2013 Linode, LLC
+    Copyright (C) 2014 Linode, LLC
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
