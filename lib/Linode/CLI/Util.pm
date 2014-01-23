@@ -76,7 +76,8 @@ our %paramsdef = (
                 'quantity'     => 'quantity|q:i',
                 'group'        => 'group|g:s',
                 'wait'         => 'wait|w',
-                'pubkey-file'  => 'pubkey-file|K:s'
+                'pubkey-file'  => 'pubkey-file|K:s',
+                'password'     => 'password|P:s'
             },
             'format'    => { 'plan' => 'format_squish', 'datacenter'  => 'format_squish' },
             'warmcache' => [ 'plan', 'distribution', 'datacenter', 'kernel' ],
@@ -495,6 +496,12 @@ sub eat_cmdargs {
         if ( defined $ENV{'LINODE_API_KEY'} ) {
             if ( !exists $cmdargs->{'api-key'} ) { # don't override a more important one
                 $cmdargs->{'api-key'} = $ENV{'LINODE_API_KEY'};
+            }
+        }
+
+        if ( defined $ENV{'LINODE_ROOT_PASSWORD'} ) {
+            if ( !exists $cmdargs->{password} ) {
+                $cmdargs->{password} = $ENV{'LINODE_ROOT_PASSWORD'};
             }
         }
 

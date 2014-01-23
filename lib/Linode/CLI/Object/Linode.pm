@@ -273,6 +273,9 @@ sub create {
         }
     };
 
+    $params->{linode_disk_createfromdistribution}{rootpass}
+        = $options->{password} if ( exists $options->{password} );
+
     if ( !exists $params->{linode_disk_createfromdistribution}{rootpass} ) {
         print 'Root password for this Linode: ';
         system( 'stty', '-echo' );
