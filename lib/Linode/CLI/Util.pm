@@ -178,7 +178,7 @@ our %paramsdef = (
     'domain' => {
         'create'  => {
             'options' => {
-                'label'       => 'label|domain|l=s',
+                'label'       => 'label|domain|l=s@',
                 'type'        => 'type|t:s',
                 'email'       => 'email|soa|e:s',
                 'description' => 'description|D:s',

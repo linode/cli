@@ -203,7 +203,7 @@ sub create {
     # - type
     # - email (master type only)
 
-    my $d_label = $options->{label};
+    my $d_label = @{ $options->{label} }[0];
     my $d_type = $options->{type} ? $options->{type} : 'master';
     my $params = {
         domain_create => {
