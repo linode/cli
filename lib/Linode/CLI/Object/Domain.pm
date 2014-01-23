@@ -114,6 +114,8 @@ sub list {
                             = $grouped_objects->{$group}{$object}{$key};
                     }
                 }
+
+                $out_hashref->{$object}{group} = $group;
             }
         }
 
