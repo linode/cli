@@ -1,3 +1,9 @@
+0.3.2  2014-01-23
+  - Fix domain create label bug
+  - Support path globbing for SSH pubkey
+  - Fix domain documentation typos
+  - Update copyright dates
+
 0.3.1  2014-01-21
   - Update references for NodeBalancer support
 
