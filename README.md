@@ -255,7 +255,7 @@ linode list --json
 ```
 {
    "linodefrontend1" : {
-      "datacenterid" : 2,
+      "location" : "dallas",
       "status" : "powered off",
       "backupsenabled" : false,
       "totalram" : "1GB",
@@ -265,7 +265,7 @@ linode list --json
       "linodeid" : 900001
    },
    "linodebackend1" : {
-      "datacenterid" : 2,
+      "location" : "dallas",
       "status" : "running",
       "backupsenabled" : true,
       "totalram" : "1GB",

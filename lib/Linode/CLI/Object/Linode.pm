@@ -126,6 +126,11 @@ sub list {
                             ? \1
                             : \0;
                     }
+                    elsif ( $key eq 'datacenterid' ) {
+                        $out_hashref->{$object}{'location'} = $humandc{
+                            $grouped_objects->{$group}{$object}{$key}
+                        };
+                    }
                     else {
                         $out_hashref->{$object}{$key}
                             = $grouped_objects->{$group}{$object}{$key};
