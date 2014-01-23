@@ -256,6 +256,7 @@ linode list --json
 {
    "linodefrontend1" : {
       "location" : "dallas",
+      "group" : "",
       "status" : "powered off",
       "backupsenabled" : false,
       "totalram" : "1GB",
@@ -266,6 +267,7 @@ linode list --json
    },
    "linodebackend1" : {
       "location" : "dallas",
+      "group" : "backend",
       "status" : "running",
       "backupsenabled" : true,
       "totalram" : "1GB",
