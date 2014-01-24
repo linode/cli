@@ -147,7 +147,7 @@ our %paramsdef = (
     'stackscript' => {
         'create'  => {
             'options' => {
-                'label'        => 'label|l=s',
+                'label'        => 'label|l=s@',
                 'codefile'     => 'codefile|s=s',
                 'distribution' => 'distribution|d=s@',
                 'ispublic'     => 'ispublic|p:s',
@@ -216,7 +216,7 @@ our %paramsdef = (
         'show'   => { 'options' => { 'label' => 'label|domain|l=s@' } },
         'record-create' => {
             'options' => {
-                'label'    => 'label|domain|l=s',
+                'label'    => 'label|domain|l=s@',
                 'type'     => 'type|t=s',
                 'name'     => 'name|n:s',
                 'target'   => 'target|R:s',
@@ -231,7 +231,7 @@ our %paramsdef = (
         },
         'record-update' => {
             'options' => {
-                'label'    => 'label|domain|l=s',
+                'label'    => 'label|domain|l=s@',
                 'type'     => 'type|t=s',
                 'match'    => 'match|m=s',
                 'name'     => 'name|n:s',
@@ -247,7 +247,7 @@ our %paramsdef = (
         },
         'record-delete' => {
             'options' => {
-                'label' => 'label|domain|l=s',
+                'label' => 'label|domain|l=s@',
                 'type'  => 'type|t=s',
                 'match' => 'match|m=s',
             },
@@ -282,7 +282,7 @@ our %paramsdef = (
         },
         'rename' => {
             'options' => {
-                'label'     => 'label|l=s',
+                'label'     => 'label|l=s@',
                 'new-label' => 'new-label|n=s',
             },
             'run'      => 'update',
@@ -290,7 +290,7 @@ our %paramsdef = (
         },
         'throttle' => {
             'options' => {
-                'label'       => 'label|l=s',
+                'label'       => 'label|l=s@',
                 'connections' => 'connections|c=i',
             },
             'run'      => 'update',

@@ -159,7 +159,7 @@ sub create {
     # - label
     # - distributionidlist
     # - script
-    my $ss_label = $options->{label};
+    my $ss_label = @{ $options->{label} }[0];
     # build Distribution ID List
     my $ss_distidlist = join (",", values %{ $options->{distributionid} } ); # x,y,z...
     # load in the source code from the file.
