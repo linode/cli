@@ -612,6 +612,9 @@ sub _get_object_list {
                 result  => $self->{_result},
                 action  => $self->{_distilled_options}{action},
             );
+        }
+
+        if ( keys %targets ) {
             $self->response($self->{_result});
             exit 1;
         }
