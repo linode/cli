@@ -9,7 +9,7 @@ use warnings;
 
 use FindBin;
 use lib "$FindBin::RealBin/lib";
-use lib '/usr/lib/linode-cli';
+
 use Getopt::Long (qw(:config pass_through));
 use Linode::CLI::Util ':basic';
 
