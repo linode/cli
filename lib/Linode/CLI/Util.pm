@@ -137,7 +137,10 @@ our %paramsdef = (
             'warmcache' => [ 'datacenter' ],
          },
         'delete' => { 'options' => { 'label' => 'label|l=s@' }, },
-        'configure' => {'run' => 'configure'}
+        'configure' => {
+            'run' => 'configure',
+            'warmcache' => [ 'plan', 'distribution', 'datacenter' ]
+            },
     },
     'account' => {
         'info'  => { 'alias' => 'show' },

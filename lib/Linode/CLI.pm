@@ -349,19 +349,28 @@ sub configure {
         [
             'distribution',
             'Default distribution to deploy when creating a new Linode or'
-             . ' rebuilding an existing one. (Optional)',
-             sub {
+             . ' rebuilding an existing one. (Optional) (? to show options)',
+            sub {
                 my $distro = shift;
                 my $cli = Linode::CLI->new(
                     api_key => $api_key,
                     mode    => 'linode',
                     opts    => { action => 'create', distribution => $distro }
                 );
-             }
+            },
+            sub {
+                my $cache = $self->_use_cache('distribution');
+                print "Valid options are:\n";
+                my $selections = [];
+                for my $object_label ( keys %$cache ) {
+                    push @$selections, "  " . $cache->{$object_label}{'label'} . "\n";
+                }
+                print sort @$selections;
+            }
         ],
         [
             'datacenter',
-            'Default datacenter to deploy new Linodes within. (Optional)',
+            'Default datacenter to deploy new Linodes within. (Optional) (? to show options)',
             sub {
                 my $datacenter = shift;
                 my $cli = Linode::CLI->new(
@@ -369,11 +378,20 @@ sub configure {
                     mode    => 'linode',
                     opts    => { action => 'create', datacenter => $datacenter }
                 );
+            },
+            sub {
+                my $cache = $self->_use_cache('datacenter');
+                print "Valid options are:\n";
+                my $selections = [];
+                for my $object_label ( keys %$cache ) {
+                    push @$selections, "  $humandc{ $cache->{$object_label}{'datacenterid'} }\n";
+                }
+                print sort @$selections;
             }
         ],
         [
             'plan',
-            'Default plan when deploying a new Linode. (Optional)',
+            'Default plan when deploying a new Linode. (Optional) (? to show options)',
             sub {
                 my $plan = shift;
                 my $cli = Linode::CLI->new(
@@ -381,6 +399,13 @@ sub configure {
                     mode    => 'linode',
                     opts    => { action => 'create', plan => $plan }
                 );
+            },
+            sub {
+                my $cache = $self->_use_cache('plan');
+                print "Valid options are:\n";
+                for my $object_label ( keys %$cache ) {
+                    print "  " . $cache->{$object_label}{'label'} . "\n";
+                }
             }
         ],
         [
@@ -392,6 +417,8 @@ sub configure {
                 $file = glob_tilde($file);
                 die if ( $file ne '' && ! -f $file );
                 return 1;
+            },
+            sub {
             }
         ],
     );
@@ -404,6 +431,11 @@ sub configure {
             chop ( my $response = <STDIN> );
 
             try {
+                if ( $response eq '?' ) {
+                    $options[$i][3]->();
+                    print '>> ';
+                    chop ( $response = <STDIN> );
+                }
                 if ( $options[$i][2]->($response) ) {
                     push @{ $options[$i] }, $response;
                     say '';
@@ -494,6 +526,19 @@ sub _use_or_evict_cache {
         else {
             return $self->{_cache}->{$mode}->{$key};
         }
+    }
+
+    return 0;
+}
+
+sub _use_cache {
+    # use cache without possible time eviction
+    my ( $self, $mode ) = @_;
+
+    return 0 unless ( scalar keys %{ $self->{_cache}->{$mode} } );
+
+    for my $key ( sort keys %{ $self->{_cache}->{$mode} } ) {
+        return $self->{_cache}->{$mode}->{$key};
     }
 
     return 0;
