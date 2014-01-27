@@ -474,7 +474,7 @@ sub eat_cmdargs {
         # HELP - is the user only requesting help for this action?
         if ( exists $cmdargs->{help} ) {
             # show help specificially for this command/action and exit
-            pod2usage(-verbose => 99, -sections => [ 'ACTIONS/' . uc($cmdargs->{action}) ], -exitval => 1);
+            pod2usage(-verbose => 99, -sections => [ 'ACTIONS/' . uc($cmdargs->{action}) ], -exitval => 0);
         }
 
         # decide which command to run for this action
@@ -554,7 +554,7 @@ sub eat_cmdargs {
     else {
         if ( exists $cmdargs->{help} ) {
             # they asked for help
-            pod2usage();
+            pod2usage(-exitval => 0);
         } else {
             die "Unknown command.  Run --help for usage.\n";
         }
