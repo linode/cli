@@ -91,7 +91,7 @@ Optional. A public key file to install at B</root/.ssh/authorized_keys> when cre
 
 =item B<-L>, B<--location>
 
-The datacenter to use for deployment.
+The datacenter to use for deployment. Locations are Dallas, Fremont, Atlanta, Newark, London, and Tokyo.
 
 =item B<-l>, B<--label>
 

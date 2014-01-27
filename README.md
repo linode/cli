@@ -307,7 +307,7 @@ Create and start a new Linode. This action prompts for a password which will be 
 
 **-K**, **--pubkey-file**: Optional. A public key file to install at `/root/.ssh/authorized_keys` when creating this Linode.
 
-**-L**, **--location**: The datacenter to use for deployment.
+**-L**, **--location**: The datacenter to use for deployment. Locations are Dallas, Fremont, Atlanta, Newark, London, and Tokyo.
 
 **-l**, **--label**: A Linode to operate on.
 
@@ -531,7 +531,7 @@ Create a NodeBalancer.
 
 **-l**, **--label**: Required. The name of the NodeBalancer.
 
-**-L**, **--location**: Required. The datacenter to use for deployment.
+**-L**, **--location**: Required. The datacenter to use for deployment. Locations are Dallas, Fremont, Atlanta, Newark, London, and Tokyo.
 
 **-t**, **--payment-term**: Optional. Payment term, one of 1, 12, or 24 (months). Default: 1.
 
