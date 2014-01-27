@@ -37,7 +37,7 @@ sub new {
     $self->_warm_cache unless $self->{_opts}{action} eq 'configure';
 
     $self->{_distilled_options} = $args{opts};
-    $self->_distill_options;
+    $self->_distill_options unless $self->{_opts}{action} eq 'configure';
 
     return $self;
 }

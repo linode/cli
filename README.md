@@ -12,10 +12,10 @@ Linode CLI is currently packaged for Debian, Ubuntu, and through Homebrew on Mac
 ### Debian/Ubuntu
 
 ```
-echo "deb http://apt.linode.com/ stable main" > /etc/apt/sources.list.d/linode.list
-wget -O- https://apt.linode.com/linode.gpg | apt-key add -
-apt-get update
-apt-get install linode-cli
+sudo bash -c 'echo "deb http://apt.linode.com/ stable main" > /etc/apt/sources.list.d/linode.list'
+wget -O- https://apt.linode.com/linode.gpg | sudo apt-key add -
+sudo apt-get update
+sudo apt-get install linode-cli
 ```
 
 ### Mac OS X
@@ -29,13 +29,21 @@ brew install linode-cli
 
 ### Others
 
-You'll first want to install cpanminus, either using cpan packaged with your system (`$ cpan App::cpanminus`) or using a one-line install helper: https://github.com/miyagawa/cpanminus#installing-to-system-perl
+You'll need the following Perl modules. They can be installed from the CPAN using your preferred method.
+
+* Crypt::SSLeay
+* JSON
+* LWP::UserAgent
+* Mozilla::CA
+* Try::Tiny
+* WebService::Linode
+
+Then, download the Linode CLI tarball, extract it, and install:
 
 ```
-cpanm -S Crypt::SSLeay JSON LWP::UserAgent Mozilla::CA Try::Tiny
 curl -Lo linode-cli.tar.gz https://github.com/linode/cli/archive/master.tar.gz
 tar xf linode-cli.tar.gz
-./cli-master/linode
+cd cli-master && perl Makefile.PL && sudo make install
 ```
 
 ## Initial configuration
@@ -45,7 +53,8 @@ You can configure defaults, including your API key and common deployment options
 ```
 linode configure
 This will walk you through setting default values for common options.
-API key for accessing the Linode API.
+
+Linode Manager user name
 >>
 ...
 ```
