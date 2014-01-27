@@ -345,6 +345,13 @@ sub configure {
         exit 1;
     }
 
+    my $cli_cache = Linode::CLI->new(
+        api_key => $api_key,
+        mode    => 'linode',
+        opts    => { action => 'create' }
+    );
+    $cli_cache->_warm_cache;
+
     my @options = (
         [
             'distribution',
@@ -359,7 +366,7 @@ sub configure {
                 );
             },
             sub {
-                my $cache = $self->_use_cache('distribution');
+                my $cache = $cli_cache->_use_cache('distribution');
                 print "Valid options are:\n";
                 my $selections = [];
                 for my $object_label ( keys %$cache ) {
@@ -380,7 +387,7 @@ sub configure {
                 );
             },
             sub {
-                my $cache = $self->_use_cache('datacenter');
+                my $cache = $cli_cache->_use_cache('datacenter');
                 print "Valid options are:\n";
                 my $selections = [];
                 for my $object_label ( keys %$cache ) {
@@ -401,7 +408,7 @@ sub configure {
                 );
             },
             sub {
-                my $cache = $self->_use_cache('plan');
+                my $cache = $cli_cache->_use_cache('plan');
                 print "Valid options are:\n";
                 for my $object_label ( keys %$cache ) {
                     print "  " . $cache->{$object_label}{'label'} . "\n";
@@ -423,7 +430,6 @@ sub configure {
         ],
     );
 
-    $self->_warm_cache;
     for my $i ( 0 .. $#options ) {
         my $retry = 1;
         while ( $retry ) {
@@ -450,7 +456,7 @@ sub configure {
         }
     }
 
-    push @options, ['api-key', '', '', $api_key];
+    push @options, ['api-key', '', '', '', $api_key];
 
     my $home_directory = $ENV{HOME} || ( getpwuid($<) )[7];
     write_config( "$home_directory/.linodecli", \@options );
