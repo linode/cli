@@ -480,6 +480,15 @@ sub recordcreate {
         }
     };
 
+    # - name is required for a CNAME
+    if ( lc($r_type) eq 'cname' && !exists $options->{name} ) {
+        return $self->fail(
+            action  => 'record-create',
+            label   => $d_label,
+            message => "A CNAME record requires the --name (hostname) option.",
+        );
+    }
+
     # Optional Create parameters
     # - name
     # - target
