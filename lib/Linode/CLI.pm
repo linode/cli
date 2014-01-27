@@ -34,7 +34,7 @@ sub new {
     );
 
     $self->_test_api unless $self->{_opts}{action} eq 'configure';
-    $self->_warm_cache;
+    $self->_warm_cache unless $self->{_opts}{action} eq 'configure';
 
     $self->{_distilled_options} = $args{opts};
     $self->_distill_options;
@@ -423,6 +423,7 @@ sub configure {
         ],
     );
 
+    $self->_warm_cache;
     for my $i ( 0 .. $#options ) {
         my $retry = 1;
         while ( $retry ) {
