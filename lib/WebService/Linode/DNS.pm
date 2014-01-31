@@ -8,11 +8,11 @@ use WebService::Linode::Base;
 
 =head1 NAME
 
-WebService::Linode::DNS - Perl Interface to the Linode.com API DNS methods.
+WebService::Linode::DNS - Deprecated Perl Interface to the Linode.com API DNS methods.
 
 =cut
 
-our $VERSION = '0.16';
+our $VERSION = '0.18';
 our @ISA = ("WebService::Linode::Base");
 
 sub getDomainIDbyName {

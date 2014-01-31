@@ -314,35 +314,55 @@ sub configure {
     print '>> ';
     chop ( my $lpm_username = <STDIN> );
 
-    my $lpm_login_retry = 1;
-    while ( $lpm_login_retry > 0 && $lpm_login_retry < 4 ) {
-        say "\nLinode Manager password";
-        print '>> ';
-        system( 'stty', '-echo' );
-        chop ( my $lpm_password = <STDIN> );
-        system( 'stty', 'echo' );
-        say "\n";
+    say "\nLinode Manager password for $lpm_username";
+    print '>> ';
+    system( 'stty', '-echo' );
+    chop ( my $lpm_password = <STDIN> );
+    system( 'stty', 'echo' );
 
-        try {
-            $api_key = WebService::Linode->new(
-                fatal     => 1,
-                useragent => "linode-cli/$VERSION",
-            )->user_getapikey(
-                username => $lpm_username,
-                password => $lpm_password,
-            )->{api_key};
+    say "\n";
 
-            $lpm_login_retry = 0;
+    my $api_params = {
+        username => $lpm_username,
+        password => $lpm_password,
+        label    => 'Linode CLI',
+        expires  => 0,
+    };
+
+    my $lpm_2fa;
+    my $tries = 0;
+    while ($tries <= 1)
+    {
+        $api_params->{token} = $lpm_2fa if ($lpm_2fa);
+
+        my $api_response = WebService::Linode->new(
+            nowarn    => 1,
+            useragent => "linode-cli/$VERSION",
+        )->user_getapikey(%{ $api_params });
+
+        my $err = $WebService::Linode::Base::err || 0;
+        if ($err == 4) {
+            die "Authentication failed for user $lpm_username\n";
         }
-        catch {
-            say STDERR "Invalid password for $lpm_username\n";
-            $lpm_login_retry++;
-        };
-    }
+        elsif ($err == 44) {
+            say 'Two-factor authentication code';
+            print '>> ';
+            chop ( $lpm_2fa = <STDIN> );
+            say '';
+            $tries++;
+            $WebService::Linode::Base::err = undef;
+            $WebService::Linode::Base::errstr = undef;
+            next;
+        }
+        elsif ($err == 443) {
+            die "$WebService::Linode::Base::errstr\n";
+        }
+        elsif ($err) {
+            die "Unexpected error obtaining API key for user $lpm_username\n";
+        }
 
-    if ( $lpm_login_retry ) {
-        say STDERR "Three failed attempts for $lpm_username";
-        exit 1;
+        $api_key = $api_response->{api_key};
+        last;
     }
 
     my $cli_cache = Linode::CLI->new(

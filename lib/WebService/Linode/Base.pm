@@ -15,7 +15,7 @@ WebService::Linode::Base - Perl Interface to the Linode.com API.
 
 =cut
 
-our $VERSION = '0.16';
+our $VERSION = '0.18';
 our $err;
 our $errstr;
 
@@ -23,13 +23,16 @@ sub new {
     my ($package, %args) = @_;
     my $self;
 
-    $self->{_apikey}    = $args{apikey} if $args{apikey};
+    $self->{_apikey}  = $args{apikey} if $args{apikey};
 
-    $self->{_nocache}   = $args{nocache}    || 0;
-    $self->{_debug}     = $args{debug}      || 0;
-    $self->{_fatal}     = $args{fatal}      || 0;
-    $self->{_nowarn}    = $args{nowarn}     || 0;
-    $self->{_apiurl}    = $args{apiurl} || 'https://api.linode.com/api/';
+    $self->{_nocache} = $args{nocache} || 0;
+    $self->{_debug}   = $args{debug}   || 0;
+    $self->{_fatal}   = $args{fatal}   || 0;
+    $self->{_nowarn}  = $args{nowarn}  || 0;
+    $self->{_apiurl}  = $args{apiurl}  || 'https://api.linode.com/api/';
+
+    # env api url supercedes all
+    $self->{_apiurl}  = $ENV{LINODE_API_URL} if $ENV{LINODE_API_URL};
 
     $self->{_ua} = LWP::UserAgent->new;
     $self->{_ua}->agent("WebService::Linode::Base/$WebService::Linode::Base::VERSION ");
@@ -156,6 +159,10 @@ verbose is 0-10 with 10 being the most and 0 being none
 
 useragent if passed gets passed on to the LWP::UserAgent agent method to set
 a custom user agent header on HTTP requests.
+
+apiurl if passed overides the default URL for API requests.  You may also use
+the environment variable LINODE_API_URL.  If set, the environment variable
+supersedes any apiurl argument supplied to the constructor, useful for testing.
 
 =head2 send_request
 
