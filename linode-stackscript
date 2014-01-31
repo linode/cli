@@ -51,6 +51,10 @@ An action to perform on Linode StackScript(s). One of: B<create>, B<update>, B<d
 
 API key to use when communicating with the Linode API. The API key can also be set using an environment variable (LINODE_API_KEY). Alternatively, you can specify the API key in a B<.linodecli> file in the working user's home directory, using the format `api-key foobar`.
 
+=item B<-u>, B<--username>:
+
+Optional. Allows users to specify the username, if using with multiple accounts and configuration files.
+
 =item B<-j>, B<--json>:
 
 Optional. JSON output.

@@ -420,11 +420,12 @@ our %paramsdef = (
 # parses command line arguments, verifies action is valid and enforces required parameters
 sub eat_cmdargs {
     my $mode = shift || 'linode';
-    my @paramsfirst = qw( action|a:s version|V|v help|h ); # initial parse of args
+    my @paramsfirst = qw( action|a:s version|V|v help|h username|U|u:s ); # initial parse of args
     my @paramscommon = qw( json|j:s output:s ); # args needed for every action
     my $cmdargs = {};
     $cmdargs->{output} = 'martian';
 
+    check_configs();
     GetOptions( $cmdargs, @paramsfirst );
 
     if ( exists $cmdargs->{version} ) {
@@ -508,15 +509,19 @@ sub eat_cmdargs {
             }
         }
 
-        # 3) .linodecli file
-        my $home_directory = $ENV{HOME} || ( getpwuid($<) )[7];
-        if ( -f "$home_directory/.linodecli" ) {
+        # 3) .linodecli config files
+        my $dir_home = $ENV{HOME} || ( getpwuid($<) )[7];
+        my $file_cli = "$dir_home/.linodecli/config";
+        if ( exists $cmdargs->{username} ) {
+            $file_cli = "$dir_home/.linodecli/config_" . $cmdargs->{username};
+        }
+        if ( -f $file_cli ) {
             # check user's file permissions
-            my $filemode = ( stat( "$home_directory/.linodecli" ) )[2];
+            my $filemode = ( stat( $file_cli ) )[2];
             if ( $filemode & 4 ) {
-                die "CRITICAL: $home_directory/.linodecli is world readable and contains your API key. Adjust your permissions and try again. Aborting.\n";
+                die "CRITICAL: $file_cli is world readable and contains your API key. Adjust your permissions and try again. Aborting.\n";
             }
-            my $config = load_config("$home_directory/.linodecli");
+            my $config = load_config($file_cli);
             for my $item ( keys %{$config} ) {
                 if ( !exists $cmdargs->{$item} ) { # don't override a more important one
                     $cmdargs->{$item} = $config->{$item};
@@ -622,6 +627,28 @@ sub format_len {
         return substr( $checkme, 0, ($sizelimit - 3) ) . "...";
     } else {
         return $checkme;
+    }
+}
+
+sub check_configs {
+    # upgrades older configs, if needed
+    my ( $cmdargs ) = @_;
+    my $dir_home = $ENV{HOME} || ( getpwuid($<) )[7];
+    my $dir_cli = "$dir_home/.linodecli";
+
+    unless ( -d $dir_cli ) {
+        if ( -f $dir_cli ) {
+            # legacy config exists (.linodecli file), convert to new format
+            rename $dir_cli, "$dir_home/.linodecli_bak";
+            unless( mkdir($dir_cli, 0755) ) {
+                die "CRITICAL: Unable to create $dir_cli";
+            }
+            rename "$dir_home/.linodecli_bak", "$dir_cli/config";
+        } else {
+            unless( mkdir($dir_cli, 0755) ) {
+                die "CRITICAL: Unable to create $dir_cli";
+            }
+        }
     }
 }
 

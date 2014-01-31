@@ -288,6 +288,19 @@ linode list --json
 }
 ```
 
+### Using with multiple accounts
+
+Multiple accounts and configuration files can be accomplished with the username option.
+
+```
+linode list -u username1
+linode list -u username2
+
+linode configure -u username1
+linode configure -u username2
+...
+```
+
 ## Usage
 
 ### Options
@@ -297,6 +310,8 @@ linode list --json
 Each action has a set of options that apply to it, which are outlined in the section ACTIONS.
 
 **--api-key**: API key to use when communicating with the Linode API. Alternatively, you can specify the API key in a .linodecli file in the working user's home directory, using the format `api-key foobar`.
+
+**-u**, **--username**: Optional. Allows users to specify the username, if using with multiple accounts and configuration files.
 
 **-j**, **--json**: Optional. JSON output.
 

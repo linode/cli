@@ -458,10 +458,13 @@ sub configure {
 
     push @options, ['api-key', '', '', '', $api_key];
 
-    my $home_directory = $ENV{HOME} || ( getpwuid($<) )[7];
-    write_config( "$home_directory/.linodecli", \@options );
-
-    say "Config written to $home_directory/.linodecli";
+    my $dir_home = $ENV{HOME} || ( getpwuid($<) )[7];
+    my $file_cli = "$dir_home/.linodecli/config";
+    if ( exists $self->{_opts}{username} ) {
+        $file_cli = "$dir_home/.linodecli/config_" . $self->{_opts}{username};
+    }
+    write_config( $file_cli, \@options );
+    say "Config written to $file_cli";
 }
 
 sub response {
