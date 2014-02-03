@@ -744,7 +744,7 @@ sub _fuzzy_match {
             my $found = '';
 
             # look for an exact match
-            for my $object_label ( keys %$cache ) {
+            for my $object_label ( sort keys %$cache ) {
                 if ( ( $param =~ /^\d+$/ && $param == $cache->{$object_label}{ $object . 'id' } ) # numeric id
                     || ( lc( $object_label ) eq lc( $param ) ) # lower case match
                     || ( format_squish( $object_label ) eq $param ) ) { # ex: Linode 1024 as linode1024
@@ -754,7 +754,7 @@ sub _fuzzy_match {
             }
             # not found yet, look for partial match
             if ( $found eq '' ) {
-                for my $object_label ( keys %$cache ) {
+                for my $object_label ( sort keys %$cache ) {
                     if ( $object_label =~ /^$param/i ) { # left partial match
                         $found = $object_label;
                         last;
