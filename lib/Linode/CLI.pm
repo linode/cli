@@ -368,11 +368,13 @@ sub configure {
             sub {
                 my $cache = $cli_cache->_use_cache('distribution');
                 print "Valid options are:\n";
-                my $selections = [];
-                for my $object_label ( keys %$cache ) {
-                    push @$selections, "  " . $cache->{$object_label}{'label'} . "\n";
+                my ( $selections, $i ) = ( [], 1 );
+                for my $object_label ( sort keys %$cache ) {
+                    print " " . sprintf( "%2s", $i) . " - $cache->{$object_label}{'label'}\n";
+                    push @$selections, $cache->{$object_label}{'label'};
+                    $i++;
                 }
-                print sort @$selections;
+                return $selections;
             }
         ],
         [
@@ -389,11 +391,13 @@ sub configure {
             sub {
                 my $cache = $cli_cache->_use_cache('datacenter');
                 print "Valid options are:\n";
-                my $selections = [];
-                for my $object_label ( keys %$cache ) {
-                    push @$selections, "  $humandc{ $cache->{$object_label}{'datacenterid'} }\n";
+                my ( $selections, $i ) = ( [], 1 );
+                for my $object_label ( sort keys %$cache ) {
+                    print " " . sprintf( "%2s", $i) . " - $humandc{ $cache->{$object_label}{'datacenterid'} }\n";
+                    push @$selections, $humandc{ $cache->{$object_label}{'datacenterid'} };
+                    $i++;
                 }
-                print sort @$selections;
+                return $selections;
             }
         ],
         [
@@ -410,9 +414,13 @@ sub configure {
             sub {
                 my $cache = $cli_cache->_use_cache('plan');
                 print "Valid options are:\n";
+                my ( $selections, $i ) = ( [], 1 );
                 for my $object_label ( keys %$cache ) {
-                    print "  " . $cache->{$object_label}{'label'} . "\n";
+                    print " " . sprintf( "%2s", $i) . " - $cache->{$object_label}{'label'}\n";
+                    push @$selections, $cache->{$object_label}{'label'};
+                    $i++;
                 }
+                return $selections;
             }
         ],
         [
@@ -439,15 +447,23 @@ sub configure {
 
             try {
                 if ( $response eq '?' ) {
-                    $options[$i][3]->();
+                    my $menu = $options[$i][3]->();
                     print '>> ';
                     chop ( $response = <STDIN> );
+
+                    if ( $response =~ m/^\d+$/ && $response >= 1 && $response <= scalar(@$menu) ) {
+                        $response = @$menu[$response - 1];
+                    } else {
+                        die "throw invalid option";
+                    }
+                } elsif ( $response eq '0' ) {
+                    die "throw invalid option";
                 }
+
                 if ( $options[$i][2]->($response) ) {
                     push @{ $options[$i] }, $response;
                     say '';
                 }
-
                 $retry = 0;
             }
             catch {
