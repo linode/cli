@@ -54,12 +54,12 @@ You can configure defaults, including your API key and common deployment options
 linode configure
 This will walk you through setting default values for common options.
 
-Linode Manager user name
+Linode Manager username
 >>
 ...
 ```
 
-This will write (or overwrite existing) options into a `.linodecli` file in your user's home directory.
+By default, this will (over)write `$HOME/.linodecli/config`. If you specify a username (`-u`), it will (over)write `$HOME/.linodecli/config_username`.
 
 Options are in the format of `option value`, for example:
 
@@ -309,7 +309,7 @@ linode configure -u username2
 
 Each action has a set of options that apply to it, which are outlined in the section ACTIONS.
 
-**--api-key**: API key to use when communicating with the Linode API. Alternatively, you can specify the API key in a .linodecli file in the working user's home directory, using the format `api-key foobar`.
+**--api-key**: API key to use when communicating with the Linode API. Alternatively, you can specify the API key in `$HOME/.linodecli/config`, using the format `api-key foobar`.
 
 **-u**, **--username**: Optional. Allows users to specify the username, if using with multiple accounts and configuration files.
 

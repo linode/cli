@@ -1,3 +1,9 @@
+1.1.0  2014-02-04
+  - Support for multiple accounts
+  - Two-factor authentication support
+  - General improvements to the configure tool
+  - Fix fuzzy matching bug on distribution, location, etc.
+
 1.0.0  2014-01-27
   - Documentation updates
   - Provide option hints in configure tool
