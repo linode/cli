@@ -331,10 +331,9 @@ sub configure {
 
     my $lpm_2fa;
     my $tries = 0;
-    while ($tries <= 1)
-    {
-        $api_params->{token} = $lpm_2fa if ($lpm_2fa);
-
+    while ($tries <= 1) {
+        $WebService::Linode::Base::err = undef;
+        $WebService::Linode::Base::errstr = undef;
         my $api_response = WebService::Linode->new(
             nowarn    => 1,
             useragent => "linode-cli/$VERSION",
@@ -348,10 +347,9 @@ sub configure {
             say 'Two-factor authentication code';
             print '>> ';
             chop ( $lpm_2fa = <STDIN> );
+            $api_params->{token} = $lpm_2fa || '0';
             say '';
             $tries++;
-            $WebService::Linode::Base::err = undef;
-            $WebService::Linode::Base::errstr = undef;
             next;
         }
         elsif ($err == 443) {
@@ -360,10 +358,13 @@ sub configure {
         elsif ($err) {
             die "Unexpected error obtaining API key for user $lpm_username\n";
         }
-
-        $api_key = $api_response->{api_key};
-        last;
+        else {
+            $api_key = $api_response->{api_key};
+            last;
+        }
     }
+
+    die "Authentication failed for user $lpm_username\n" unless $api_key;
 
     my $cli_cache = Linode::CLI->new(
         api_key => $api_key,
@@ -390,8 +391,8 @@ sub configure {
                 print "Valid options are:\n";
                 my ( $selections, $i ) = ( [], 1 );
                 for my $object_label ( sort keys %$cache ) {
-                    print " " . sprintf( "%2s", $i) . " - $cache->{$object_label}{'label'}\n";
-                    push @$selections, $cache->{$object_label}{'label'};
+                    print " " . sprintf( "%2s", $i ) . " - $cache->{$object_label}{label}\n";
+                    push @$selections, $cache->{$object_label}{label};
                     $i++;
                 }
                 return $selections;
@@ -413,8 +414,8 @@ sub configure {
                 print "Valid options are:\n";
                 my ( $selections, $i ) = ( [], 1 );
                 for my $object_label ( sort keys %$cache ) {
-                    print " " . sprintf( "%2s", $i) . " - $humandc{ $cache->{$object_label}{'datacenterid'} }\n";
-                    push @$selections, $humandc{ $cache->{$object_label}{'datacenterid'} };
+                    print " " . sprintf( "%2s", $i ) . " - $humandc{ $cache->{$object_label}{datacenterid} }\n";
+                    push @$selections, $humandc{ $cache->{$object_label}{datacenterid} };
                     $i++;
                 }
                 return $selections;
@@ -436,8 +437,8 @@ sub configure {
                 print "Valid options are:\n";
                 my ( $selections, $i ) = ( [], 1 );
                 for my $object_label ( keys %$cache ) {
-                    print " " . sprintf( "%2s", $i) . " - $cache->{$object_label}{'label'}\n";
-                    push @$selections, $cache->{$object_label}{'label'};
+                    print " " . sprintf( "%2s", $i ) . " - $cache->{$object_label}{label}\n";
+                    push @$selections, $cache->{$object_label}{label};
                     $i++;
                 }
                 return $selections;
