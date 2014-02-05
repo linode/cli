@@ -11,6 +11,7 @@ use Linode::CLI::Object::Stackscript;
 use Linode::CLI::Object::Domain;
 use Linode::CLI::Object::Nodebalancer;
 use Linode::CLI::Util (qw(:basic :config :json));
+use Linode::CLI::SystemInfo;
 use Try::Tiny;
 use WebService::Linode;
 
@@ -27,10 +28,12 @@ sub new {
 
     $self->{_opts} = $args{opts};
 
+    my $system = Linode::CLI::SystemInfo->system;
+
     $self->{_api_obj} = WebService::Linode->new(
         apikey    => $self->{api_key},
         fatal     => 1,
-        useragent => "linode-cli/$VERSION",
+        useragent => "linode-cli/$VERSION ($system)",
     );
 
     $self->_test_api unless $self->{_opts}{action} eq 'configure';
@@ -322,6 +325,8 @@ sub configure {
 
     say "\n";
 
+    my $system = Linode::CLI::SystemInfo->system();
+
     my $api_params = {
         username => $lpm_username,
         password => $lpm_password,
@@ -336,7 +341,7 @@ sub configure {
         $WebService::Linode::Base::errstr = undef;
         my $api_response = WebService::Linode->new(
             nowarn    => 1,
-            useragent => "linode-cli/$VERSION",
+            useragent => "linode-cli/$VERSION ($system)",
         )->user_getapikey(%{ $api_params });
 
         my $err = $WebService::Linode::Base::err || 0;
