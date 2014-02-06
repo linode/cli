@@ -28,12 +28,12 @@ sub new {
 
     $self->{_opts} = $args{opts};
 
-    my $system = Linode::CLI::SystemInfo->system;
+    my $system_info = Linode::CLI::SystemInfo->system_info;
 
     $self->{_api_obj} = WebService::Linode->new(
         apikey    => $self->{api_key},
         fatal     => 1,
-        useragent => "linode-cli/$VERSION ($system)",
+        useragent => "linode-cli/$VERSION ($system_info)",
     );
 
     $self->_test_api unless $self->{_opts}{action} eq 'configure';
@@ -325,7 +325,7 @@ sub configure {
 
     say "\n";
 
-    my $system = Linode::CLI::SystemInfo->system();
+    my $system_info = Linode::CLI::SystemInfo->system_info();
 
     my $api_params = {
         username => $lpm_username,
@@ -341,7 +341,7 @@ sub configure {
         $WebService::Linode::Base::errstr = undef;
         my $api_response = WebService::Linode->new(
             nowarn    => 1,
-            useragent => "linode-cli/$VERSION ($system)",
+            useragent => "linode-cli/$VERSION ($system_info)",
         )->user_getapikey(%{ $api_params });
 
         my $err = $WebService::Linode::Base::err || 0;

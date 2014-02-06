@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 use Exporter 'import';
-our @EXPORT = qw(system);
+our @EXPORT = qw(system_info);
 
 # A lot of this is borrowed from:
 #   http://search.cpan.org/~chorny/Linux-Distribution-0.21/lib/Linux/Distribution.pm
@@ -35,7 +35,7 @@ sub new {
     return bless $self;
 }
 
-sub system {
+sub system_info {
     my $self = shift || new();
 
     return $^O if ($^O eq 'Win32');
