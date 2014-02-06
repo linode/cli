@@ -526,7 +526,7 @@ sub eat_cmdargs {
             # check user's file permissions
             my $filemode = ( stat( $file_cli ) )[2];
             if ( $filemode & 4 ) {
-                die "CRITICAL: $file_cli is world readable and contains your API key. Adjust your permissions and try again. Aborting.\n";
+                die "$file_cli is world readable and contains your API key. Adjust your permissions and try again.\n";
             }
             my $config = load_config($file_cli);
             for my $item ( keys %{$config} ) {
@@ -648,12 +648,12 @@ sub check_configs {
             # legacy config exists (.linodecli file), convert to new format
             rename $dir_cli, "$dir_home/.linodecli_bak";
             unless( mkdir($dir_cli, 0755) ) {
-                die "CRITICAL: Unable to create $dir_cli";
+                die "Unable to create directory '$dir_cli'\n";
             }
             rename "$dir_home/.linodecli_bak", "$dir_cli/config";
         } else {
             unless( mkdir($dir_cli, 0755) ) {
-                die "CRITICAL: Unable to create $dir_cli";
+                die "Unable to create directory '$dir_cli'\n";
             }
         }
     }
@@ -662,17 +662,14 @@ sub check_configs {
 sub load_config {
     my $file = shift;
     my $ret  = {};
-    open my $fh, '<', $file or do {
-        die "Unable to open $file: $!";
-        return $ret;
-    };
+    open my $fh, '<', $file or die "Unable to open file '$file': $!\n";
+
     while ( my $line = <$fh> ) {
         next if $line =~ /^\s*#/;
         next if $line =~ /^\s*$/;
         my ( $key, $value ) = $line =~ /^\s*(\S*)\s(.+)$/;
         unless ( $key && $value ) {
-            die "Unable to parse line in $file: '$line' does not conform to standard";
-            next;
+            die "Unable to parse line in $file: '$line' does not conform to standard\n";
         }
 
         chomp($ret->{$key} = $value);
@@ -683,9 +680,7 @@ sub load_config {
 sub write_config {
     my ($file, $options) = @_;
 
-    open my $fh, '>', $file or do {
-        die "Unable to open $file: $!";
-    };
+    open my $fh, '>', $file or die "Unable to open file '$file': $!\n";
 
     chmod(0640, $fh);
 

@@ -330,12 +330,12 @@ sub create {
             $params->{linode_disk_createfromdistribution}->{rootsshkey} = do {
                 local $/ = undef;
                 open my $fh, '<', $options->{pubkeyfile}
-                    or die "CRITICAL: Unable to open $options->{pubkeyfile}.\n";
+                    or die "Unable to open file '$options->{pubkeyfile}': $!\n";
                 <$fh>;
             };
         }
         elsif ( $options->{pubkeyfile} ) {
-            die "CRITICAL: Unable to open $options->{pubkeyfile}.\n";
+            die "File '$options->{pubkeyfile}' does not exist\n";
         }
 
         $disk = $api->linode_disk_createfromdistribution(

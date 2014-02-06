@@ -165,15 +165,14 @@ sub create {
     # load in the source code from the file.
     my $ss_scriptcontents = '';
     if ( -e $options->{codefile} ) {
-        open my $fh, '<', $options->{codefile} or do {
-            die "CRITICAL: Unable to open $options->{codefile}.\n"; # permissions?
-        };
+        open my $fh, '<', $options->{codefile}
+          or die "Unable to open file '$options->{codefile}': $!\n"; # permissions?
         while ( my $eachline = <$fh> ) {
             $ss_scriptcontents .= $eachline;
         }
         close ($fh);
     } else {
-        die "CRITICAL: Unable to open $options->{codefile}.\n"; # doesn't exist
+        die "File '$options->{codefile}' does not exist\n";
     }
 
     my $params = {
@@ -263,15 +262,14 @@ sub update {
             my $ss_scriptcontents = '';
             if ( exists $args->{codefile} ) {
                 if ( -e $args->{codefile} ) {
-                    open my $fh, '<', $args->{codefile} or do {
-                        die "CRITICAL: Unable to open $args->{codefile}.\n"; # permissions?
-                    };
+                    open my $fh, '<', $args->{codefile}
+                        or die "Unable to open file '$args->{codefile}': $!\n"; # permissions?
                     while ( my $eachline = <$fh> ) {
                         $ss_scriptcontents .= $eachline;
                     }
                     close ($fh);
                 } else {
-                    die "CRITICAL: Unable to open $args->{codefile}.\n"; # doesn't exist
+                    die "File '$args->{codefile}' does not exist\n";
                 }
             }
             $params->{stackscript_update}{script} = $ss_scriptcontents;

@@ -505,10 +505,10 @@ sub configure {
                     if ( $response =~ m/^\d+$/ && $response >= 1 && $response <= scalar(@$menu) ) {
                         $response = @$menu[$response - 1];
                     } else {
-                        die "throw invalid option";
+                        die;
                     }
                 } elsif ( $response eq '0' ) {
-                    die "throw invalid option";
+                    die;
                 }
 
                 if ( $options[$i][2]->($response) ) {
@@ -536,17 +536,22 @@ sub configure {
 
 sub response {
     my $self = shift;
+    my $status = 0;
 
-    if ( $self->{output_format} eq 'human' ) {
-        for my $key ( keys %{ $self->{_result} } ) {
+    for my $key ( keys %{ $self->{_result} } ) {
+        $status ||= $self->{_result}{$key}{request_error} ? 1 : 0;
+        if ( $self->{output_format} eq 'human' ) {
             $self->{_result}{$key}{request_error}
                 ? say STDERR $self->{_result}{$key}{request_error}
                 : say $self->{_result}{$key}{message};
         }
     }
-    else {
+
+    if ( $self->{output_format} eq 'json' ) {
         print json_response( $self->{_result} );
     }
+
+    exit $status;
 }
 
 sub _warm_cache {
@@ -852,12 +857,12 @@ sub _test_api {
     my $api_availability_test = try {
         $self->{_api_obj}->api_spec();
     };
-    die 'API unavailable' unless $api_availability_test;
+    die "API unavailable: $WebService::Linode::Base::errstr\n" unless $api_availability_test;
 
     my $api_key_test = try {
         $self->{_api_obj}->test_echo();
     };
-    die 'API key invalid' unless $api_key_test;
+    die "API key invalid\n" unless $api_key_test;
 
     return 1;
 }
