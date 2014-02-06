@@ -12,6 +12,7 @@ use Linode::CLI::Object::Domain;
 use Linode::CLI::Object::Nodebalancer;
 use Linode::CLI::Util (qw(:basic :config :json));
 use Linode::CLI::SystemInfo;
+use Sys::Hostname;
 use Try::Tiny;
 use WebService::Linode;
 
@@ -330,7 +331,7 @@ sub configure {
     my $api_params = {
         username => $lpm_username,
         password => $lpm_password,
-        label    => 'Linode CLI',
+        label    => 'Linode CLI - ' . hostname,
         expires  => 0,
     };
 
