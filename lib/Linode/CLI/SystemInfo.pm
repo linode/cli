@@ -85,9 +85,11 @@ sub lsb_release {
     if (-f '/etc/lsb-release') {
         $self->{file} = '/etc/lsb-release';
         $self->{pattern} = 'DISTRIB_ID=(.+)';
-        $self->{name} = $self->scrape_distro_release();
+        $self->{name} = lc($self->scrape_distro_release());
+        $self->{name} =~ s/\s/\-/g;
         $self->{pattern} = 'DISTRIB_RELEASE=(.+)';
-        $self->{release} = $self->scrape_distro_release();
+        $self->{release} = lc($self->scrape_distro_release());
+        $self->{release} =~ s/\s/\-/g;
         return $self->{release};
     }
     undef;
