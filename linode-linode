@@ -241,6 +241,26 @@ Optional. Amount of time (in minutes) to wait for human output. Using the flag o
 
 =back
 
+=head2 ADD-IP
+
+=over 8
+
+Add an IP address to a Linode. By default, this will add a public IP address.
+
+=over 8
+
+=item B<-l>, B<--label>
+
+A Linode to operate on.
+
+=item B<--private>
+
+Add a private IP address instead of a public one.
+
+=back
+
+=back
+
 =head2 DELETE
 
 =over 8

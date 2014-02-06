@@ -137,10 +137,17 @@ our %paramsdef = (
             'warmcache' => [ 'datacenter' ],
          },
         'delete' => { 'options' => { 'label' => 'label|l=s@' }, },
+        'add-ip' => {
+            'options'   => {
+                'label'   => 'label|l=s@',
+                'private' => 'private',
+            },
+            'run'       => 'add_ip',
+        },
         'configure' => {
             'run' => 'configure',
             'warmcache' => [ 'plan', 'distribution', 'datacenter' ]
-            },
+        },
     },
     'account' => {
         'info'  => { 'alias' => 'show' },

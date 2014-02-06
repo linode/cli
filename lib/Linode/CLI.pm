@@ -253,6 +253,30 @@ sub delete {
     ) unless $delete_result;
 }
 
+sub add_ip {
+    my $self = shift;
+
+    my $add_ip_result = try {
+        my $linodes = Linode::CLI::Object::Linode->new_from_list(
+            api_obj     => $self->{_api_obj},
+            object_list => $self->_get_object_list(
+                'linode', $self->{_distilled_options}{label}
+            ),
+            action => $self->{_opts}->{action},
+        );
+
+        my $result = $linodes->add_ip( $self->{_distilled_options} );
+        my %combined = ( %$result, %{ $self->{_result} } );
+        %{ $self->{_result} } = %combined;
+    };
+
+    $self->{_result} = $self->fail(
+        label   => 'Generic error',
+        message => "Problem while trying to run '$self->{mode} add-ip'",
+        result  => $self->{_result},
+    ) unless $add_ip_result;
+}
+
 sub domainrecord {
     my $self = shift;
 

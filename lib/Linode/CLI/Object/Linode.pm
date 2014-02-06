@@ -678,6 +678,61 @@ sub delete {
     return $self->{_result};
 }
 
+sub add_ip {
+    my ( $self, $args ) = @_;
+    my $api = $self->{_api_obj};
+    my $private = exists $args->{private} ? 1 : 0;
+
+    for my $object ( keys %{ $self->{object} } ) {
+        my $linode_id    = $self->{object}->{$object}->{linodeid};
+        my $linode_label = $self->{object}->{$object}->{label};
+
+        if (!$private) {
+            $self->{_result} = $self->fail(
+                action  => $self->{_action},
+                label   => $linode_label,
+                message => 'Adding public IPs is not yet supported',
+                result  => $self->{_result},
+            );
+            next;
+        }
+
+        my $ip_address;
+        my $add_ip_result = try {
+            my $ip_id;
+            if ($private) {
+                $ip_id = $api->linode_ip_addprivate(
+                    linodeid => $linode_id
+                )->{ipaddressid};
+            }
+            $ip_address = $api->linode_ip_list(
+                linodeid    => $linode_id,
+                ipaddressid => $ip_id,
+            )->[0]->{ipaddress};
+        };
+
+        if ($add_ip_result) {
+            $self->{_result} = $self->succeed(
+                action  => $self->{_action},
+                label   => $linode_label,
+                message => "Added IP $ip_address to $linode_label",
+                payload => { action => 'add-ip', ipaddress => $ip_address },
+                result  => $self->{_result},
+            );
+        }
+        else {
+            $self->{_result} = $self->fail(
+                action  => $self->{_action},
+                label   => $linode_label,
+                message => "Unable to add IP to $linode_label",
+                result  => $self->{_result},
+            );
+        }
+    }
+
+    return $self->{_result};
+}
+
 sub _poll_and_wait {
     my ( $self, $api_obj, $linode_id, $job_id, $output_format, $timeout ) = @_;
     $timeout = $timeout ? ($timeout * 12) : 12;
