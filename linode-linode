@@ -35,11 +35,41 @@ linode-linode - command-line interface for Linode instances
 
 =head1 SYNOPSIS
 
-B<linode-linode> [B<--api-key> API key] [B<-a> action] [action-options...] [options...]
+B<linode-linode> [B<-a> action] [action-options...] [options...]
 
-B<Actions> available: B<create>, B<start>, B<stop>, B<restart>, B<rename>, B<group>, B<resize>, B<delete>, B<list>, B<show>.
+=over
 
-Most actions require a B<-l> or B<--label> option specifying the Linode's label. You can also specify multiple Linodes using their labels.
+=item S<-a create, --action create    create and start a new Linode>
+
+=item S<-a start,  --action start     start a Linode>
+
+=item S<-a stop,   --action stop      stop a Linode>
+
+=item S<-a stop,   --action restart   restart a Linode>
+
+=item S<-a rename, --action rename    change a Linode's label>
+
+=item S<-a group,  --action group     set a Linode's display group>
+
+=item S<-a resize, --action resize    resize a Linode and boot>
+
+=item S<-a add-ip, --action add-ip    add an IP address to a Linode>
+
+=item S<-a delete, --action delete    completely delete a Linode>
+
+=item S<-a list,   --action list      list info about Linodes>
+
+=item S<-a show,   --action show      show detailed info about a Linode>
+
+=item S<           --apikey=KEY       your user's API key>
+
+=item S<-h,        --help             display this help and exit>
+
+=item S<-j,        --json             return output in JSON format>
+
+=item S<-u,        --username=USER    username for Linode CLI config file>
+
+=back
 
 =head1 OPTIONS
 
@@ -77,7 +107,7 @@ Displays help documentation.
 
 =over 8
 
-Create and start a new Linode. This action prompts for a password which will be used as the root password on the newly-created Linode.
+=item Create and start a new Linode. This action prompts for a password which will be used as the root password on the newly-created Linode.
 
 =over 8
 
@@ -121,7 +151,7 @@ Optional. Amount of time (in minutes) to wait for human output. Using the flag o
 
 =over 8
 
-Starts (boots) a Linode.
+=item Starts (boots) a Linode.
 
 =over 8
 
@@ -141,7 +171,7 @@ Optional. Amount of time (in minutes) to wait for human output. Using the flag o
 
 =over 8
 
-Stops (powers down) a Linode.
+=item Stops (powers down) a Linode.
 
 =over 8
 
@@ -161,7 +191,7 @@ Optional. Amount of time (in minutes) to wait for human output. Using the flag o
 
 =over 8
 
-Restart (reboots) a Linode.
+=item Restart (reboots) a Linode.
 
 =over 8
 
@@ -181,7 +211,7 @@ Optional. Amount of time (in minutes) to wait for human output. Using the flag o
 
 =over 8
 
-Change a Linode's label.
+=item Change a Linode's label.
 
 =over 8
 
@@ -201,7 +231,7 @@ New label to apply to this Linode.
 
 =over 8
 
-Set a Linode's display group.
+=item Set a Linode's display group.
 
 =over 8
 
@@ -221,7 +251,7 @@ A Linode to operate on.
 
 =over 8
 
-Resize a Linode to a new plan size, and issue a boot job.
+=item Resize a Linode to a new plan size, and issue a boot job.
 
 =over 8
 
@@ -245,7 +275,7 @@ Optional. Amount of time (in minutes) to wait for human output. Using the flag o
 
 =over 8
 
-Add an IP address to a Linode. By default, this will add a public IP address.
+=item Add an IP address to a Linode. By default, this will add a public IP address.
 
 =over 8
 
@@ -265,7 +295,7 @@ Add a private IP address instead of a public one.
 
 =over 8
 
-Delete a Linode, its disk image(s), and configuration profile(s).
+=item Delete a Linode, its disk image(s), and configuration profile(s).
 
 =over 8
 
@@ -281,7 +311,7 @@ The Linode to Delete.
 
 =over 8
 
-List information about one or more Linodes. Linodes are grouped by their display group.
+=item List information about one or more Linodes. Linodes are grouped by their display group.
 
 =over 8
 
@@ -297,7 +327,7 @@ Optional. A specific Linode to list.
 
 =over 8
 
-Display detailed information about one or more Linodes.
+=item Display detailed information about one or more Linodes.
 
 =over 8
 
@@ -315,11 +345,11 @@ Required. A specific Linode to show.
 
 =over 8
 
-Actions can be performed on multiple Linodes using their labels. Using multiple --label arguments will accomplish the same thing.
+=item Actions can be performed on multiple Linodes using their labels. Using multiple --label arguments will accomplish the same thing.
 
-$ linode start My-Linode-Label1 My-Linode-Label2
+=item $ linode start My-Linode-Label1 My-Linode-Label2
 
-$ linode show --label My-Linode-Label1 --label My-Linode-Label2
+=item $ linode show --label My-Linode-Label1 --label My-Linode-Label2
 
 =back
 

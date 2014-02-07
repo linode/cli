@@ -35,9 +35,51 @@ linode-nodebalancer - command-line interface for Linode NodeBalancers
 
 =head1 SYNOPSIS
 
-B<linode-nodebalancer> [B<--api-key> API key] [B<-a> action] [action-options...] [options...]
+B<linode-nodebalancer> [B<-a> action] [action-options...] [options...]
 
-B<Actions> available: B<create>, B<rename>, B<throttle>, B<delete>, B<list>, B<show>, B<config-create>, B<config-update>, B<config-delete>, B<config-list>, B<config-show>, B<node-create>, B<node-update>, B<node-delete>, B<node-list>, B<node-show>.
+=over
+
+=item S<-a create,   --action create    create a NodeBalancer>
+
+=item S<-a rename,   --action rename    rename a NodeBalancer>
+
+=item S<-a throttle, --action throttle  set a client connections per second cap>
+
+=item S<-a delete,   --action delete    delete a NodeBalancer>
+
+=item S<-a list,   --action list        list info about NodeBalancers>
+
+=item S<-a show,   --action show        show detailed info about a NodeBalancer>
+
+=item S<-a config-create, --action config-create  create a NodeBalancer config>
+
+=item S<-a config-update, --action config-update  update a NodeBalancer config>
+
+=item S<-a config-delete, --action config-delete  delete a NodeBalancer config>
+
+=item S<-a config-list,   --action config-list    list info about a NodeBalancer config>
+
+=item S<-a config-show,   --action config-show    show detailed info about a NodeBalancer config>
+
+=item S<-a node-create,   --action node-create    create a NodeBalancer node>
+
+=item S<-a node-update,   --action node-update    update a NodeBalancer node>
+
+=item S<-a node-delete,   --action node-delete    delete a NodeBalancer node>
+
+=item S<-a node-list,     --action node-list      list info about a NodeBalancer node>
+
+=item S<-a node-show,     --action node-show      show detailed info about a NodeBalancer node>
+
+=item S<           --apikey=KEY       your user's API key>
+
+=item S<-h,        --help             display this help and exit>
+
+=item S<-j,        --json             return output in JSON format>
+
+=item S<-u,        --username=USER    username for Linode CLI config file>
+
+=back
 
 =head1 OPTIONS
 
@@ -71,7 +113,7 @@ Displays help documentation.
 
 =over 8
 
-Create a NodeBalancer.
+=item Create a NodeBalancer.
 
 =over 8
 
@@ -95,7 +137,7 @@ Optional. Payment term, one of 1, 12, or 24 (months). Default: 1.
 
 =over 8
 
-Rename a NodeBalancer.
+=item Rename a NodeBalancer.
 
 =over 8
 
@@ -115,7 +157,7 @@ Required. The new name for the NodeBalancer.
 
 =over 8
 
-Adjust the connections per second allowed per client IP for a NodeBalancer, to help mitigate abuse.
+=item Adjust the connections per second allowed per client IP for a NodeBalancer, to help mitigate abuse.
 
 =over 8
 
@@ -135,7 +177,7 @@ Required. To help mitigate abuse, throttle connections per second, per client IP
 
 =over 8
 
-Delete a NodeBalancer.
+=item Delete a NodeBalancer.
 
 =over 8
 
@@ -151,7 +193,7 @@ Required. The NodeBalancer to delete.
 
 =over 8
 
-List information about one or more NodeBalancers.
+=item List information about one or more NodeBalancers.
 
 =over 8
 
@@ -167,7 +209,7 @@ Optional. A specific NodeBalancer to list.
 
 =over 8
 
-Display detailed information about one or more NodeBalancers.
+=item Display detailed information about one or more NodeBalancers.
 
 =over 8
 
@@ -183,7 +225,7 @@ Required. A specific NodeBalancer to list.
 
 =over 8
 
-Create a NodeBalancer config (port).
+=item Create a NodeBalancer config (port).
 
 =over 8
 
@@ -247,7 +289,7 @@ Optional. Unpassphrased private key for the SSL certificate when protocol is 'ht
 
 =over 8
 
-Update a NodeBalancer config (port).
+=item Update a NodeBalancer config (port).
 
 =over 8
 
@@ -315,7 +357,7 @@ Optional. Unpassphrased private key for the SSL certificate when protocol is 'ht
 
 =over 8
 
-Delete a NodeBalancer config (port).
+=item Delete a NodeBalancer config (port).
 
 =over 8
 
@@ -335,7 +377,7 @@ The NodeBalancer config port to delete.
 
 =over 8
 
-List all configs (ports) for a specific NodeBalancer.
+=item List all configs (ports) for a specific NodeBalancer.
 
 =over 8
 
@@ -351,7 +393,7 @@ Required. A specific NodeBalancer to list.
 
 =over 8
 
-Display detailed information about a specific NodeBalancer config/port.
+=item Display detailed information about a specific NodeBalancer config/port.
 
 =over 8
 
@@ -371,7 +413,7 @@ Required. The NodeBalancer port or config port to show.
 
 =over 8
 
-Create a NodeBalancer Node.
+=item Create a NodeBalancer Node.
 
 =over 8
 
@@ -407,7 +449,7 @@ Optional. The connections mode to use. Options are 'accept', 'reject', and 'drai
 
 =over 8
 
-Update a NodeBalancer Node.
+=item Update a NodeBalancer Node.
 
 =over 8
 
@@ -447,7 +489,7 @@ Optional. The connections mode to use. Options are 'accept', 'reject', and 'drai
 
 =over 8
 
-Delete a NodeBalancer Node.
+=item Delete a NodeBalancer Node.
 
 =over 8
 
@@ -471,7 +513,7 @@ The specific Node name to delete.
 
 =over 8
 
-List all Nodes for a specific NodeBalancer port.
+=item List all Nodes for a specific NodeBalancer port.
 
 =over 8
 
@@ -491,7 +533,7 @@ Required. The NodeBalancer port or config port.
 
 =over 8
 
-Show detailed information about a specific Node for a specific NodeBalancer port.
+=item Show detailed information about a specific Node for a specific NodeBalancer port.
 
 =over 8
 

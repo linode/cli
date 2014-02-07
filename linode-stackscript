@@ -35,9 +35,31 @@ linode-stackscript - command-line interface for Linode StackScripts
 
 =head1 SYNOPSIS
 
-B<linode-stackscript> [B<--api-key> API key] [B<-a> action] [action-options...] [options...]
+B<linode-stackscript> [B<-a> action] [action-options...] [options...]
 
-B<Actions> available: B<create>, B<update>, B<delete>, B<list>, B<show>, B<source>.
+=over
+
+=item S<-a create, --action create    create a new StackScript>
+
+=item S<-a update, --action update    update a StackScript>
+
+=item S<-a delete, --action delete    delete a StackScript>
+
+=item S<-a list,   --action list      list info about StackScripts>
+
+=item S<-a show,   --action show      show detailed info about a StackScript>
+
+=item S<-a source, --action source    show a StackScript's source>
+
+=item S<           --apikey=KEY       your user's API key>
+
+=item S<-h,        --help             display this help and exit>
+
+=item S<-j,        --json             return output in JSON format>
+
+=item S<-u,        --username=USER    username for Linode CLI config file>
+
+=back
 
 =head1 OPTIONS
 
@@ -71,7 +93,7 @@ Displays help documentation.
 
 =over 8
 
-Create a StackScript.
+=item Create a StackScript.
 
 =over 8
 
@@ -107,14 +129,13 @@ Optional. Note for describing the version.
 
 =over 8
 
-Update a StackScript.
+=item Update a StackScript.
 
 =over 8
 
 =item B<-l>, B<--label>
 
 The label (name) for the StackScript.
-
 
 =item B<-n>, B<--new-label>
 
@@ -148,7 +169,7 @@ Optional. Note for describing the version.
 
 =over 8
 
-Delete a StackScript
+=item Delete a StackScript
 
 =over 8
 
@@ -164,7 +185,7 @@ The StackScript to delete.
 
 =over 8
 
-List information about one or more StackScripts.
+=item List information about one or more StackScripts.
 
 =over 8
 
@@ -180,7 +201,7 @@ Optional. A specific StackScript to list.
 
 =over 8
 
-Display detailed information about one or more StackScripts.
+=item Display detailed information about one or more StackScripts.
 
 =over 8
 
@@ -196,7 +217,7 @@ Required. A specific StackScript to show.
 
 =over 8
 
-Display the source code for a StackScript.
+=item Display the source code for a StackScript.
 
 =over 8
 

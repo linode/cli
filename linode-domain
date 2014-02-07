@@ -35,9 +35,39 @@ linode-domain - command-line interface for Linode Domains
 
 =head1 SYNOPSIS
 
-B<linode-domain> [B<--api-key> API key] [B<-a> action] [action-options...] [options...]
+B<linode-domain> [B<-a> action] [action-options...] [options...]
 
-B<Actions> available: B<create>, B<update>, B<delete>, B<list>, B<show>, B<record-create>, B<record-update>, B<record-delete>, B<record-list>, B<record-show>.
+=over
+
+=item S<-a create, --action create    create a domain>
+
+=item S<-a update, --action update    update a domain>
+
+=item S<-a delete, --action delete    delete a domain>
+
+=item S<-a list,   --action list      list info about domains>
+
+=item S<-a show,   --action show      show detailed info about a domain>
+
+=item S<-a record-create, --action record-create  create a domain record>
+
+=item S<-a record-update, --action record-update  update a domain record>
+
+=item S<-a record-delete, --action record-delete  delete a domain record>
+
+=item S<-a record-list,   --action record-list    list info about a record>
+
+=item S<-a record-show,   --action record-show    show detailed info about a record>
+
+=item S<           --apikey=KEY       your user's API key>
+
+=item S<-h,        --help             display this help and exit>
+
+=item S<-j,        --json             return output in JSON format>
+
+=item S<-u,        --username=USER    username for Linode CLI config file>
+
+=back
 
 =head1 OPTIONS
 
@@ -71,7 +101,7 @@ Displays help documentation.
 
 =over 8
 
-Create a Domain.
+=item Create a Domain.
 
 =over 8
 
@@ -131,7 +161,7 @@ Optional. Accepts multiple entries. IP addresses allowed to AXFR the entire zone
 
 =over 8
 
-Update a Domain.
+=item Update a Domain.
 
 =over 8
 
@@ -195,7 +225,7 @@ Optional. Accepts multiple entries. IP addresses allowed to AXFR the entire zone
 
 =over 8
 
-Delete a Domain.
+=item Delete a Domain.
 
 =over 8
 
@@ -211,7 +241,7 @@ The Domain to delete.
 
 =over 8
 
-List information about one or more Domains.
+=item List information about one or more Domains.
 
 =over 8
 
@@ -227,7 +257,7 @@ Optional. A specific Domain to list.
 
 =over 8
 
-Display detailed information about one or more Domains.
+=item Display detailed information about one or more Domains.
 
 =over 8
 
@@ -243,7 +273,7 @@ Required. A specific Domain to list.
 
 =over 8
 
-Create a Domain record.
+=item Create a Domain record.
 
 =over 8
 
@@ -291,7 +321,7 @@ Optional. Default: 0
 
 =over 8
 
-Update a Domain record.
+=item Update a Domain record.
 
 =over 8
 
@@ -343,7 +373,7 @@ Optional. Default: 0
 
 =over 8
 
-Delete a Domain record.
+=item Delete a Domain record.
 
 =over 8
 
@@ -367,7 +397,7 @@ The match for the record to delete. Match to a name or target.
 
 =over 8
 
-List Domain Record information for one or more Domains.
+=item List Domain Record information for one or more Domains.
 
 =over 8
 
@@ -387,7 +417,7 @@ Optional. Allows domain record filtering by type. One of: NS, MX, A, AAAA, CNAME
 
 =over 8
 
-Display detailed Domain Record information for one or more Domains.
+=item Display detailed Domain Record information for one or more Domains.
 
 =over 8
 

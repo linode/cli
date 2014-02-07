@@ -35,9 +35,21 @@ linode-account - command-line interface for Linode account information
 
 =head1 SYNOPSIS
 
-B<linode-account> [B<--api-key> API key] [B<-a> action] [action-options...] [options...]
+B<linode-account> [B<-a> action] [action-options...] [options...]
 
-B<Actions> available: B<show>.
+=over
+
+=item S<-a show,   --action show      show info about this Linode account>
+
+=item S<           --apikey=KEY       your user's API key>
+
+=item S<-h,        --help             display this help and exit>
+
+=item S<-j,        --json             return output in JSON format>
+
+=item S<-u,        --username=USER    username for Linode CLI config file>
+
+=back
 
 =head1 OPTIONS
 
@@ -71,7 +83,7 @@ Displays help documentation.
 
 =over 8
 
-Shows information about this Linode account.
+=item Shows information about this Linode account.
 
 =back
 

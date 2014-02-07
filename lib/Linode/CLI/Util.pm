@@ -566,7 +566,7 @@ sub eat_cmdargs {
     else {
         if ( exists $cmdargs->{help} ) {
             # they asked for help
-            pod2usage(-exitval => 0);
+            pod2usage(-verbose => 99, -exitval => 0, -sections => [ 'SYNOPSIS' ]);
         } else {
             die "Unknown command.  Run --help for usage.\n";
         }

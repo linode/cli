@@ -18,6 +18,9 @@ my $object;
 if ( defined( $ARGV[0] ) && ( my @found = grep { $_ eq lc( $ARGV[0] ) } @MODES ) ) {
     $object = shift;
 }
+elsif ( defined( $ARGV[0] ) && $ARGV[0] =~ 'help' ) {
+	Linode::CLI::Util::eat_cmdargs;
+}
 else {
     GetOptions( 'o|object=s' => \$object ) or die "Unable to parse options\n";
 }
