@@ -275,7 +275,7 @@ Optional. Amount of time (in minutes) to wait for human output. Using the flag o
 
 =over 8
 
-=item Add an IP address to a Linode. By default, this will add a public IP address.
+=item Add an IP address to a Linode. Adding public IP addresses is not yet supported, so the B<--private> flag is implicitly required.
 
 =over 8
 
