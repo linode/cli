@@ -1,3 +1,6 @@
+1.1.2  2014-02-12
+  - Fix issue with gathering user agent in some cases
+
 1.1.1  2014-02-12
   - Support for adding private IPs
   - Exit nonzero on partial failures
