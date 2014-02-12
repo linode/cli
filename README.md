@@ -323,21 +323,45 @@ Each action has a set of options that apply to it, which are outlined in the sec
 
 #### Create
 
-Create and start a new Linode. This action prompts for a password which will be used as the root password on the newly-created Linode.
+Create and start a new Linode.
 
-**-d**, **--distribution**: Distribution name or DistributionID to deploy.
+**-l**, **--label**: Required. A Linode to operate on.
+
+**-L**, **--location**: Required. The datacenter to use for deployment. Locations are Atlanta, Dallas, Fremont, London, Newark, and Tokyo.
+
+**-d**, **--distribution**: Required. Distribution name or DistributionID to deploy.
+
+**-p**, **--plan**: Required. The Plan to deploy. Plans are linode1024, linode2048, linode4096, linode8192, linode16384, linode24576, linode32768, and linode40960.
+
+**-P**, **--password**: Required. The root user's password.  Needs to be at least 6 characters and contain at least two of these four character classes: lower case letters, upper case letters, numbers, and punctuation.
+
+**-t**, **--payment-term**: Optional. Payment term, one of 1, 12, or 24 (months). Default: 1. This is ignored when using metered.
 
 **-g**, **--group**: Optional. Linode Manager display group to place this Linode under. Default: none.
 
 **-K**, **--pubkey-file**: Optional. A public key file to install at `/root/.ssh/authorized_keys` when creating this Linode.
 
-**-L**, **--location**: The datacenter to use for deployment. Locations are Dallas, Fremont, Atlanta, Newark, London, and Tokyo.
+**-S**, **--stackscript**: Optional. Personal or public StackScript ID to use for deployment.  Names of personal StackScripts are accepted.
 
-**-l**, **--label**: A Linode to operate on.
+**-J**, **--stackscriptjson**: The JSON encoded name/value pairs, answering the StackScript's User Defined Fields (UDF). A path to a JSON file is also accepted.
 
-**-p**, **--plan**: The Plan to deploy. Plans are linode1024, linode2048, linode4096, linode8192, linode16384, linode24576, linode32768, and linode40960.
+**-w**, **--wait**: Optional. Amount of time (in minutes) to wait for human output. Using the flag only, will use the default of 5.
 
-**-t**, **--payment-term**: Optional. Payment term, one of 1, 12, or 24 (months). Default: 1.
+#### Rebuild
+
+Rebuild an existing Linode.
+
+**-l**, **--label**: Required. A Linode to operate on.
+
+**-d**, **--distribution**: Required. Distribution name or DistributionID to deploy.
+
+**-P**, **--password**: Required. The root user's password.  Needs to be at least 6 characters and contain at least two of these four character classes: lower case letters, upper case letters, numbers, and punctuation.
+
+**-K**, **--pubkey-file**: Optional. A public key file to install at `/root/.ssh/authorized_keys` when creating this Linode.
+
+**-S**, **--stackscript**: Optional. Personal or public StackScript ID to use for deployment.  Names of personal StackScripts are accepted.
+
+**-J**, **--stackscriptjson**: The JSON encoded name/value pairs, answering the StackScript's User Defined Fields (UDF). A path to a JSON file is also accepted.
 
 **-w**, **--wait**: Optional. Amount of time (in minutes) to wait for human output. Using the flag only, will use the default of 5.
 
@@ -565,7 +589,7 @@ Create a NodeBalancer.
 
 **-L**, **--location**: Required. The datacenter to use for deployment. Locations are Dallas, Fremont, Atlanta, Newark, London, and Tokyo.
 
-**-t**, **--payment-term**: Optional. Payment term, one of 1, 12, or 24 (months). Default: 1.
+**-t**, **--payment-term**: Optional. Payment term, one of 1, 12, or 24 (months). Default: 1. This is ignored when using metered.
 
 #### Rename
 

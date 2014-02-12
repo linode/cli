@@ -45,25 +45,26 @@ sub list {
     my $output_format = $args{output_format} || 'human';
     my $out_arrayref = [];
     my $out_hashref = {};
-    my @colw = ( 32, 8, 14 );
+    my @colw = ( 10, 32, 8, 14 );
 
     if ( $output_format eq 'human' ) {
         push @$out_arrayref, (
             '+ ' . ( '-' x $colw[0] ) . ' + ' . ( '-' x $colw[1] ) . ' + ' .
-            ( '-' x $colw[2] ) . ' +');
+            ( '-' x $colw[2] ) . ' + ' . ( '-' x $colw[3] ) . ' +');
         push @$out_arrayref, sprintf(
-            "| %-${colw[0]}s | %-${colw[1]}s | %-${colw[2]}s |",
-            'label', 'public', 'revision note' );
+            "| %-${colw[0]}s | %-${colw[1]}s | %-${colw[2]}s | %-${colw[3]}s |",
+            'id', 'label', 'public', 'revision note' );
         push @$out_arrayref, (
             '| ' . ( '-' x $colw[0] ) . ' + ' . ( '-' x $colw[1] ) . ' + ' .
-            ( '-' x $colw[2] ) . ' |');
+            ( '-' x $colw[2] ) . ' + ' . ( '-' x $colw[3] ) . ' |');
     }
 
     for my $object ( keys %{ $self->{object}} ) {
         if ( $output_format eq 'human' ) {
             push @$out_arrayref, sprintf(
-                "| %-${colw[0]}s | %-${colw[1]}s | %-${colw[2]}s |",
-                format_len( $self->{object}{$object}{label}, $colw[0] ),
+                "| %-${colw[0]}s | %-${colw[1]}s | %-${colw[2]}s | %-${colw[3]}s |",
+                $self->{object}{$object}{stackscriptid},
+                format_len( $self->{object}{$object}{label}, $colw[1] ),
                 $humanyn{ $self->{object}{$object}{ispublic} },
                 $self->{object}{$object}{rev_note},
             );
@@ -74,6 +75,7 @@ sub list {
                 $out_hashref->{$object}{source}  = $self->{object}{$object}{script};
             } else {
                 $out_hashref->{$object}{label}             = $self->{object}{$object}{label};
+                $out_hashref->{$object}{id}                = $self->{object}{$object}{stackscriptid};
                 $out_hashref->{$object}{deploymentstotal}  = $self->{object}{$object}{deploymentstotal};
                 $out_hashref->{$object}{latestrev}         = $self->{object}{$object}{latestrev};
                 $out_hashref->{$object}{deploymentsactive} = $self->{object}{$object}{deploymentsactive};
@@ -84,8 +86,8 @@ sub list {
         }
     }
 
-    push @$out_arrayref, ( '+ ' . ( '-' x $colw[0] ) . ' + ' .
-        ( '-' x $colw[1] ) . ' + ' . ( '-' x $colw[2] ) . " +\n" ) if ($output_format eq 'human');
+    push @$out_arrayref, ( '+ ' . ( '-' x $colw[0] ) . ' + ' . ( '-' x $colw[1] ) . ' + ' .
+        ( '-' x $colw[2] ) . ' + ' . ( '-' x $colw[3] ) . " +\n" ) if ($output_format eq 'human');
 
     if ( $output_format eq 'raw' ) {
         return $out_hashref;
@@ -130,8 +132,9 @@ sub show {
                 # source only lists the scripts source code
                 $return .= $self->{object}->{$object_label}->{script};
             } else {
-                $return .= sprintf( "%19s %-45s\n%19s %-45s\n%19s %-45s\n%19s %-45s\n%19s %-45s\n%19s %-45s\n",
+                $return .= sprintf( "%19s %-45s\n%19s %-45s\n%19s %-45s\n%19s %-45s\n%19s %-45s\n%19s %-45s\n%19s %-45s\n",
                         'label:', $self->{object}->{$object_label}->{label},
+                        'id:', $self->{object}->{$object_label}->{stackscriptid},
                         'public:', $humanyn{ $self->{object}->{$object_label}->{ispublic} },
                         'latest revision:', $self->{object}->{$object_label}->{latestrev},
                         'revision note:', $self->{object}->{$object_label}->{rev_note},
