@@ -29,7 +29,7 @@ sub new {
 
     $self->{_opts} = $args{opts};
 
-    my $system_info = Linode::CLI::SystemInfo->system_info;
+    my $system_info = system_info();
 
     $self->{_api_obj} = WebService::Linode->new(
         apikey    => $self->{api_key},
@@ -350,7 +350,7 @@ sub configure {
 
     say "\n";
 
-    my $system_info = Linode::CLI::SystemInfo->system_info();
+    my $system_info = system_info();
 
     my $api_params = {
         username => $lpm_username,
