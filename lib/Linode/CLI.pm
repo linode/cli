@@ -272,7 +272,7 @@ sub add_ip {
 
     $self->{_result} = $self->fail(
         label   => 'Generic error',
-        message => "Problem while trying to run '$self->{mode} add-ip'",
+        message => "Problem while trying to run '$self->{mode} ip-add'",
         result  => $self->{_result},
     ) unless $add_ip_result;
 }

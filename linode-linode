@@ -53,7 +53,7 @@ B<linode-linode> [B<-a> action] [action-options...] [options...]
 
 =item S<-a resize, --action resize    resize a Linode and boot>
 
-=item S<-a add-ip, --action add-ip    add an IP address to a Linode>
+=item S<-a ip-add, --action ip-add    add an IP address to a Linode>
 
 =item S<-a delete, --action delete    completely delete a Linode>
 
@@ -271,7 +271,7 @@ Optional. Amount of time (in minutes) to wait for human output. Using the flag o
 
 =back
 
-=head2 ADD-IP
+=head2 IP-ADD
 
 =over 8
 

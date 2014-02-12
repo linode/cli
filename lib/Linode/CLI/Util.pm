@@ -137,7 +137,8 @@ our %paramsdef = (
             'warmcache' => [ 'datacenter' ],
          },
         'delete' => { 'options' => { 'label' => 'label|l=s@' }, },
-        'add-ip' => {
+        'add-ip' => { 'alias' => 'ip-add' },
+        'ip-add' => {
             'options'   => {
                 'label'   => 'label|l=s@',
                 'private' => 'private',

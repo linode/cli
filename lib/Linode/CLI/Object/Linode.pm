@@ -716,7 +716,7 @@ sub add_ip {
                 action  => $self->{_action},
                 label   => $linode_label,
                 message => "Added IP $ip_address to $linode_label",
-                payload => { action => 'add-ip', ipaddress => $ip_address },
+                payload => { action => 'ip-add', ipaddress => $ip_address },
                 result  => $self->{_result},
             );
         }

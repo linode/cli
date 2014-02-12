@@ -375,7 +375,7 @@ Resize a Linode to a new plan size, and issue a boot job.
 
 **-w**, **--wait**: Optional. Amount of time (in minutes) to wait for human output. Using the flag only, will use the default of 20.
 
-#### Add-IP
+#### IP-Add
 
 Add an IP address to a Linode. Adding public IP addresses is not yet supported, so the **--private** flag is implicitly required.
 
