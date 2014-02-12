@@ -1,3 +1,11 @@
+1.1.1  2014-02-12
+  - Support for adding private IPs
+  - Exit nonzero on partial failures
+  - Additional help output
+  - Add system hostname to two-factor token label
+  - Add OS/distribution to user agent
+  - Add supplemental information for some errors
+
 1.1.0  2014-02-04
   - Support for multiple accounts
   - Two-factor authentication support
