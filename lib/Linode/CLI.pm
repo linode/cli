@@ -386,7 +386,8 @@ sub configure {
             die "$WebService::Linode::Base::errstr\n";
         }
         elsif ($err) {
-            die "Unexpected error obtaining API key for user $lpm_username\n";
+            die "Unexpected error obtaining API key for user $lpm_username: "
+             . $WebService::Linode::Base::errstr . "\n";
         }
         else {
             $api_key = $api_response->{api_key};
