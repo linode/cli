@@ -45,34 +45,23 @@ This is a wrapper utility to the suite of Linode command line tools.
 =head2 Objects
 
 The following command line tools are available, and can be called directly or
-with B<linode object>, e.g.: B<linode domain list>.
+with B<linode object>, e.g.: B<linode domain list>. Each has its own help
+documentation accessible with B<--help>; for instance: B<linode -o domain
+--help>.
 
-=over 8
+If no object is specified, B<-o linode> is implied.
 
-=item B<linode-account>
+=over
 
-Interface to Linode account information. Use B<man linode-account> or
-B<linode-account --help> for more information.
+=item S<-o account,       --object account       account information>
 
-=item B<linode-domain>
+=item S<-o domain,        --object domain        domains and DNS records>
 
-Interface to Linode domains and DNS records. Use B<man linode-domain> or
-B<linode-domain --help> for more information.
+=item S<-o linode,        --object linode        Linode instances>
 
-=item B<linode-linode>
+=item S<-o nodebalancer,  --object nodebalancer  NodeBalancer configs and nodes>
 
-Interface to Linode instances. Use B<man linode-linode> or
-B<linode-linode --help> for more information.
-
-=item B<linode-nodebalancer>
-
-Interface to NodeBalancers. Use B<man linode-nodebalancer> or
-B<linode-nodebalancer --help> for more information.
-
-=item B<linode-stackscript>
-
-Interface to StackScripts. Use B<man linode-stackscript> or
-B<linode-stackscript --help> for more information.
+=item S<-o stackscript,   --object stackscript   available StackScripts>
 
 =back
 
