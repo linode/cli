@@ -274,7 +274,7 @@ sub create {
     };
     return $self->fail(
         action  => 'create',
-        label   => $$linode_label,
+        label   => $linode_label,
         message => "Unable to update $linode_label after initial creation",
     ) unless $update_result;
 

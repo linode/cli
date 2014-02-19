@@ -39,37 +39,37 @@ B<linode-linode> [B<-a> action] [action-options...] [options...]
 
 =over
 
-=item S<-a create, --action create    create and start a new Linode>
+=item S<-a create,  --action create    create and start a new Linode>
 
 =item S<-a rebuild, --action rebuild   rebuild an existing Linode>
 
-=item S<-a start,  --action start     start a Linode>
+=item S<-a start,   --action start     start a Linode>
 
-=item S<-a stop,   --action stop      stop a Linode>
+=item S<-a stop,    --action stop      stop a Linode>
 
-=item S<-a stop,   --action restart   restart a Linode>
+=item S<-a stop,    --action restart   restart a Linode>
 
-=item S<-a rename, --action rename    change a Linode's label>
+=item S<-a rename,  --action rename    change a Linode's label>
 
-=item S<-a group,  --action group     set a Linode's display group>
+=item S<-a group,   --action group     set a Linode's display group>
 
-=item S<-a resize, --action resize    resize a Linode and boot>
+=item S<-a resize,  --action resize    resize a Linode and boot>
 
-=item S<-a ip-add, --action ip-add    add an IP address to a Linode>
+=item S<-a ip-add,  --action ip-add    add an IP address to a Linode>
 
-=item S<-a delete, --action delete    completely delete a Linode>
+=item S<-a delete,  --action delete    completely delete a Linode>
 
-=item S<-a list,   --action list      list info about Linodes>
+=item S<-a list,    --action list      list info about Linodes>
 
-=item S<-a show,   --action show      show detailed info about a Linode>
+=item S<-a show,    --action show      show detailed info about a Linode>
 
-=item S<           --apikey=KEY       your user's API key>
+=item S<            --apikey=KEY       your user's API key>
 
-=item S<-h,        --help             display this help and exit>
+=item S<-h,         --help             display this help and exit>
 
-=item S<-j,        --json             return output in JSON format>
+=item S<-j,         --json             return output in JSON format>
 
-=item S<-u,        --username=USER    username for Linode CLI config file>
+=item S<-u,         --username=USER    username for Linode CLI config file>
 
 =back
 
