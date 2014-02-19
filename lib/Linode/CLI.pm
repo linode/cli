@@ -50,13 +50,30 @@ sub create {
     my $self = shift;
 
     my $result = "Linode::CLI::Object::$correct_case{$self->{mode}}"->create(
-        api     => $self->{_api_obj},
+        api_obj => $self->{_api_obj},
         options => $self->{_distilled_options},
         format  => $self->{output_format},
         wait    => $self->{wait},
     );
     my %combined = ( %$result, %{ $self->{_result} } );
     %{ $self->{_result} } = %combined;
+}
+
+sub rebuild {
+    my $self = shift;
+
+    my $result = "Linode::CLI::Object::$correct_case{$self->{mode}}"->buildrebuild(
+        api_obj    => $self->{_api_obj},
+        options    => $self->{_distilled_options},
+        # single object
+        set_obj => @{ $self->_get_object_list(
+            $self->{mode}, $self->{_distilled_options}{label}
+        ) }[0],
+        format     => $self->{output_format},
+        wait       => $self->{wait},
+    );
+    my %combined = (%$result, %{$self->{_result}});
+    %{$self->{_result}} = %combined;
 }
 
 sub update {

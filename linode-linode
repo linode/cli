@@ -41,6 +41,8 @@ B<linode-linode> [B<-a> action] [action-options...] [options...]
 
 =item S<-a create, --action create    create and start a new Linode>
 
+=item S<-a rebuild, --action rebuild   rebuild an existing Linode>
+
 =item S<-a start,  --action start     start a Linode>
 
 =item S<-a stop,   --action stop      stop a Linode>
@@ -107,13 +109,33 @@ Displays help documentation.
 
 =over 8
 
-=item Create and start a new Linode. This action prompts for a password which will be used as the root password on the newly-created Linode.
+=item Create and start a new Linode.
 
 =over 8
 
+=item B<-l>, B<--label>
+
+Required. A Linode to operate on.
+
+=item B<-L>, B<--location>
+
+Required. The datacenter to use for deployment. Locations are Atlanta, Dallas, Fremont, London, Newark, and Tokyo.
+
 =item B<-d>, B<--distribution>
 
-Distribution name or DistributionID to deploy.
+Required. Distribution name or DistributionID to deploy.
+
+=item B<-p>, B<--plan>
+
+Required. The Plan to deploy. Plans are linode1024, linode2048, linode4096, linode8192, linode16384, linode24576, linode32768, and linode40960.
+
+=item B<-P>, B<--password>
+
+Required. The root user's password.  Needs to be at least 6 characters and contain at least two of these four character classes: lower case letters, upper case letters, numbers, and punctuation.
+
+=item B<-t>, B<--payment-term>
+
+Optional. Payment term, one of 1, 12, or 24 (months). Default: 1. This is ignored when using metered.
 
 =item B<-g>, B<--group>
 
@@ -121,23 +143,55 @@ Optional. Linode Manager display group to place this Linode under. Default: none
 
 =item B<-K>, B<--pubkey-file>
 
-Optional. A public key file to install at B</root/.ssh/authorized_keys> when creating this Linode.
+Optional. A public key file to install at `/root/.ssh/authorized_keys` when creating this Linode.
 
-=item B<-L>, B<--location>
+=item B<-S>, B<--stackscript>
 
-The datacenter to use for deployment. Locations are Dallas, Fremont, Atlanta, Newark, London, and Tokyo.
+Optional. Personal or public StackScript ID to use for deployment.  Names of personal StackScripts are accepted.
+
+=item B<-J>, B<--stackscriptjson>
+
+The JSON encoded name/value pairs, answering the StackScript's User Defined Fields (UDF). A path to a JSON file is also accepted.
+
+=item B<-w>, B<--wait>
+
+Optional. Amount of time (in minutes) to wait for human output. Using the flag only, will use the default of 5.
+
+=back
+
+=back
+
+=head2 REBUILD
+
+=over 8
+
+=item Rebuild an existing Linode.
+
+=over 8
 
 =item B<-l>, B<--label>
 
-A Linode to operate on.
+Required. A Linode to operate on.
 
-=item B<-p>, B<--plan>
+=item B<-d>, B<--distribution>
 
-The Plan to deploy. Plans are linode1024, linode2048, linode4096, linode8192, linode16384, linode24576, linode32768, and linode40960.
+Required. Distribution name or DistributionID to deploy.
 
-=item B<-t>, B<--payment-term>
+=item B<-P>, B<--password>
 
-Optional. Payment term, one of 1, 12, or 24 (months). Default: 1.
+Required. The root user's password.  Needs to be at least 6 characters and contain at least two of these four character classes: lower case letters, upper case letters, numbers, and punctuation.
+
+=item B<-K>, B<--pubkey-file>
+
+Optional. A public key file to install at `/root/.ssh/authorized_keys` when creating this Linode.
+
+=item B<-S>, B<--stackscript>
+
+Optional. Personal or public StackScript ID to use for deployment.  Names of personal StackScripts are accepted.
+
+=item B<-J>, B<--stackscriptjson>
+
+The JSON encoded name/value pairs, answering the StackScript's User Defined Fields (UDF). A path to a JSON file is also accepted.
 
 =item B<-w>, B<--wait>
 

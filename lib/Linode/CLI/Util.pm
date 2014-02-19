@@ -68,19 +68,33 @@ our %paramsdef = (
     'linode' => {
         'create' => {
             'options' => {
-                'label'        => 'label|l=s@',
-                'datacenter'   => 'datacenter|location|L=s',
-                'distribution' => 'distribution|d=s',
-                'plan'         => 'plan|p=s',
-                'payment-term' => 'payment-term|t:i',
-                'quantity'     => 'quantity|q:i',
-                'group'        => 'group|g:s',
-                'wait'         => 'wait|w',
-                'pubkey-file'  => 'pubkey-file|K:s',
-                'password'     => 'password|P:s'
+                'label'           => 'label|l=s@',
+                'datacenter'      => 'datacenter|location|L=s',
+                'distribution'    => 'distribution|d=s',
+                'plan'            => 'plan|p=s',
+                'password'        => 'password|P:s',
+                'payment-term'    => 'payment-term|t:i',
+                'group'           => 'group|g:s',
+                'pubkey-file'     => 'pubkey-file|K:s',
+                'stackscript'     => 'stackscript|S:s',
+                'stackscriptjson' => 'stackscriptjson|J:s',
+                'wait'            => 'wait|w:i'
             },
             'format'    => { 'plan' => 'format_squish', 'datacenter'  => 'format_squish' },
             'warmcache' => [ 'plan', 'distribution', 'datacenter', 'kernel' ],
+        },
+        'rebuild' => {
+            'options' => {
+                'label'           => 'label|l=s@',
+                'distribution'    => 'distribution|d=s',
+                'password'        => 'password|P:s',
+                'pubkey-file'     => 'pubkey-file|K:s',
+                'stackscript'     => 'stackscript|S:s',
+                'stackscriptjson' => 'stackscriptjson|J:s',
+                'wait'            => 'wait|w:i'
+            },
+            'run'       => 'rebuild',
+            'warmcache' => [ 'distribution', 'kernel' ]
         },
         'boot'  => { 'alias' => 'start' },
         'start' => {

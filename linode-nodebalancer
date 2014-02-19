@@ -127,7 +127,7 @@ Required. The datacenter to use for deployment. Locations are Dallas, Fremont, A
 
 =item B<-t> B<--payment-term>
 
-Optional. Payment term, one of 1, 12, or 24 (months). Default: 1.
+Optional. Payment term, one of 1, 12, or 24 (months). Default: 1. This is ignored when using metered.
 
 =back
 

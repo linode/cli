@@ -8,6 +8,7 @@ use parent 'Linode::CLI::Object';
 
 use Linode::CLI::Util (qw(:basic :json));
 use Try::Tiny;
+use JSON;
 
 sub new {
     my ( $class, %args ) = @_;
@@ -204,7 +205,7 @@ sub show {
     for my $object_label ( keys %{ $self->{object} } ) {
         my $linodeid = $self->{object}{$object_label}{linodeid};
         my @ips = map { $_->{ipaddress} } @{$api->linode_ip_list(linodeid => $linodeid)};
-       $return .= sprintf( "%9s %-45s\n%9s %-45s\n%9s %-45s\n%9s %-45s\n%9s %-45s\n%9s %-45s\n%9s %-45s\n",
+        $return .= sprintf( "%9s %-45s\n%9s %-45s\n%9s %-45s\n%9s %-45s\n%9s %-45s\n%9s %-45s\n%9s %-45s\n",
                 'label:', $self->{object}->{$object_label}->{label},
                 'status:', $humanstatus{ $self->{object}->{$object_label}->{status} },
                 'location:', $humandc{ $self->{object}->{$object_label}->{datacenterid} },
@@ -221,68 +222,36 @@ sub show {
 sub create {
     my ( $self, %args ) = @_;
 
-    my $api     = $args{api};
+    my $api     = $args{api_obj};
     my $options = $args{options};
     my $format  = $args{format};
-    my $wait    = 0;
-
-    if ( defined $args{wait} && $args{wait} == 0 ) {
-        $wait = 5;
-    }
-    elsif ( defined $args{wait} ) {
-        $wait = $args{wait};
-    }
 
     # For now, only create one Linode at a time
-    $options->{label} = pop @{ $options->{label} };
+    my $linode_label = @{ $options->{label} }[0];
 
     # check if this label is already in use
     my $linodeobjects = $api->linode_list();
     for my $lobject (@$linodeobjects) {
-        if ( $lobject->{label} eq $options->{label} ) {
+        if ( $lobject->{label} eq $linode_label ) {
             return $self->fail(
                 action  => 'create',
-                label   => $options->{label},
-                message => "The name $options->{label} is already in use by another Linode.",
+                label   => $linode_label,
+                message => "The name $linode_label is already in use by another Linode.",
             );
         }
     }
 
     my $params = {
         linode_create => {
-            datacenterid    => delete $options->{datacenterid},
-            paymentterm     => delete $options->{paymentterm} || 1,
-            planid          => delete $options->{planid},
+            datacenterid => $options->{datacenterid},
+            paymentterm  => $options->{paymentterm} || 1,
+            planid       => $options->{planid},
         },
-        linode_disk_createfromdistribution => {
-            distributionid  => delete $options->{distributionid},
-            label           => "$options->{label}-disk",
-        },
-        linode_disk_create => {
-            label           => "$options->{label}-swap",
-            type            => 'swap',
-            size            => 256,
-        },
-        linode_config_create => {
-            kernelid        => delete $options->{kernelid},
-            label           => "$options->{label}-config",
-        },
-        linode_update       => {
-            label               => $options->{label},
-            lpm_displaygroup    => $options->{group} ? $options->{group} : '',
+        linode_update => {
+            label            => $linode_label,
+            lpm_displaygroup => $options->{group} ? $options->{group} : '',
         }
     };
-
-    $params->{linode_disk_createfromdistribution}{rootpass}
-        = $options->{password} if ( exists $options->{password} );
-
-    if ( !exists $params->{linode_disk_createfromdistribution}{rootpass} ) {
-        print 'Root password for this Linode: ';
-        system( 'stty', '-echo' );
-        chop( $params->{linode_disk_createfromdistribution}{rootpass} = <STDIN> );
-        system( 'stty', 'echo' );
-        say '';
-    }
 
     # Create the Linode
     my $linode_id;
@@ -294,13 +263,10 @@ sub create {
     return $self->fail(
         action  => 'create',
         label   => $params->{linode_update}{label},
-        message => "Unable to create $options->{label}",
+        message => "Unable to create $linode_label",
     ) unless $create_result;
 
-    $params->{linode_disk_createfromdistribution}{linodeid} = $linode_id;
-    $params->{linode_disk_create}{linodeid}                 = $linode_id;
-    $params->{linode_update}{linodeid}                      = $linode_id;
-    $params->{linode_config_create}{linodeid}               = $linode_id;
+    $params->{linode_update}{linodeid} = $linode_id;
 
     # Update Linode
     my $update_result = try {
@@ -308,44 +274,254 @@ sub create {
     };
     return $self->fail(
         action  => 'create',
-        label   => $params->{linode_update}{label},
-        message => "Unable to update $options->{label} after initial creation",
+        label   => $$linode_label,
+        message => "Unable to update $linode_label after initial creation",
     ) unless $update_result;
 
-    my @disk_list;
 
-    # Deploy main disk image
-    my $disk                = {};
-    my $distribution_result = try {
-        my $linode_hd_space
-            = $api->linode_list( linodeid => $linode_id )->[0]->{totalhd};
+    # Linode is created, now make disks and configure
+    $args{set_obj} = { linodeid => $linode_id };
+    $self->buildrebuild( %args );
 
-        $params->{linode_disk_createfromdistribution}->{size}
-            = ( $linode_hd_space - $params->{linode_disk_create}{size} );
+}
+
+
+sub buildrebuild {
+    my ( $self, %args) = @_;
+
+    my $api     = $args{api_obj};
+    my $options = $args{options};
+    my $format  = $args{format};
+    my $wait    = 0;
+
+    if ( defined $options->{wait} && $options->{wait} == 0 ) {
+        $wait = 5;
+    } elsif ( defined $options->{wait} ) {
+        $wait = $options->{wait};
+    }
+
+    my $linode_label = @{ $options->{label} }[0];
+    my $linode_id    = $args{set_obj}->{linodeid};
+    my $error_ins    = " Re-run with 'linode rebuild $linode_label ...'";
+
+    # Make sure we have the root password
+    if ( !exists $options->{password} && $format eq 'human' ) {
+        print 'Root password for this Linode: ';
+        system( 'stty', '-echo' );
+        chop( $options->{password} = <STDIN> );
+        system( 'stty', 'echo' );
+        say '';
+    } elsif ( !exists $options->{password} && $format ne 'human' ) {
+        return $self->fail(
+            action  => $options->{action},
+            label   => $linode_label,
+            message => "A root user's password is required.$error_ins",
+        );
+    }
+
+    my $params = {
+        linode_disk_createfromx=> {
+            linodeid        => $linode_id,
+            distributionid  => $options->{distributionid},
+            label           => "${linode_label}-disk",
+            rootpass        => $options->{password}
+        },
+        linode_disk_create => {
+            linodeid        => $linode_id,
+            label           => "${linode_label}-swap",
+            type            => 'swap',
+            size            => 256
+        },
+        linode_config_create => {
+            linodeid        => $linode_id,
+            kernelid        => $options->{kernelid},
+            label           => "${linode_label}-config"
+        }
+    };
+
+
+    if ( exists $options->{stackscript} ) {
+        # create from stackscript args
+
+        # stackscript ID handling
+        if ( $options->{stackscript} =~ m/^\d+$/ ) { # look like an ID?
+            $params->{linode_disk_createfromx}->{stackscriptid} = $options->{stackscript};
+        } else {
+            # If the provided is not an ID, try to match it to one of the users StackScripts
+            my $objects = $api->stackscript_list();
+            for my $object ( @$objects ) {
+                if ( $object->{ 'label' } =~ m/$options->{stackscript}/i ) {
+                    $params->{linode_disk_createfromx}->{stackscriptid} = $object->{ 'stackscriptid' };
+                    last;
+                }
+            }
+            return $self->fail(
+                action  => $options->{action},
+                label   => $linode_label,
+                message => "Unable to find StackScript $options->{stackscript}.$error_ins",
+            ) unless $params->{linode_disk_createfromx}->{stackscriptid};
+        }
+
+        # UDF Responses in JSON format
+        if ( exists $options->{stackscriptjson} ) {
+            my $jsonin = $options->{stackscriptjson};
+            $jsonin =~ s/^\s+//; # remove any leading whitespace
+            $jsonin =~ s/\s+$//; # remove any trailing whitespace
+
+            if ( length($jsonin) > 1 && substr($jsonin, 0, 1) ne '{' ) {
+                # assume a file path, read in the contents of the file
+                if ( -e $jsonin ) {
+                    $params->{linode_disk_createfromx}->{stackscriptudfresponses} = do {
+                        local $/ = undef;
+                        open my $fh, '<', $jsonin or do {
+                            return $self->fail(
+                                action  => $options->{action},
+                                label   => $linode_label,
+                                message => "Unable to open file '$jsonin': $!$error_ins",
+                            );
+                        };
+                        <$fh>;
+                    };
+                } else {
+                    return $self->fail(
+                        action  => $options->{action},
+                        label   => $linode_label,
+                        message => "File '$jsonin' does not exist.$error_ins",
+                    );
+                }
+            } else {
+                # assume JSON
+                $params->{linode_disk_createfromx}->{stackscriptudfresponses} = $jsonin;
+            }
+            my $test_json = try {
+                decode_json( $params->{linode_disk_createfromx}->{stackscriptudfresponses} );
+            };
+            return $self->fail(
+                action  => $options->{action},
+                label   => $linode_label,
+                message => "The JSON provided is invalid.$error_ins",
+            ) unless $test_json;
+
+        } else {
+            return $self->fail(
+                action  => $options->{action},
+                label   => $linode_label,
+                message => "StackScripts require JSON (stackscriptjson) with user defines fields.$error_ins",
+            );
+        }
+
+    } else {
+        # create from distribution args
 
         $options->{pubkeyfile}
             = glob_tilde($options->{pubkeyfile}) if $options->{pubkeyfile};
 
         if ( $options->{pubkeyfile} && -f $options->{pubkeyfile} ) {
-            $params->{linode_disk_createfromdistribution}->{rootsshkey} = do {
+            $params->{linode_disk_createfromx}->{rootsshkey} = do {
                 local $/ = undef;
-                open my $fh, '<', $options->{pubkeyfile}
-                    or die "Unable to open file '$options->{pubkeyfile}': $!\n";
+                open my $fh, '<', $options->{pubkeyfile} or do {
+                    return $self->fail(
+                        action  => $options->{action},
+                        label   => $linode_label,
+                        message => "Unable to open file '$options->{pubkeyfile}': $!$error_ins",
+                    );
+                };
                 <$fh>;
             };
         }
         elsif ( $options->{pubkeyfile} ) {
-            die "File '$options->{pubkeyfile}' does not exist\n";
+            return $self->fail(
+                action  => $options->{action},
+                label   => $linode_label,
+                message => "File '$options->{pubkeyfile}' does not exist.$error_ins",
+            );
         }
+    }
 
-        $disk = $api->linode_disk_createfromdistribution(
-            %{ $params->{linode_disk_createfromdistribution} } );
+
+    # Required information confirmed, now make sure Linode prepared to be rebuilt
+    # 1 - Make sure Linode is powered down.
+    # 2 - Remove existing disks so that we can make new ones.
+    # 3 - Remove existing configurations so that we can make a new one.
+
+    # Check status of this linode, shutdown if nessesary
+    my $linode_status = $api->linode_list( linodeid => $linode_id )->[0]->{status};
+    if ( $humanstatus{$linode_status} eq 'running') {
+        my $stop_job;
+        print "Powering down linode '$linode_label'." if ( $format eq 'human' );
+        my $stop_result = try {
+            $stop_job = $api->linode_shutdown( linodeid => $linode_id );
+        };
+
+        my $linode_job_result = $self->_poll_and_wait( $api, $linode_id, $stop_job->{jobid}, $format, $wait );
+        return $self->fail(
+            action  => $options->{action},
+            label   => $linode_label,
+            message => "Timed out waiting for linode to stop '$linode_label'.$error_ins."
+        ) unless $linode_job_result;
+    }
+    # Destroy any existings disks
+    my $existdisks = $api->linode_disk_list( linodeid => $linode_id );
+    if ( @$existdisks != 0 ) {
+        for my $eachdisk ( @$existdisks ) {
+
+            my $disk;
+            my $delete_result = try {
+                print "Removing existing disk '$eachdisk->{label}'." if ( $format eq 'human' );
+                $disk = $api->linode_disk_delete( linodeid => $linode_id, diskid => $eachdisk->{diskid} );
+            };
+            return $self->fail(
+                action  => $options->{action},
+                label   => $linode_label,
+                message => "Unable to delete existing disk '$eachdisk->{label}'.$error_ins",
+            ) unless $delete_result;
+
+            my $disk_job_result = $self->_poll_and_wait( $api, $linode_id, $disk->{jobid}, $format, $wait );
+            return $self->fail(
+                action  => $options->{action},
+                label   => $linode_label,
+                message => "Timed out waiting for disk to delete '$eachdisk->{label}'.$error_ins."
+            ) unless $disk_job_result;
+        }
+    }
+    # Destroy any existings configs
+    my $existconfigs = $api->linode_config_list( linodeid => $linode_id);
+    if ( @$existconfigs != 0 ) {
+        for my $eachconfig ( @$existconfigs) {
+            my $delete_result = try {
+                $api->linode_config_delete( linodeid => $linode_id, configid => $eachconfig->{configid} );
+            };
+            return $self->fail(
+                action  => $options->{action},
+                label   => $linode_label,
+                message => "Unable to delete existing config $eachconfig->{label}.$error_ins",
+            ) unless $delete_result;
+        }
+    }
+
+
+    # calculate disk space
+    my $linode_hd_space = $api->linode_list( linodeid => $linode_id )->[0]->{totalhd};
+    $params->{linode_disk_createfromx}->{size}
+        = ( $linode_hd_space - $params->{linode_disk_create}{size} );
+
+    my @disk_list;
+    my $disk = {};
+    # Deploy main disk image
+    my $maindisk_result = try {
+        if ( exists $options->{stackscript} ) {
+            $disk = $api->linode_disk_createfromstackscript(
+                %{ $params->{linode_disk_createfromx} } );
+        } else {
+            $disk = $api->linode_disk_createfromdistribution(
+                %{ $params->{linode_disk_createfromx} } );
+        }
     };
     return $self->fail(
-        action  => 'create',
-        label   => $params->{linode_update}{label},
-        message => 'Unable to create primary disk image',
-    ) unless $distribution_result;
+        action  => $options->{action},
+        label   => $linode_label,
+        message => "Unable to create primary disk image.$error_ins",
+    ) unless $maindisk_result;
 
     push @disk_list, $disk->{diskid};
 
@@ -355,9 +531,9 @@ sub create {
         $swap_disk = $api->linode_disk_create( %{ $params->{linode_disk_create} } );
     };
     return $self->fail(
-        action  => 'create',
-        label   => $params->{linode_update}{label},
-        message => 'Unable to create swap image',
+        action  => $options->{action},
+        label   => $linode_label,
+        message => "Unable to create swap image.$error_ins",
     ) unless $swap_result;
 
     push @disk_list, $swap_disk->{diskid};
@@ -369,9 +545,9 @@ sub create {
             %{ $params->{linode_config_create} } );
     };
     return $self->fail(
-        action  => 'create',
-        label   => $params->{linode_update}{label},
-        message => 'Unable to create configuration profile',
+        action  => $options->{action},
+        label   => $linode_label,
+        message => "Unable to create configuration profile.$error_ins",
     ) unless $config_result;
 
     # Boot!
@@ -381,9 +557,9 @@ sub create {
     };
 
     return $self->fail(
-        action  => 'create',
-        label   => $params->{linode_update}{label},
-        message => "Unable to issue boot job for $options->{label}",
+        action  => $options->{action},
+        label   => $linode_label,
+        message => "Unable to issue boot job for $linode_label.",
     ) unless $boot_result;
 
     if ($wait) {
@@ -392,26 +568,27 @@ sub create {
             $format, $wait );
 
         return $self->succeed(
-            action  => 'create',
-            label   => $params->{linode_update}{label},
-            message => "Created and booted $options->{label}",
+            action  => $options->{action},
+            label   => $linode_label,
+            message => "Completed. Booted $linode_label",
             payload => { jobid => $boot->{jobid}, job => 'start' },
         ) if $boot_job_result;
 
         return $self->fail(
-            action  => 'create',
-            label   => $params->{linode_update}{label},
-            message => "Timed out waiting for boot to complete for $params->{linode_update}{label}",
+            action  => $options->{action},
+            label   => $linode_label,
+            message => "Timed out waiting for boot to complete for $linode_label",
             payload => { jobid => $boot->{jobid}, job => 'start' },
         );
     }
 
     return $self->succeed(
-        action  => 'create',
-        label   => $params->{linode_update}{label},
-        message => "Creating and booting $options->{label}...",
+        action  => $options->{action},
+        label   => $linode_label,
+        message => "Completed. Booting $linode_label.",
         payload => { jobid => $boot->{jobid}, job => 'start' },
     );
+
 }
 
 sub change_state {
