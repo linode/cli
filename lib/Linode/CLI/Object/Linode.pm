@@ -56,10 +56,10 @@ sub list {
     my $api           = $self->{_api_obj};
     my $label         = $args{label};
     my $output_format = $args{output_format} || 'human';
-    my $out_arrayref = [];
-    my $out_hashref = {};
-    my @colw = ( 32, 14, 10, 8, 10, 10 );
+    my $out_arrayref  = [];
+    my $out_hashref   = {};
 
+    my @colw = ( 32, 14, 10, 8, 10, 10 );
     my $grouped_objects = {};
 
     # Group into display groups
@@ -142,9 +142,12 @@ sub list {
             }
         }
 
-        push @$out_arrayref, ( '+ ' . ( '-' x $colw[0] ) . ' + ' .
-            ( '-' x $colw[1] ) . ' + ' . ( '-' x $colw[2] ) . ' + ' . ( '-' x $colw[3] ) . ' + ' .
-            ( '-' x $colw[4] ) . ' + ' . ( '-' x $colw[5] ) . " +\n" ) if ($output_format eq 'human');
+        if ($output_format eq 'human') {
+            push @$out_arrayref, ( '+ ' . ( '-' x $colw[0] ) . ' + ' .
+                ( '-' x $colw[1] ) . ' + ' . ( '-' x $colw[2] ) . ' + ' .
+                ( '-' x $colw[3] ) . ' + ' . ( '-' x $colw[4] ) . ' + ' .
+                ( '-' x $colw[5] ) . " +\n" );
+        }
     }
 
     if ( $output_format eq 'raw' ) {
@@ -189,8 +192,9 @@ sub list {
                 ( '-' x $colw[2] ) . ' + ' . ( '-' x $colw[3] ) . ' + ' .
                 ( '-' x $colw[4] ) . ' + ' . ( '-' x $colw[5] ) . ' |');
             push @$out_arrayref, ( '+ ' . ( '-' x $colw[0] ) . ' + ' .
-                ( '-' x $colw[1] ) . ' + ' . ( '-' x $colw[2] ) . ' + ' . ( '-' x $colw[3] ) . ' + ' .
-                ( '-' x $colw[4] ) . ' + ' . ( '-' x $colw[5] ) . " +\n" );
+                ( '-' x $colw[1] ) . ' + ' . ( '-' x $colw[2] ) . ' + ' .
+                ( '-' x $colw[3] ) . ' + ' . ( '-' x $colw[4] ) . ' + ' .
+                ( '-' x $colw[5] ) . " +\n" );
         }
         return join( "\n", @$out_arrayref );
     }
@@ -206,14 +210,14 @@ sub show {
         my $linodeid = $self->{object}{$object_label}{linodeid};
         my @ips = map { $_->{ipaddress} } @{$api->linode_ip_list(linodeid => $linodeid)};
         $return .= sprintf( "%9s %-45s\n%9s %-45s\n%9s %-45s\n%9s %-45s\n%9s %-45s\n%9s %-45s\n%9s %-45s\n",
-                'label:', $self->{object}->{$object_label}->{label},
-                'status:', $humanstatus{ $self->{object}->{$object_label}->{status} },
-                'location:', $humandc{ $self->{object}->{$object_label}->{datacenterid} },
-                'backups:', $humanyn{ $self->{object}->{$object_label}->{backupsenabled} },
-                'disk:',human_displaymemory( $self->{object}->{$object_label}->{totalhd} ),
-                'ram:', human_displaymemory( $self->{object}->{$object_label}->{totalram} ),
-                'ips:', join(' ', @ips)
-            ) . "\n";
+            'label:', $self->{object}->{$object_label}->{label},
+            'status:', $humanstatus{ $self->{object}{$object_label}{status} },
+            'location:', $humandc{ $self->{object}{$object_label}{datacenterid} },
+            'backups:', $humanyn{ $self->{object}{$object_label}{backupsenabled} },
+            'disk:',human_displaymemory( $self->{object}{$object_label}{totalhd} ),
+            'ram:', human_displaymemory( $self->{object}{$object_label}{totalram} ),
+            'ips:', join(' ', @ips)
+        ) . "\n";
     }
 
     return $return;
@@ -226,7 +230,6 @@ sub create {
     my $options = $args{options};
     my $format  = $args{format};
 
-    # For now, only create one Linode at a time
     my $linode_label = @{ $options->{label} }[0];
 
     # check if this label is already in use
@@ -236,7 +239,8 @@ sub create {
             return $self->fail(
                 action  => 'create',
                 label   => $linode_label,
-                message => "The name $linode_label is already in use by another Linode.",
+                message => "The name $linode_label is already in use by "
+                         . "another Linode.",
             );
         }
     }
@@ -345,21 +349,22 @@ sub buildrebuild {
 
         # stackscript ID handling
         if ( $options->{stackscript} =~ m/^\d+$/ ) { # look like an ID?
-            $params->{linode_disk_createfromx}->{stackscriptid} = $options->{stackscript};
+            $params->{linode_disk_createfromx}{stackscriptid} = $options->{stackscript};
         } else {
             # If the provided is not an ID, try to match it to one of the users StackScripts
             my $objects = $api->stackscript_list();
             for my $object ( @$objects ) {
                 if ( $object->{ 'label' } =~ m/$options->{stackscript}/i ) {
-                    $params->{linode_disk_createfromx}->{stackscriptid} = $object->{ 'stackscriptid' };
+                    $params->{linode_disk_createfromx}{stackscriptid} = $object->{ 'stackscriptid' };
                     last;
                 }
             }
             return $self->fail(
                 action  => $options->{action},
                 label   => $linode_label,
-                message => "Unable to find StackScript $options->{stackscript}.$error_ins",
-            ) unless $params->{linode_disk_createfromx}->{stackscriptid};
+                message => "Unable to find StackScript $options->{stackscript}."
+                         . $error_ins,
+            ) unless $params->{linode_disk_createfromx}{stackscriptid};
         }
 
         # UDF Responses in JSON format
@@ -371,13 +376,14 @@ sub buildrebuild {
             if ( length($jsonin) > 1 && substr($jsonin, 0, 1) ne '{' ) {
                 # assume a file path, read in the contents of the file
                 if ( -e $jsonin ) {
-                    $params->{linode_disk_createfromx}->{stackscriptudfresponses} = do {
+                    $params->{linode_disk_createfromx}{stackscriptudfresponses} = do {
                         local $/ = undef;
                         open my $fh, '<', $jsonin or do {
                             return $self->fail(
                                 action  => $options->{action},
                                 label   => $linode_label,
-                                message => "Unable to open file '$jsonin': $!$error_ins",
+                                message => "Unable to open file '$jsonin': $!"
+                                         . $error_ins,
                             );
                         };
                         <$fh>;
@@ -386,27 +392,29 @@ sub buildrebuild {
                     return $self->fail(
                         action  => $options->{action},
                         label   => $linode_label,
-                        message => "File '$jsonin' does not exist.$error_ins",
+                        message => "File '$jsonin' does not exist."
+                                 . $error_ins,
                     );
                 }
             } else {
                 # assume JSON
-                $params->{linode_disk_createfromx}->{stackscriptudfresponses} = $jsonin;
+                $params->{linode_disk_createfromx}{stackscriptudfresponses} = $jsonin;
             }
             my $test_json = try {
-                decode_json( $params->{linode_disk_createfromx}->{stackscriptudfresponses} );
+                decode_json( $params->{linode_disk_createfromx}{stackscriptudfresponses} );
             };
             return $self->fail(
                 action  => $options->{action},
                 label   => $linode_label,
-                message => "The JSON provided is invalid.$error_ins",
+                message => "The JSON provided is invalid." . $error_ins,
             ) unless $test_json;
 
         } else {
             return $self->fail(
                 action  => $options->{action},
                 label   => $linode_label,
-                message => "StackScripts require JSON (stackscriptjson) with user defines fields.$error_ins",
+                message => "StackScripts require JSON (stackscriptjson) with"
+                         . " user defined fields." . $error_ins,
             );
         }
 
@@ -423,7 +431,8 @@ sub buildrebuild {
                     return $self->fail(
                         action  => $options->{action},
                         label   => $linode_label,
-                        message => "Unable to open file '$options->{pubkeyfile}': $!$error_ins",
+                        message => "Unable to open file "
+                                 . "'$options->{pubkeyfile}': $!" . $error_ins,
                     );
                 };
                 <$fh>;
@@ -433,7 +442,8 @@ sub buildrebuild {
             return $self->fail(
                 action  => $options->{action},
                 label   => $linode_label,
-                message => "File '$options->{pubkeyfile}' does not exist.$error_ins",
+                message => "File '$options->{pubkeyfile}' does not exist."
+                         . $error_ins,
             );
         }
     }
@@ -453,11 +463,14 @@ sub buildrebuild {
             $stop_job = $api->linode_shutdown( linodeid => $linode_id );
         };
 
-        my $linode_job_result = $self->_poll_and_wait( $api, $linode_id, $stop_job->{jobid}, $format, $wait );
+        my $linode_job_result = $self->_poll_and_wait(
+            $api, $linode_id, $stop_job->{jobid}, $format, $wait
+        );
         return $self->fail(
             action  => $options->{action},
             label   => $linode_label,
-            message => "Timed out waiting for linode to stop '$linode_label'.$error_ins."
+            message => "Timed out waiting for linode to stop '$linode_label'."
+                      . $error_ins,
         ) unless $linode_job_result;
     }
     # Destroy any existings disks
@@ -467,20 +480,28 @@ sub buildrebuild {
 
             my $disk;
             my $delete_result = try {
-                print "Removing existing disk '$eachdisk->{label}'." if ( $format eq 'human' );
-                $disk = $api->linode_disk_delete( linodeid => $linode_id, diskid => $eachdisk->{diskid} );
+                if ( $format eq 'human' ) {
+                    print "Removing existing disk '$eachdisk->{label}'.";
+                }
+                $disk = $api->linode_disk_delete(
+                    linodeid => $linode_id, diskid => $eachdisk->{diskid}
+                );
             };
             return $self->fail(
                 action  => $options->{action},
                 label   => $linode_label,
-                message => "Unable to delete existing disk '$eachdisk->{label}'.$error_ins",
+                message => "Unable to delete existing disk "
+                          . "'$eachdisk->{label}'." . $error_ins,
             ) unless $delete_result;
 
-            my $disk_job_result = $self->_poll_and_wait( $api, $linode_id, $disk->{jobid}, $format, $wait );
+            my $disk_job_result = $self->_poll_and_wait(
+                $api, $linode_id, $disk->{jobid}, $format, $wait
+            );
             return $self->fail(
                 action  => $options->{action},
                 label   => $linode_label,
-                message => "Timed out waiting for disk to delete '$eachdisk->{label}'.$error_ins."
+                message => "Timed out waiting for disk to delete "
+                         . "'$eachdisk->{label}'." . $error_ins,
             ) unless $disk_job_result;
         }
     }
@@ -489,12 +510,15 @@ sub buildrebuild {
     if ( @$existconfigs != 0 ) {
         for my $eachconfig ( @$existconfigs) {
             my $delete_result = try {
-                $api->linode_config_delete( linodeid => $linode_id, configid => $eachconfig->{configid} );
+                $api->linode_config_delete(
+                    linodeid => $linode_id, configid => $eachconfig->{configid}
+                );
             };
             return $self->fail(
                 action  => $options->{action},
                 label   => $linode_label,
-                message => "Unable to delete existing config $eachconfig->{label}.$error_ins",
+                message => "Unable to delete existing config "
+                         . "$eachconfig->{label}." . $error_ins,
             ) unless $delete_result;
         }
     }
@@ -585,7 +609,7 @@ sub buildrebuild {
     return $self->succeed(
         action  => $options->{action},
         label   => $linode_label,
-        message => "Completed. Booting $linode_label.",
+        message => "Completed. Booting $linode_label...",
         payload => { jobid => $boot->{jobid}, job => 'start' },
     );
 
@@ -661,8 +685,9 @@ sub change_state {
             my $jobid        = $job;
             my $linode_id    = $queue->{$job}[0];
             my $linode_label = $queue->{$job}[1];
-            my $boot_job_result
-                = $self->_poll_and_wait( $api, $linode_id, $jobid, $format, $wait );
+            my $boot_job_result = $self->_poll_and_wait(
+                $api, $linode_id, $jobid, $format, $wait
+            );
 
             if ( !$boot_job_result ) {
                 $self->{_result} = $self->fail(
