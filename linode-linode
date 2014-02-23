@@ -63,7 +63,7 @@ B<linode-linode> [B<-a> action] [action-options...] [options...]
 
 =item S<-a show,    --action show      show detailed info about a Linode>
 
-=item S<            --apikey=KEY       your user's API key>
+=item S<            --api-key=KEY       your user's API key>
 
 =item S<-h,         --help             display this help and exit>
 
