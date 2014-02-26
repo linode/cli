@@ -425,6 +425,18 @@ Display detailed information about one or more Linodes.
 
 **-l**, **--label**: Required. A specific Linode to show.
 
+#### Locations
+
+List all available datacenters.
+
+#### Distros
+
+List all available distributions.
+
+#### Plans
+
+List all available Linode plans.
+
 ---
 
 ### Domain Actions
