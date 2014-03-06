@@ -424,8 +424,8 @@ sub configure {
     my @options = (
         [
             'distribution',
-            'Default distribution to deploy when creating a new Linode or'
-             . ' rebuilding an existing one. (Optional) (? to show options)',
+            'Default distribution when deploying a new Linode or'
+             . ' rebuilding an existing one. (Optional)',
             sub {
                 my $distro = shift;
                 my $cli = Linode::CLI->new(
@@ -448,7 +448,7 @@ sub configure {
         ],
         [
             'datacenter',
-            'Default datacenter to deploy new Linodes within. (Optional) (? to show options)',
+            'Default datacenter when deploying a new Linode. (Optional)',
             sub {
                 my $datacenter = shift;
                 my $cli = Linode::CLI->new(
@@ -471,7 +471,7 @@ sub configure {
         ],
         [
             'plan',
-            'Default plan when deploying a new Linode. (Optional) (? to show options)',
+            'Default plan when deploying a new Linode. (Optional)',
             sub {
                 my $plan = shift;
                 my $cli = Linode::CLI->new(
@@ -494,7 +494,7 @@ sub configure {
         ],
         [
             'pubkey-file',
-            'Path to an SSH public key to install when creating a new Linode.'
+            'Path to an SSH public key to install when deploying a new Linode.'
              . ' (Optional)',
             sub {
                 my $file = shift;
@@ -511,25 +511,24 @@ sub configure {
         my $retry = 1;
         while ( $retry ) {
             say $options[$i][1];
-            print '>> ';
-            chop ( my $response = <STDIN> );
+            my $menu = $options[$i][3]->();
+            my $response;
+            if ( defined $menu ) {
+                print 'Choose[ 1-' . scalar(@$menu) . ' ] or Enter to skip>> ';
+                chop ( $response = <STDIN> );
+
+                if ( $response =~ m/^\d+$/ && $response >= 1 && $response <= scalar(@$menu) ) {
+                    $response = @$menu[$response - 1];
+                }
+            } else {
+                print '>> ';
+                chop ( $response = <STDIN> );
+            }
 
             try {
-                if ( $response eq '?' ) {
-                    my $menu = $options[$i][3]->();
-                    print '>> ';
-                    chop ( $response = <STDIN> );
-
-                    if ( $response =~ m/^\d+$/ && $response >= 1 && $response <= scalar(@$menu) ) {
-                        $response = @$menu[$response - 1];
-                    } else {
-                        die;
-                    }
-                } elsif ( $response eq '0' ) {
+                if ( $response eq '0' ) {
                     die;
-                }
-
-                if ( $options[$i][2]->($response) ) {
+                } elsif ( $options[$i][2]->($response) ) {
                     push @{ $options[$i] }, $response;
                     say '';
                 }
