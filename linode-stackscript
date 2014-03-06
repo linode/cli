@@ -51,7 +51,7 @@ B<linode-stackscript> [B<-a> action] [action-options...] [options...]
 
 =item S<-a source, --action source    show a StackScript's source>
 
-=item S<           --api-key=KEY       your user's API key>
+=item S<           --api-key=KEY      your user's API key>
 
 =item S<-h,        --help             display this help and exit>
 
