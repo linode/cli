@@ -401,7 +401,7 @@ Resize a Linode to a new plan size, and issue a boot job.
 
 #### IP-Add
 
-Add an IP address to a Linode. Adding public IP addresses is not yet supported, so the **--private** flag is implicitly required.
+Add an IP address to a Linode.
 
 **-l**, **--label**: A Linode to operate on.
 
