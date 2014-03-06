@@ -230,6 +230,7 @@ linode nodebalancer node-list mynodebalancer 80
 Actions can be performed on StackScripts.
 
 ```
+linode stackscript list
 linode stackscript create --label "StackScript Name" --codefile "/path/myscript.sh" --distribution "Debian 7"
 linode stackscript show My-StackScript-Label
 linode stackscript source mystackscript > myscript.sh
