@@ -163,6 +163,20 @@ our %paramsdef = (
             'run' => 'configure',
             'warmcache' => [ 'plan', 'distribution', 'datacenter' ]
         },
+        'datacenters' => { 'alias' => 'locations' },
+        'locations' => {
+            'run' => 'showoptions',
+            'warmcache' => [ 'datacenter' ]
+        },
+        'distributions' => { 'alias' => 'distros' },
+        'distros' => {
+            'run' => 'showoptions',
+            'warmcache' => [ 'distribution' ]
+        },
+        'plans' => {
+            'run' => 'showoptions',
+            'warmcache' => [ 'plan' ]
+        },
     },
     'account' => {
         'info'  => { 'alias' => 'show' },

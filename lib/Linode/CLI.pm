@@ -349,6 +349,29 @@ sub nodebalancer {
     %{$self->{_result}} = %combined;
 }
 
+
+sub showoptions {
+    my $self = shift;
+
+    if ($self->{mode} eq 'linode' && $self->{_opts}->{action} eq 'locations') {
+        my $cache = $self->_use_cache('datacenter');
+        for my $object_label ( sort keys %$cache ) {
+            print "$humandc{ $cache->{$object_label}{datacenterid} }\n";
+        }
+    } elsif ($self->{mode} eq 'linode' && $self->{_opts}->{action} eq 'distros') {
+        my $cache = $self->_use_cache('distribution');
+        for my $object_label ( sort keys %$cache ) {
+            print "$cache->{$object_label}{label}\n";
+        }
+    } elsif ($self->{mode} eq 'linode' && $self->{_opts}->{action} eq 'plans') {
+        my $cache = $self->_use_cache('plan');
+        for my $object_label ( sort { (split ' ', $a)[1] <=> (split ' ', $b)[1] } keys %$cache ) {
+            print "$object_label\n";
+        }
+    }
+}
+
+
 sub configure {
     my $self = shift;
     my $api_key;
@@ -484,9 +507,9 @@ sub configure {
                 my $cache = $cli_cache->_use_cache('plan');
                 print "Valid options are:\n";
                 my ( $selections, $i ) = ( [], 1 );
-                for my $object_label ( keys %$cache ) {
-                    print " " . sprintf( "%2s", $i ) . " - $cache->{$object_label}{label}\n";
-                    push @$selections, $cache->{$object_label}{label};
+                for my $object_label ( sort { (split ' ', $a)[1] <=> (split ' ', $b)[1] } keys %$cache ) {
+                    print " " . sprintf( "%2s", $i ) . " - $object_label\n";
+                    push @$selections, $object_label;
                     $i++;
                 }
                 return $selections;
