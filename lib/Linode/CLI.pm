@@ -352,22 +352,26 @@ sub nodebalancer {
 
 sub showoptions {
     my $self = shift;
+    my $responses = [];
 
-    if ($self->{mode} eq 'linode' && $self->{_opts}->{action} eq 'locations') {
+    if ($self->{mode} eq 'linode' && $self->{_opts}{action} eq 'locations') {
         my $cache = $self->_use_cache('datacenter');
-        for my $object_label ( sort keys %$cache ) {
-            print "$humandc{ $cache->{$object_label}{datacenterid} }\n";
-        }
-    } elsif ($self->{mode} eq 'linode' && $self->{_opts}->{action} eq 'distros') {
+        push (@$responses, $_) foreach ( keys %$cache );
+    } elsif ($self->{mode} eq 'linode' && $self->{_opts}{action} eq 'distros') {
         my $cache = $self->_use_cache('distribution');
-        for my $object_label ( sort keys %$cache ) {
-            print "$cache->{$object_label}{label}\n";
-        }
-    } elsif ($self->{mode} eq 'linode' && $self->{_opts}->{action} eq 'plans') {
+        push (@$responses, $cache->{$_}{label}) foreach ( keys %$cache );
+    } elsif ($self->{mode} eq 'linode' && $self->{_opts}{action} eq 'plans') {
         my $cache = $self->_use_cache('plan');
-        for my $object_label ( sort { (split ' ', $a)[1] <=> (split ' ', $b)[1] } keys %$cache ) {
-            print "$object_label\n";
-        }
+        push (@$responses, $_) foreach ( keys %$cache );
+    }
+
+    for my $response (@$responses) {
+        $self->{_result} = $self->succeed(
+            label   => $response,
+            message => $response,
+            action  => $self->{_opts}{action},
+            result  => $self->{_result},
+        );
     }
 }
 
