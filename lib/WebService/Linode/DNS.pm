@@ -12,10 +12,11 @@ WebService::Linode::DNS - Deprecated Perl Interface to the Linode.com API DNS me
 
 =cut
 
-our $VERSION = '0.18';
+our $VERSION = '0.20';
 our @ISA = ("WebService::Linode::Base");
 
 sub getDomainIDbyName {
+	carp "WebService::Linode::DNS is deprecated, use WebService::Linode instead!";
 	my $self = shift;
 	my $name = shift;
 	$self->_debug(10, 'getDomainIDbyName called for: ' . $name);
@@ -36,6 +37,7 @@ sub getDomainIDbyName {
 }
 
 sub domainList {
+	carp "WebService::Linode::DNS is deprecated, use WebService::Linode instead!";
 	my $self = shift;
 	$self->_debug(10, 'domainList called');
 
@@ -56,6 +58,7 @@ sub domainList {
 }
 
 sub domainGet {
+	carp "WebService::Linode::DNS is deprecated, use WebService::Linode instead!";
 	my ($self, %args) = @_;
 	$self->_debug(10, 'domainGet called');
 	my $domainid;
@@ -82,6 +85,7 @@ sub domainGet {
 }
 
 sub domainCreate {
+	carp "WebService::Linode::DNS is deprecated, use WebService::Linode instead!";
 	my ($self, %args) = @_;
 	$self->_debug(10, 'domainCreate called');
 
@@ -92,12 +96,14 @@ sub domainCreate {
 }
 
 sub domainSave {
+    carp "WebService::Linode::DNS is deprecated, use WebService::Linode instead!";
     my ($self, %args) = @_;
     carp "Deprecated use of domainSave, use domainCreate";
     return $self->domainCreate(%args);
 }
 
 sub domainUpdate {
+	carp "WebService::Linode::DNS is deprecated, use WebService::Linode instead!";
 	my ($self, %args) = @_;
 	$self->_debug(10, 'domainUpdate called');
 
@@ -116,6 +122,7 @@ sub domainUpdate {
 }
 
 sub domainDelete {
+	carp "WebService::Linode::DNS is deprecated, use WebService::Linode instead!";
 	my ($self, %args) = @_;
 	$self->_debug(10, 'domainDelete called');
 
@@ -131,6 +138,7 @@ sub domainDelete {
 }
 
 sub domainResourceList {
+	carp "WebService::Linode::DNS is deprecated, use WebService::Linode instead!";
 	my ($self, %args) = @_;
 	$self->_debug(10, 'domainResourceList called');
 	my $domainid;
@@ -163,6 +171,7 @@ sub domainResourceList {
 }
 
 sub domainResourceGet {
+	carp "WebService::Linode::DNS is deprecated, use WebService::Linode instead!";
 	my ($self, %args) = @_;
 	$self->_debug(10, 'domainResourceGet called');
 
@@ -194,6 +203,7 @@ sub domainResourceGet {
 }
 
 sub getResourceIDbyName {
+	carp "WebService::Linode::DNS is deprecated, use WebService::Linode instead!";
 	my ($self, %args) = @_;
 	$self->_debug(10, 'getResourceIDbyName called');
 
@@ -214,6 +224,7 @@ sub getResourceIDbyName {
 }
 
 sub domainResourceCreate {
+	carp "WebService::Linode::DNS is deprecated, use WebService::Linode instead!";
 	my ($self, %args) = @_;
 	$self->_debug(10, 'domainResourceCreate called');
 
@@ -224,6 +235,7 @@ sub domainResourceCreate {
 }
 
 sub domainResourceSave {
+	carp "WebService::Linode::DNS is deprecated, use WebService::Linode instead!";
 	my ($self, %args) = @_;
 	$self->_debug(10, 'domainResourceCreate called');
 
@@ -233,6 +245,7 @@ sub domainResourceSave {
 }
 
 sub domainResourceUpdate {
+	carp "WebService::Linode::DNS is deprecated, use WebService::Linode instead!";
 	my ($self, %args) = @_;
 	$self->_debug(10, 'domainResourceUpdate called');
 
@@ -245,6 +258,7 @@ sub domainResourceUpdate {
 }
 
 sub domainResourceDelete {
+	carp "WebService::Linode::DNS is deprecated, use WebService::Linode instead!";
 	my ($self, %args) = @_;
 	$self->_debug(10, 'domainResourceDelete called');
 
@@ -261,106 +275,12 @@ sub domainResourceDelete {
 
 =head1 SYNOPSIS
 
-THIS MODULE IS DEPRECATED, DON'T USE IT, USE WebService::Linode
-
-This module provides a simple OOish interface to the Linode.com API.
-
-Example usage:
-
-	use WebService::Linode::DNS;
-
-	my $api = WebService::Linode::DNS->new(apikey => 'mmmcake');
-	for my $domain (@{$api->domainList}) {
-		print $domain->{domainid}, "\n";
-	}
+THIS MODULE IS DEPRECATED, DON'T USE IT, USE L<WebService::Linode>
 
 =head1 METHODS
 
-=head2 new
+If you are still reading, you are doing it wrong! Go here L<WebService::Linode>
 
-All methods take the same parameters as the Linode API itself does.  Field
-names should be lower cased.  All caps fields from the Linode API will be
-lower cased before returning the data.
-
-Accepts a hash as an argument.  apikey is the only required parameter
-specifying your Linode API key.
-
-Errors mirror the perl DBI error handling method.
-$WebService::Linode::DNS::err and ::errstr will be populated with the last error
-number and string that occurred.  All errors generated within the module
-are currently error code -1.  By default, will warn on errors as well, pass
-a true value for fatal to die instead or nowarn to prevent the warnings.
-
-verbose is 0-10 with 10 being the most and 0 being none
-
-nocache disables some cacheing of domainname -> domainid
-
-=head2 domainList
-
-Returns a reference to an array.  The array contains one entry per domain
-containing a reference to a hash with the data for that domain.  Keys in the
-hash use the same names returned by the Linode API though the names have been
-converted to lower-case.
-
-=head2 domainSave
-
-=head2 domainGet
-
-Requires domainid or domain passed in as args.  'domain' is the name of the
-zone and will be mapped to domainid before executing the API method.
-Returns a reference to a hash.  The hash contains the data for the domain
-returned by the Linode API with the keys lower cased.
-
-=head2 getDomainIDbyName
-
-Returns the ID for a domain given the name.
-
-=head2 domainCreate
-
-Requires domainid, use 0 to create a domain.
-
-=head2 domainUpdate
-
-Requires domainid, grabs current data, overwrites passed values then calls
-domainSave for you.
-
-=head2 domainDelete
-
-Requires domainid, deletes the domain
-
-=head2 domainResourceCreate
-
-=head2 domainResourceList
-
-Requires domainid or domain passed in as args.  'domain' is the name of the
-zone and will be mapped to domainid before executing the API method. 
-Returns a reference to an array.  The array contains one entry per domain
-containing a reference to a hash with the data for that domain.  Keys in the
-hash use the same names returned by the Linode API though the names have been
-converted to lower-case.
-
-=head2 domainResourceGet
-
-Requires domainid and resourceid.
-Returns a reference to a hash.  The hash contains the data for the resource
-record returned by the Linode API with the keys lower cased.
-
-=head2 getResourceIDbyName
-
-Takes a record name and domainid or domain and returns the resourceid
-
-=head2 domainResourceSave
-
-Requires domainid and resourceid.  Use 0 for resourceid to create.
-
-=head2 domainResourceUpdate
-
-Requires resourceid, grabs current data, overwrites passed values then calls
-domainResourceSave for you.
-
-=head2 domainResourceDelete
-
-Requires resourceid, deletes the resource record.
 
 =head1 AUTHOR
 
