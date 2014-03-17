@@ -42,7 +42,7 @@ sub new_from_list {
 sub create {
     my ( $self, %args ) = @_;
 
-    my $api     = $args{api};
+    my $api     = $args{api_obj};
     my $options = $args{options};
     my $format  = $args{format};
 
