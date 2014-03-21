@@ -717,7 +717,7 @@ sub _get_object_list {
                 # collect matches
                 for my $object ( @$objects ) {
                     my $object_label = $object->{ $objectunique };
-                    if ( $object_label =~ /^${findme}/i ) { # left partial match
+                    if ( $object_label =~ /^\Q${findme}\E/i ) { # left partial match
                         unless ( my @found = grep { $_ eq $object_label } @$filtered ) {
                             # new hit
                             push @$filtered, $object;
@@ -733,7 +733,7 @@ sub _get_object_list {
                 # collect matches
                 for my $object ( @$objects ) {
                     my $object_label = $object->{ $objectunique };
-                    if ( $object_label =~ /${findme}$/i ) { # right partial match
+                    if ( $object_label =~ /\Q${findme}\E$/i ) { # right partial match
                         unless ( my @found = grep { $_ eq $object_label } @$filtered ) {
                             # new hit
                             push @$filtered, $object;
@@ -749,7 +749,7 @@ sub _get_object_list {
                 # collect matches
                 for my $object ( @$objects ) {
                     my $object_label = $object->{ $objectunique };
-                    if ( $object_label =~ /^\S*${findme}\S*$/i ) { # partial match
+                    if ( $object_label =~ /^\S*\Q${findme}\E\S*$/i ) { # partial match
                         unless ( my @found = grep { $_ eq $object_label } @$filtered ) {
                             # new hit
                             push @$filtered, $object;
@@ -871,7 +871,7 @@ sub _fuzzy_match {
             # not found yet, look for partial match
             if ( $found eq '' ) {
                 for my $object_label ( sort keys %$cache ) {
-                    if ( $object_label =~ /^$param/i ) { # left partial match
+                    if ( $object_label =~ /^\Q$param\E/i ) { # left partial match
                         $found = $object_label;
                         last;
                     }
