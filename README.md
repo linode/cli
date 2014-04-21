@@ -106,17 +106,17 @@ linode rename mylinodename mylinodenewname
 **Warning:** This *will* attempt to charge the credit card on file, or use any account credit available, and spin up a new Linode 1GB.
 
 ```
-linode create New-Linode --location dallas --plan linode1024 --payment-term 1 --distribution 'Debian 7' --group Frontends
+linode create New-Linode --location dallas --plan linode2048 --payment-term 1 --distribution 'Debian 7' --group Frontends
 ```
 
 ### Resizing a Linode
 
 **Warning:** This *will* shut the Linode down, charge/credit the account, and issue a migration to another host server.
 
-This example resizes a Linode 1024 to a Linode 2048.
+This example resizes a Linode 2048 to a Linode 4096.
 
 ```
-linode resize mylinode linode2048
+linode resize mylinode linode4096
 ```
 
 ### Deleting a Linode
@@ -332,7 +332,7 @@ Create and start a new Linode.
 
 **-d**, **--distribution**: Required. Distribution name or DistributionID to deploy.
 
-**-p**, **--plan**: Required. The Plan to deploy. Plans are linode1024, linode2048, linode4096, linode8192, linode16384, linode24576, linode32768, and linode40960.
+**-p**, **--plan**: Required. The Plan to deploy. Plans are linode2048, linode4096, linode8192, linode16384, linode32768, linode49152, linode65536, and linode98304.
 
 **-P**, **--password**: Required. The root user's password.  Needs to be at least 6 characters and contain at least two of these four character classes: lower case letters, upper case letters, numbers, and punctuation.
 
@@ -396,7 +396,7 @@ Resize a Linode to a new plan size, and issue a boot job.
 
 **-l**, **--label**: A Linode to operate on.
 
-**-p**, **--plan**: The Plan to resize to. Plans are linode1024, linode2048, linode4096, linode8192, linode16384, linode24576, linode32768, and linode40960.
+**-p**, **--plan**: The Plan to resize to. Plans are linode2048, linode4096, linode8192, linode16384, linode32768, linode49152, linode65536, and linode98304.
 
 **-w**, **--wait**: Optional. Amount of time (in minutes) to wait for human output. Using the flag only, will use the default of 20.
 
