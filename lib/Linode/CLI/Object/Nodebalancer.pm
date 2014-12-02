@@ -697,7 +697,7 @@ sub configdelete {
 
     if ( $config_id != 0 ) {
         my $delete_result = try {
-            $api_obj->nodebalancer_config_delete( configid => $config_id );
+            $api_obj->nodebalancer_config_delete( configid => $config_id, nodebalancerid => $nb_id );
         };
         if ($delete_result) {
             return $self->succeed(
