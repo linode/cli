@@ -455,7 +455,7 @@ sub recordcreate {
 
     my $api_obj    = $args{api_obj};
     my $options    = $args{options};
-    my $domain_obj = $args{domain_obj};
+    my $domain_obj = $args{match_obj};
 
     my $d_id    = $domain_obj->{domainid};
     my $d_label = $domain_obj->{domain};
@@ -537,7 +537,7 @@ sub recordupdate {
 
     my $api_obj    = $args{api_obj};
     my $options    = $args{options};
-    my $domain_obj = $args{domain_obj};
+    my $domain_obj = $args{match_obj};
 
     my $d_id    = $domain_obj->{domainid};
     my $d_label = $domain_obj->{domain};
@@ -626,7 +626,7 @@ sub recorddelete {
 
     my $api_obj    = $args{api_obj};
     my $options    = $args{options};
-    my $domain_obj = $args{domain_obj};
+    my $domain_obj = $args{match_obj};
 
     my $d_id    = $domain_obj->{domainid};
     my $d_label = $domain_obj->{domain};

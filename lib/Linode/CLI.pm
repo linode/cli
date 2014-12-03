@@ -294,35 +294,11 @@ sub add_ip {
     ) unless $add_ip_result;
 }
 
-sub domainrecord {
+sub runsinglematch {
     my $self = shift;
-
-    my $sub = 'recordcreate';
-    if ( $self->{mode} eq 'domain' && $self->{_opts}{action} eq 'record-update' ) {
-        $sub  = 'recordupdate';
-    }
-    elsif ( $self->{mode} eq 'domain' && $self->{_opts}{action} eq 'record-delete' ) {
-        $sub  = 'recorddelete';
-    }
-
-    my $result = "Linode::CLI::Object::$correct_case{$self->{mode}}"->$sub(
-        api_obj    => $self->{_api_obj},
-        options    => $self->{_distilled_options},
-        # single domain object
-        domain_obj => @{ $self->_get_object_list(
-            $self->{mode}, $self->{_distilled_options}{label}
-        ) }[0],
-        format     => $self->{output_format},
-        wait       => $self->{wait},
-    );
-    my %combined = ( %$result, %{ $self->{_result} } );
-    %{ $self->{_result} } = %combined;
-}
-
-sub nodebalancer {
-    my $self = shift;
-
     my $sub = 'configcreate';
+    my $matchwith = 'label';
+
     if ($self->{mode} eq 'nodebalancer' && $self->{_opts}->{action} eq 'config-update') {
         $sub  = 'configupdate';
     } elsif ($self->{mode} eq 'nodebalancer' && $self->{_opts}->{action} eq 'config-delete') {
@@ -333,14 +309,20 @@ sub nodebalancer {
         $sub  = 'nodeupdate';
     } elsif ($self->{mode} eq 'nodebalancer' && $self->{_opts}->{action} eq 'node-delete') {
         $sub  = 'nodedelete';
+    } elsif ( $self->{mode} eq 'domain' && $self->{_opts}{action} eq 'record-create' ) {
+        $sub  = 'recordcreate';
+    } elsif ( $self->{mode} eq 'domain' && $self->{_opts}{action} eq 'record-update' ) {
+        $sub  = 'recordupdate';
+    } elsif ( $self->{mode} eq 'domain' && $self->{_opts}{action} eq 'record-delete' ) {
+        $sub  = 'recorddelete';
     }
 
     my $result = "Linode::CLI::Object::$correct_case{$self->{mode}}"->$sub(
         api_obj    => $self->{_api_obj},
         options    => $self->{_distilled_options},
         # single object
-        set_obj => @{ $self->_get_object_list(
-            $self->{mode}, $self->{_distilled_options}{label}
+        match_obj => @{ $self->_get_object_list(
+            $self->{mode}, $self->{_distilled_options}{$matchwith}
         ) }[0],
         format     => $self->{output_format},
         wait       => $self->{wait},
