@@ -331,6 +331,23 @@ sub runsinglematch {
     %{$self->{_result}} = %combined;
 }
 
+sub runnomatching {
+    my $self = shift;
+    my $sub = 'imagedelete';
+
+    if ( $self->{mode} eq 'linode' && $self->{_opts}{action} eq 'image-delete' ) {
+        $sub  = 'imagedelete';
+    }
+
+    my $result = "Linode::CLI::Object::$correct_case{$self->{mode}}"->$sub(
+        api_obj    => $self->{_api_obj},
+        options    => $self->{_distilled_options},
+        format     => $self->{output_format},
+        wait       => $self->{wait},
+    );
+    my %combined = ( %$result, %{ $self->{_result} } );
+    %{ $self->{_result} } = %combined;
+}
 
 sub showoptions {
     my $self = shift;

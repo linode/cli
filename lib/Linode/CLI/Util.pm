@@ -177,6 +177,10 @@ our %paramsdef = (
             'run' => 'showoptions',
             'warmcache' => [ 'plan' ]
         },
+        'image-delete' => {
+            'options' => { 'imageid' => 'imageid|i=i' },
+            'run'       => 'runnomatching'
+        },
     },
     'account' => {
         'info'  => { 'alias' => 'show' },

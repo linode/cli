@@ -929,6 +929,54 @@ sub add_ip {
     return $self->{_result};
 }
 
+sub imagedelete {
+    my ( $self, %args ) = @_;
+
+    my $api_obj = $args{api_obj};
+    my $options = $args{options};
+    my $found = 0;
+
+    # lookup image
+    my $images = $api_obj->image_list();
+    if ( @$images != 0 ) {
+        for my $image ( @$images ) {
+            if ( $options->{imageid} eq $image->{imageid} ) {
+                $found = 1;
+                last;
+            }
+        }
+    }
+
+    if ( !$found ) {
+        return $self->fail(
+            action  => 'image-delete',
+            imageid => $options->{imageid},
+            message => "Unable to find Image $options->{imageid} to delete."
+        );
+    }
+
+    my $delete_result = try {
+        $api_obj->image_delete( imageid => $options->{imageid} );
+    };
+    if ($delete_result) {
+        return $self->succeed(
+            action  => 'image-delete',
+            label   => $options->{imageid},
+            message => "Deleted Image $options->{imageid}.",
+            payload => { action => 'image-delete' },
+        );
+    } else {
+        return $self->fail(
+            action  => 'image-delete',
+            label   => $options->{imageid},
+            message => "Unable to delete Image $options->{imageid}.",
+            payload => { action => 'image-delete' },
+        );
+    }
+}
+
+
+
 sub _poll_and_wait {
     my ( $self, $api_obj, $linode_id, $job_id, $output_format, $timeout ) = @_;
     $timeout = $timeout ? ($timeout * 12) : 12;
