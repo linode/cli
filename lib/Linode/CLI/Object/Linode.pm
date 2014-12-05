@@ -418,11 +418,10 @@ sub buildrebuild {
             );
         }
 
-    } else {
-        # create from distribution args
+    }
 
-        $options->{pubkeyfile}
-            = glob_tilde($options->{pubkeyfile}) if $options->{pubkeyfile};
+    if ( exists $options->{pubkeyfile} ) {
+        $options->{pubkeyfile} = glob_tilde($options->{pubkeyfile});
 
         if ( $options->{pubkeyfile} && -f $options->{pubkeyfile} ) {
             $params->{linode_disk_createfromx}->{rootsshkey} = do {
@@ -437,8 +436,7 @@ sub buildrebuild {
                 };
                 <$fh>;
             };
-        }
-        elsif ( $options->{pubkeyfile} ) {
+        } else {
             return $self->fail(
                 action  => $options->{action},
                 label   => $linode_label,
