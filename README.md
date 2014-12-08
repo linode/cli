@@ -330,7 +330,9 @@ Create and start a new Linode.
 
 **-L**, **--location**: Required. The datacenter to use for deployment. Locations are Atlanta, Dallas, Fremont, London, Newark, and Tokyo.
 
-**-d**, **--distribution**: Required. Distribution name or DistributionID to deploy.
+**-d**, **--distribution**: Required when not using imageid. Distribution name or DistributionID to deploy.
+
+**-i**, **--imageid**: Required when not using distribution. The ID of the gold-master image to use for deployment.
 
 **-p**, **--plan**: Required. The Plan to deploy. Plans are linode2048, linode4096, linode8192, linode16384, linode32768, linode49152, linode65536, and linode98304.
 
@@ -342,7 +344,7 @@ Create and start a new Linode.
 
 **-K**, **--pubkey-file**: Optional. A public key file to install at `/root/.ssh/authorized_keys` when creating this Linode.
 
-**-S**, **--stackscript**: Optional. Personal or public StackScript ID to use for deployment.  Names of personal StackScripts are accepted.
+**-S**, **--stackscript**: Optional when creating with a distribution. Personal or public StackScript ID to use for deployment.  Names of personal StackScripts are accepted.
 
 **-J**, **--stackscriptjson**: The JSON encoded name/value pairs, answering the StackScript's User Defined Fields (UDF). A path to a JSON file is also accepted.
 
@@ -354,13 +356,15 @@ Rebuild an existing Linode.
 
 **-l**, **--label**: Required. A Linode to operate on.
 
-**-d**, **--distribution**: Required. Distribution name or DistributionID to deploy.
+**-d**, **--distribution**: Required when not using imageid. Distribution name or DistributionID to deploy.
+
+**-i**, **--imageid**: Required when not using distribution. The ID of the gold-master image to use for deployment.
 
 **-P**, **--password**: Required. The root user's password.  Needs to be at least 6 characters and contain at least two of these four character classes: lower case letters, upper case letters, numbers, and punctuation.
 
 **-K**, **--pubkey-file**: Optional. A public key file to install at `/root/.ssh/authorized_keys` when creating this Linode.
 
-**-S**, **--stackscript**: Optional. Personal or public StackScript ID to use for deployment.  Names of personal StackScripts are accepted.
+**-S**, **--stackscript**: Optional when rebuilding with a distribution. Personal or public StackScript ID to use for deployment.  Names of personal StackScripts are accepted.
 
 **-J**, **--stackscriptjson**: The JSON encoded name/value pairs, answering the StackScript's User Defined Fields (UDF). A path to a JSON file is also accepted.
 
@@ -437,6 +441,36 @@ List all available distributions.
 #### Plans
 
 List all available Linode plans.
+
+#### Disks-List
+
+Lists disks associated with a specific Linode.
+
+**-l**, **--label**: Required. The Linode to display.
+
+#### Images-List
+
+Lists available gold-master images.
+
+#### Image-Ize
+
+Creates a gold-master image for future deployments.
+
+**-l**, **--label**: Required. Specifies the source Linode to create the image from.
+
+**-d**, **--diskid**: Required. Specifies the source Disk ID to create the image from.
+
+**-D**, **--description**: Optional. An optional description of the created image.
+
+**-n**, **--name**: Optional. Sets the name of the image shown in the base image list, defaults to the source image label.
+
+**-w**, **--wait**: Optional. Amount of time (in minutes) to wait for human output. Using the flag only, will use the default of 5.
+
+#### Image-Delete
+
+Deletes a gold-master image.
+
+**-i**, **--imageid**: Required. The ID of the gold-master image to delete.
 
 ---
 
