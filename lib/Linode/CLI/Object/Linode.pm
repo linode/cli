@@ -973,6 +973,145 @@ sub add_ip {
     return $self->{_result};
 }
 
+sub disklist {
+    my ( $self, %args ) = @_;
+    my $label         = $args{label};
+    my $output_format = $args{output_format} || 'human';
+    my $out_arrayref = [];
+    my $out_recordsarrayref = [];
+    my $out_hashref = {};
+    my $api_obj = $self->{_api_obj};
+    my @colw = ( 48, 12, 12, 12 ); # name (disk label), diskid, type, size
+
+    for my $object_label ( keys %{ $self->{object} } ) {
+        if ( $output_format eq 'human' ) {
+            my $disks = $api_obj->linode_disk_list( linodeid => $self->{object}->{$object_label}->{linodeid} );
+            if ( @$disks != 0 ) {
+                push @$out_recordsarrayref, (
+                    "+ " . ( '-' x $colw[0] ) . ' + ' . ( '-' x $colw[1] ) . ' + ' . ( '-' x $colw[2] ) .
+                    ' + ' . ( '-' x $colw[3] ) . ' +');
+                push @$out_recordsarrayref, sprintf(
+                    "| %-${colw[0]}s | %-${colw[1]}s | %-${colw[2]}s | %-${colw[3]}s |",
+                    'name', 'diskid', 'type', 'size' );
+                push @$out_recordsarrayref, (
+                    '| ' . ( '-' x $colw[0] ) . ' + ' . ( '-' x $colw[1] ) . ' + ' . ( '-' x $colw[2] ) .
+                    ' + ' . ( '-' x $colw[3] ) . ' |');
+                for my $disk ( @$disks ) {
+                    push @$out_recordsarrayref, sprintf(
+                        "| %-${colw[0]}s | %-${colw[1]}s | %-${colw[2]}s | %-${colw[3]}s |",
+                        format_len( $disk->{label}, $colw[0] ),
+                        $disk->{diskid},
+                        $disk->{type},
+                        $disk->{size});
+                }
+                push @$out_recordsarrayref, (
+                    '+ ' . ( '-' x $colw[0] ) . ' + ' . ( '-' x $colw[1] ) . ' + ' . ( '-' x $colw[2] ) .
+                    ' + ' . ( '-' x $colw[3] ) . " +\n");
+            } else {
+                push @$out_recordsarrayref, ("No disks to list.\n");
+            }
+        } else {
+            # json output
+            my $disks = $api_obj->linode_disk_list( linodeid => $self->{object}->{$object_label}->{linodeid} );
+            if ( @$disks != 0 ) {
+                for my $disk ( @$disks ) {
+                    push( @{ $out_hashref->{$object_label}{disks} }, $disk);
+                }
+            }
+        }
+    }
+
+    if ( $output_format eq 'raw' ) {
+        return $out_hashref;
+    } elsif ( $output_format eq 'json' ) {
+       if (scalar( keys %{ $out_hashref }) > 0) {
+            for my $object ( keys %$out_hashref ) {
+                $self->{_result} = $self->succeed(
+                    action  => $self->{_action},
+                    label   => $object,
+                    payload => $out_hashref->{$object},
+                    result  => $self->{_result},
+                    format  => $output_format,
+                );
+            }
+            return $self->{_result};
+        } else {
+            # empty
+            return $self->succeed(
+                action  => $self->{_action},
+                label   => '',
+                payload => {},
+                result  => {},
+                message => "No Disks to list.",
+                format  => $self->{output_format},
+            );
+        }
+    } else {
+        return join("\n", @$out_arrayref, @$out_recordsarrayref);
+    }
+}
+
+sub imagelist {
+    my ( $self, %args ) = @_;
+
+    my $output_format = $args{output_format} || 'human';
+    my $out_arrayref = [];
+    my $out_recordsarrayref = [];
+    my $out_hashref = {};
+    my $api_obj = $self->{_api_obj};
+    my @colw = ( 48, 12, 12, 12 ); # name (disk label), imageid, fs type, size
+
+    if ( $output_format eq 'human' ) {
+        my $images = $api_obj->image_list();
+        if ( @$images != 0 ) {
+            push @$out_recordsarrayref, (
+                "+ " . ( '-' x $colw[0] ) . ' + ' . ( '-' x $colw[1] ) . ' + ' . ( '-' x $colw[2] ) .
+                ' + ' . ( '-' x $colw[3] ) . ' +');
+            push @$out_recordsarrayref, sprintf(
+                "| %-${colw[0]}s | %-${colw[1]}s | %-${colw[2]}s | %-${colw[3]}s |",
+                'image name', 'imageid', 'fs_type', 'size' );
+            push @$out_recordsarrayref, (
+                '| ' . ( '-' x $colw[0] ) . ' + ' . ( '-' x $colw[1] ) . ' + ' . ( '-' x $colw[2] ) .
+                ' + ' . ( '-' x $colw[3] ) . ' |');
+            for my $image ( @$images ) {
+                push @$out_recordsarrayref, sprintf(
+                    "| %-${colw[0]}s | %-${colw[1]}s | %-${colw[2]}s | %-${colw[3]}s |",
+                    format_len( $image->{label}, $colw[0] ),
+                    $image->{imageid},
+                    $image->{fs_type},
+                    $image->{minsize});
+            }
+            push @$out_recordsarrayref, (
+                '+ ' . ( '-' x $colw[0] ) . ' + ' . ( '-' x $colw[1] ) . ' + ' . ( '-' x $colw[2] ) .
+                ' + ' . ( '-' x $colw[3] ) . " +\n");
+        } else {
+            push @$out_recordsarrayref, ("No images to list.\n");
+        }
+    } else {
+        # json output
+        $out_hashref->{images} = [];
+        my $images = $api_obj->image_list();
+        if ( @$images != 0 ) {
+            for my $image ( @$images ) {
+                push( @{ $out_hashref->{images} }, $image);
+            }
+        }
+    }
+
+    if ( $output_format eq 'raw' ) {
+        return $out_hashref;
+    } elsif ( $output_format eq 'json' ) {
+        return $self->succeed(
+            action  => $self->{_action},
+            label   => 'youraccount',
+            payload => $out_hashref,
+            result  => $self->{_result},
+            format  => $args{output_format}
+        );
+    } else {
+        return join("\n", @$out_arrayref, @$out_recordsarrayref);
+    }
+}
 sub imagedelete {
     my ( $self, %args ) = @_;
 

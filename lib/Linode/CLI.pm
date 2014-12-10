@@ -168,6 +168,10 @@ sub list {
         $sub = 'configlist';
     } elsif ($self->{mode} eq 'nodebalancer' && $self->{_opts}->{action} eq 'node-list') {
         $sub = 'nodelist';
+    } elsif ($self->{mode} eq 'linode' && $self->{_opts}->{action} eq 'disk-list') {
+        $sub = 'disklist';
+    } elsif ($self->{mode} eq 'linode' && $self->{_opts}->{action} eq 'image-list') {
+        $sub = 'imagelist';
     }
 
     my $list_result = try {

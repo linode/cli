@@ -442,17 +442,17 @@ List all available distributions.
 
 List all available Linode plans.
 
-#### Disks-List
+#### Disk-List
 
 Lists disks associated with a specific Linode.
 
 **-l**, **--label**: Required. The Linode to display.
 
-#### Images-List
+#### Image-List
 
 Lists available gold-master images.
 
-#### Image-Ize
+#### Image-Create
 
 Creates a gold-master image for future deployments.
 

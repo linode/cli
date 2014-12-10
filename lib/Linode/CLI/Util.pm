@@ -179,6 +179,11 @@ our %paramsdef = (
             'run' => 'showoptions',
             'warmcache' => [ 'plan' ]
         },
+        'disk-list'   => {
+            'options' => { 'label' => 'label|l=s@' },
+            'run'     => 'list'
+        },
+        'image-list' => { 'run'   => 'list' },
         'image-delete' => {
             'options' => { 'imageid' => 'imageid|i=i' },
             'run'       => 'runnomatching'
