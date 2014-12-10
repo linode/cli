@@ -232,6 +232,15 @@ sub create {
 
     my $linode_label = @{ $options->{label} }[0];
 
+    # from distribution/image check
+    if ( !exists $options->{distribution} && !exists $options->{imageid} ) {
+        return $self->fail(
+            action  => 'create',
+            label   => $linode_label,
+            message => "A distribution or an imageid must be provided.",
+        );
+    }
+
     # check if this label is already in use
     my $linodeobjects = $api->linode_list();
     for my $lobject (@$linodeobjects) {
@@ -307,30 +316,24 @@ sub buildrebuild {
     my $linode_label = @{ $options->{label} }[0];
     my $linode_id    = $args{set_obj}->{linodeid};
     my $error_ins    = " Re-run with 'linode rebuild $linode_label ...'";
+    my $linode_disk_createtype;
 
-    # Make sure we have the root password
-    if ( !exists $options->{password} && $format eq 'human' ) {
-        print 'Root password for this Linode: ';
-        system( 'stty', '-echo' );
-        chop( $options->{password} = <STDIN> );
-        system( 'stty', 'echo' );
-        say '';
-    } elsif ( !exists $options->{password} && $format ne 'human' ) {
+    # from distribution/image check
+    if ( !exists $options->{distribution} && !exists $options->{imageid} ) {
         return $self->fail(
             action  => $options->{action},
             label   => $linode_label,
-            message => "A root user's password is required.$error_ins",
+            message => "A distribution or an imageid must be provided.",
         );
     }
 
+    my $kernel = 138; #  latest 64 bit
+    if ( exists $options->{kernelid} ) {
+        $kernel = $options->{kernelid};
+    }
+
     my $params = {
-        linode_disk_createfromx=> {
-            linodeid        => $linode_id,
-            distributionid  => $options->{distributionid},
-            label           => "${linode_label}-disk",
-            rootpass        => $options->{password}
-        },
-        linode_disk_create => {
+         linode_disk_create => {
             linodeid        => $linode_id,
             label           => "${linode_label}-swap",
             type            => 'swap',
@@ -338,93 +341,133 @@ sub buildrebuild {
         },
         linode_config_create => {
             linodeid        => $linode_id,
-            kernelid        => $options->{kernelid},
+            kernelid        => $kernel,
             label           => "${linode_label}-config"
         }
     };
 
 
-    if ( exists $options->{stackscript} ) {
-        # create from stackscript args
+    if ( exists $options->{imageid} ) {
+        # create from image
+        $linode_disk_createtype = 'linode_disk_createfromimage';
 
-        # stackscript ID handling
-        if ( $options->{stackscript} =~ m/^\d+$/ ) { # look like an ID?
-            $params->{linode_disk_createfromx}{stackscriptid} = $options->{stackscript};
-        } else {
-            # If the provided is not an ID, try to match it to one of the users StackScripts
-            my $objects = $api->stackscript_list();
-            for my $object ( @$objects ) {
-                if ( $object->{ 'label' } =~ m/$options->{stackscript}/i ) {
-                    $params->{linode_disk_createfromx}{stackscriptid} = $object->{ 'stackscriptid' };
-                    last;
-                }
-            }
-            return $self->fail(
-                action  => $options->{action},
-                label   => $linode_label,
-                message => "Unable to find StackScript $options->{stackscript}."
-                         . $error_ins,
-            ) unless $params->{linode_disk_createfromx}{stackscriptid};
+        $params->{ $linode_disk_createtype } = {
+            linodeid        => $linode_id,
+            imageid         => $options->{imageid}
+        };
+        # optional
+        if ( exists $options->{password} ) {
+            $params->{ $linode_disk_createtype }{rootpass} = $options->{password};
         }
 
-        # UDF Responses in JSON format
-        if ( exists $options->{stackscriptjson} ) {
-            my $jsonin = $options->{stackscriptjson};
-            $jsonin =~ s/^\s+//; # remove any leading whitespace
-            $jsonin =~ s/\s+$//; # remove any trailing whitespace
+    } else {
+        # create from distribution or stackscript
+        $linode_disk_createtype = 'linode_disk_createfromx';
 
-            if ( length($jsonin) > 1 && substr($jsonin, 0, 1) ne '{' ) {
-                # assume a file path, read in the contents of the file
-                if ( -e $jsonin ) {
-                    $params->{linode_disk_createfromx}{stackscriptudfresponses} = do {
-                        local $/ = undef;
-                        open my $fh, '<', $jsonin or do {
-                            return $self->fail(
-                                action  => $options->{action},
-                                label   => $linode_label,
-                                message => "Unable to open file '$jsonin': $!"
-                                         . $error_ins,
-                            );
-                        };
-                        <$fh>;
-                    };
-                } else {
-                    return $self->fail(
-                        action  => $options->{action},
-                        label   => $linode_label,
-                        message => "File '$jsonin' does not exist."
-                                 . $error_ins,
-                    );
-                }
-            } else {
-                # assume JSON
-                $params->{linode_disk_createfromx}{stackscriptudfresponses} = $jsonin;
-            }
-            my $test_json = try {
-                decode_json( $params->{linode_disk_createfromx}{stackscriptudfresponses} );
-            };
+        # Make sure we have the root password
+        if ( !exists $options->{password} && $format eq 'human' ) {
+            print 'Root password for this Linode: ';
+            system( 'stty', '-echo' );
+            chop( $options->{password} = <STDIN> );
+            system( 'stty', 'echo' );
+            say '';
+        } elsif ( !exists $options->{password} && $format ne 'human' ) {
             return $self->fail(
                 action  => $options->{action},
                 label   => $linode_label,
-                message => "The JSON provided is invalid." . $error_ins,
-            ) unless $test_json;
-
-        } else {
-            return $self->fail(
-                action  => $options->{action},
-                label   => $linode_label,
-                message => "StackScripts require JSON (stackscriptjson) with"
-                         . " user defined fields." . $error_ins,
+                message => "A root user's password is required.$error_ins",
             );
         }
 
+        $params->{ $linode_disk_createtype } = {
+            linodeid        => $linode_id,
+            distributionid  => $options->{distributionid},
+            label           => "${linode_label}-disk",
+            rootpass        => $options->{password}
+        };
+
+        if ( exists $options->{stackscript} ) {
+            # create from stackscript args
+
+            # stackscript ID handling
+            if ( $options->{stackscript} =~ m/^\d+$/ ) { # look like an ID?
+                $params->{ $linode_disk_createtype }{stackscriptid} = $options->{stackscript};
+            } else {
+                # If the provided is not an ID, try to match it to one of the users StackScripts
+                my $objects = $api->stackscript_list();
+                for my $object ( @$objects ) {
+                    if ( $object->{ 'label' } =~ m/$options->{stackscript}/i ) {
+                        $params->{ $linode_disk_createtype }{stackscriptid} = $object->{ 'stackscriptid' };
+                        last;
+                    }
+                }
+                return $self->fail(
+                    action  => $options->{action},
+                    label   => $linode_label,
+                    message => "Unable to find StackScript $options->{stackscript}."
+                             . $error_ins,
+                ) unless $params->{ $linode_disk_createtype }{stackscriptid};
+            }
+
+            # UDF Responses in JSON format
+            if ( exists $options->{stackscriptjson} ) {
+                my $jsonin = $options->{stackscriptjson};
+                $jsonin =~ s/^\s+//; # remove any leading whitespace
+                $jsonin =~ s/\s+$//; # remove any trailing whitespace
+
+                if ( length($jsonin) > 1 && substr($jsonin, 0, 1) ne '{' ) {
+                    # assume a file path, read in the contents of the file
+                    if ( -e $jsonin ) {
+                        $params->{ $linode_disk_createtype }{stackscriptudfresponses} = do {
+                            local $/ = undef;
+                            open my $fh, '<', $jsonin or do {
+                                return $self->fail(
+                                    action  => $options->{action},
+                                    label   => $linode_label,
+                                    message => "Unable to open file '$jsonin': $!"
+                                             . $error_ins,
+                                );
+                            };
+                            <$fh>;
+                        };
+                    } else {
+                        return $self->fail(
+                            action  => $options->{action},
+                            label   => $linode_label,
+                            message => "File '$jsonin' does not exist."
+                                     . $error_ins,
+                        );
+                    }
+                } else {
+                    # assume JSON
+                    $params->{ $linode_disk_createtype }{stackscriptudfresponses} = $jsonin;
+                }
+                my $test_json = try {
+                    decode_json( $params->{ $linode_disk_createtype }{stackscriptudfresponses} );
+                };
+                return $self->fail(
+                    action  => $options->{action},
+                    label   => $linode_label,
+                    message => "The JSON provided is invalid." . $error_ins,
+                ) unless $test_json;
+
+            } else {
+                return $self->fail(
+                    action  => $options->{action},
+                    label   => $linode_label,
+                    message => "StackScripts require JSON (stackscriptjson) with"
+                             . " user defined fields." . $error_ins,
+                );
+            }
+
+        }
     }
 
     if ( exists $options->{pubkeyfile} ) {
         $options->{pubkeyfile} = glob_tilde($options->{pubkeyfile});
 
         if ( $options->{pubkeyfile} && -f $options->{pubkeyfile} ) {
-            $params->{linode_disk_createfromx}->{rootsshkey} = do {
+            $params->{ $linode_disk_createtype }->{rootsshkey} = do {
                 local $/ = undef;
                 open my $fh, '<', $options->{pubkeyfile} or do {
                     return $self->fail(
@@ -524,19 +567,22 @@ sub buildrebuild {
 
     # calculate disk space
     my $linode_hd_space = $api->linode_list( linodeid => $linode_id )->[0]->{totalhd};
-    $params->{linode_disk_createfromx}->{size}
+    $params->{ $linode_disk_createtype }->{size}
         = ( $linode_hd_space - $params->{linode_disk_create}{size} );
 
     my @disk_list;
     my $disk = {};
     # Deploy main disk image
     my $maindisk_result = try {
-        if ( exists $options->{stackscript} ) {
+        if ( exists $options->{imageid} ) {
+            $disk = $api->linode_disk_createfromimage(
+                %{ $params->{ $linode_disk_createtype } } );
+        } elsif ( exists $options->{stackscript} ) {
             $disk = $api->linode_disk_createfromstackscript(
-                %{ $params->{linode_disk_createfromx} } );
+                %{ $params->{ $linode_disk_createtype } } );
         } else {
             $disk = $api->linode_disk_createfromdistribution(
-                %{ $params->{linode_disk_createfromx} } );
+                %{ $params->{ $linode_disk_createtype } } );
         }
     };
     return $self->fail(

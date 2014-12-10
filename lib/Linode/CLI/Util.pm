@@ -70,7 +70,8 @@ our %paramsdef = (
             'options' => {
                 'label'           => 'label|l=s@',
                 'datacenter'      => 'datacenter|location|L=s',
-                'distribution'    => 'distribution|d=s',
+                'distribution'    => 'distribution|d:s',
+                'imageid'         => 'imageid|i:s',
                 'plan'            => 'plan|p=s',
                 'password'        => 'password|P:s',
                 'payment-term'    => 'payment-term|t:i',
@@ -86,7 +87,8 @@ our %paramsdef = (
         'rebuild' => {
             'options' => {
                 'label'           => 'label|l=s@',
-                'distribution'    => 'distribution|d=s',
+                'distribution'    => 'distribution|d:s',
+                'imageid'         => 'imageid|i:s',
                 'password'        => 'password|P:s',
                 'pubkey-file'     => 'pubkey-file|K:s',
                 'stackscript'     => 'stackscript|S:s',
