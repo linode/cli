@@ -203,7 +203,7 @@ sub list {
 
     $self->{_result} = $self->fail(
         label   => 'Generic error',
-        message => "Problem while trying to run '$self->{mode} list'",
+        message => "Problem while trying to run '$self->{mode} $self->{_opts}->{action}'",
         result  => $self->{_result},
     ) unless $list_result;
 }
