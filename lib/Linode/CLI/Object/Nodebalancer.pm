@@ -324,7 +324,7 @@ sub configcreate {
 
     my $api_obj = $args{api_obj};
     my $options = $args{options};
-    my $set_obj = $args{set_obj};
+    my $set_obj = $args{match_obj};
 
     my $nb_id    = $set_obj->{nodebalancerid};
     my $nb_label = $set_obj->{label};
@@ -492,7 +492,7 @@ sub configupdate {
 
     my $api_obj = $args{api_obj};
     my $options = $args{options};
-    my $set_obj = $args{set_obj};
+    my $set_obj = $args{match_obj};
 
     my $nb_id     = $set_obj->{nodebalancerid};
     my $nb_label  = $set_obj->{label};
@@ -678,7 +678,7 @@ sub configdelete {
 
     my $api_obj = $args{api_obj};
     my $options = $args{options};
-    my $nb_obj  = $args{set_obj};
+    my $nb_obj  = $args{match_obj};
 
     my $nb_label  = $nb_obj->{label};
     my $nb_id     = $nb_obj->{nodebalancerid};
@@ -867,7 +867,7 @@ sub nodecreate {
 
     my $api_obj   = $args{api_obj};
     my $options   = $args{options};
-    my $nb_obj    = $args{set_obj};
+    my $nb_obj    = $args{match_obj};
     my $config_id = 0;
 
     my $nb_label = $nb_obj->{label};
@@ -974,7 +974,7 @@ sub nodeupdate {
 
     my $api_obj   = $args{api_obj};
     my $options   = $args{options};
-    my $nb_obj    = $args{set_obj};
+    my $nb_obj    = $args{match_obj};
 
     my $nb_label = $nb_obj->{label};
     my $nb_id    = $nb_obj->{nodebalancerid};
@@ -1091,7 +1091,7 @@ sub nodedelete {
 
     my $api_obj = $args{api_obj};
     my $options = $args{options};
-    my $nb_obj  = $args{set_obj};
+    my $nb_obj  = $args{match_obj};
 
     my $nb_label = $nb_obj->{label};
     my $nb_id    = $nb_obj->{nodebalancerid};

@@ -70,7 +70,8 @@ our %paramsdef = (
             'options' => {
                 'label'           => 'label|l=s@',
                 'datacenter'      => 'datacenter|location|L=s',
-                'distribution'    => 'distribution|d=s',
+                'distribution'    => 'distribution|d:s',
+                'imageid'         => 'imageid|i:s',
                 'plan'            => 'plan|p=s',
                 'password'        => 'password|P:s',
                 'payment-term'    => 'payment-term|t:i',
@@ -86,7 +87,8 @@ our %paramsdef = (
         'rebuild' => {
             'options' => {
                 'label'           => 'label|l=s@',
-                'distribution'    => 'distribution|d=s',
+                'distribution'    => 'distribution|d:s',
+                'imageid'         => 'imageid|i:s',
                 'password'        => 'password|P:s',
                 'pubkey-file'     => 'pubkey-file|K:s',
                 'stackscript'     => 'stackscript|S:s',
@@ -177,6 +179,25 @@ our %paramsdef = (
             'run' => 'showoptions',
             'warmcache' => [ 'plan' ]
         },
+        'disk-list'   => {
+            'options' => { 'label' => 'label|l=s@' },
+            'run'     => 'list'
+        },
+        'image-list' => { 'run'   => 'list' },
+        'image-create'    => {
+            'options' => {
+                'label'       => 'label|l=s@',
+                'diskid'      => 'diskid|d=i',
+                'description' => 'description|D:s',
+                'name'        => 'name|n:s',
+                'wait'        => 'wait|w:i'
+            },
+            'run'       => 'runsinglematch',
+        },
+        'image-delete' => {
+            'options' => { 'imageid' => 'imageid|i=i' },
+            'run'       => 'runnomatching'
+        },
     },
     'account' => {
         'info'  => { 'alias' => 'show' },
@@ -265,7 +286,7 @@ our %paramsdef = (
                 'protocol' => 'protocol|L:s',
                 'ttl'      => 'ttl|T:s',
             },
-            'run'      => 'domainrecord',
+            'run'      => 'runsinglematch',
             'seeknext' => [ 'type', 'name', 'target' ],
         },
         'record-update' => {
@@ -281,7 +302,7 @@ our %paramsdef = (
                 'protocol' => 'protocol|L:s',
                 'ttl'      => 'ttl|T:s',
             },
-            'run'      => 'domainrecord',
+            'run'      => 'runsinglematch',
             'seeknext' => [ 'type', 'match' ],
         },
         'record-delete' => {
@@ -290,7 +311,7 @@ our %paramsdef = (
                 'type'  => 'type|t=s',
                 'match' => 'match|m=s',
             },
-            'run'      => 'domainrecord',
+            'run'      => 'runsinglematch',
             'seeknext' => [ 'type', 'match' ],
         },
         'record-list' => {
@@ -354,7 +375,7 @@ our %paramsdef = (
             'ssl-cert'       => 'ssl-cert|C:s',
             'ssl-key'        => 'ssl-key|K:s',
             },
-            'run'      => 'nodebalancer',
+            'run'      => 'runsinglematch',
             'seeknext' => [ 'port' ],
          },
         'config-update'  => {
@@ -374,7 +395,7 @@ our %paramsdef = (
             'ssl-cert'       => 'ssl-cert|C:s',
             'ssl-key'        => 'ssl-key|K:s',
             },
-            'run'      => 'nodebalancer',
+            'run'      => 'runsinglematch',
             'seeknext' => [ 'port' ],
          },
         'config-delete' => {
@@ -382,7 +403,7 @@ our %paramsdef = (
                 'label' => 'label|nodebalancer|l=s@',
                 'port'  => 'port|config|p=i',
             },
-            'run'      => 'nodebalancer',
+            'run'      => 'runsinglematch',
             'seeknext' => [ 'port'],
         },
         'config-list'   => {
@@ -408,7 +429,7 @@ our %paramsdef = (
                 'weight'  => 'weight|W:s',
                 'mode'    => 'mode|M:s',
             },
-            'run'      => 'nodebalancer',
+            'run'      => 'runsinglematch',
             'seeknext' => [ 'port', 'name', 'address' ],
          },
         'node-update'  => {
@@ -421,7 +442,7 @@ our %paramsdef = (
                 'weight'   => 'weight|W:s',
                 'mode'     => 'mode|M:s',
             },
-            'run'      => 'nodebalancer',
+            'run'      => 'runsinglematch',
             'seeknext' => [ 'port', 'name' ],
          },
         'node-delete' => {
@@ -430,7 +451,7 @@ our %paramsdef = (
                 'port'  => 'port|config|p=i',
                 'name'  => 'name|n=s',
             },
-            'run'      => 'nodebalancer',
+            'run'      => 'runsinglematch',
             'seeknext' => [ 'port', 'name' ],
         },
         'node-list'   => {

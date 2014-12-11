@@ -168,6 +168,10 @@ sub list {
         $sub = 'configlist';
     } elsif ($self->{mode} eq 'nodebalancer' && $self->{_opts}->{action} eq 'node-list') {
         $sub = 'nodelist';
+    } elsif ($self->{mode} eq 'linode' && $self->{_opts}->{action} eq 'disk-list') {
+        $sub = 'disklist';
+    } elsif ($self->{mode} eq 'linode' && $self->{_opts}->{action} eq 'image-list') {
+        $sub = 'imagelist';
     }
 
     my $list_result = try {
@@ -199,7 +203,7 @@ sub list {
 
     $self->{_result} = $self->fail(
         label   => 'Generic error',
-        message => "Problem while trying to run '$self->{mode} list'",
+        message => "Problem while trying to run '$self->{mode} $self->{_opts}->{action}'",
         result  => $self->{_result},
     ) unless $list_result;
 }
@@ -294,35 +298,11 @@ sub add_ip {
     ) unless $add_ip_result;
 }
 
-sub domainrecord {
+sub runsinglematch {
     my $self = shift;
-
-    my $sub = 'recordcreate';
-    if ( $self->{mode} eq 'domain' && $self->{_opts}{action} eq 'record-update' ) {
-        $sub  = 'recordupdate';
-    }
-    elsif ( $self->{mode} eq 'domain' && $self->{_opts}{action} eq 'record-delete' ) {
-        $sub  = 'recorddelete';
-    }
-
-    my $result = "Linode::CLI::Object::$correct_case{$self->{mode}}"->$sub(
-        api_obj    => $self->{_api_obj},
-        options    => $self->{_distilled_options},
-        # single domain object
-        domain_obj => @{ $self->_get_object_list(
-            $self->{mode}, $self->{_distilled_options}{label}
-        ) }[0],
-        format     => $self->{output_format},
-        wait       => $self->{wait},
-    );
-    my %combined = ( %$result, %{ $self->{_result} } );
-    %{ $self->{_result} } = %combined;
-}
-
-sub nodebalancer {
-    my $self = shift;
-
     my $sub = 'configcreate';
+    my $matchwith = 'label';
+
     if ($self->{mode} eq 'nodebalancer' && $self->{_opts}->{action} eq 'config-update') {
         $sub  = 'configupdate';
     } elsif ($self->{mode} eq 'nodebalancer' && $self->{_opts}->{action} eq 'config-delete') {
@@ -333,14 +313,22 @@ sub nodebalancer {
         $sub  = 'nodeupdate';
     } elsif ($self->{mode} eq 'nodebalancer' && $self->{_opts}->{action} eq 'node-delete') {
         $sub  = 'nodedelete';
+    } elsif ( $self->{mode} eq 'domain' && $self->{_opts}{action} eq 'record-create' ) {
+        $sub  = 'recordcreate';
+    } elsif ( $self->{mode} eq 'domain' && $self->{_opts}{action} eq 'record-update' ) {
+        $sub  = 'recordupdate';
+    } elsif ( $self->{mode} eq 'domain' && $self->{_opts}{action} eq 'record-delete' ) {
+        $sub  = 'recorddelete';
+    } elsif ($self->{mode} eq 'linode' && $self->{_opts}->{action} eq 'image-create') {
+        $sub  = 'imagecreate';
     }
 
     my $result = "Linode::CLI::Object::$correct_case{$self->{mode}}"->$sub(
         api_obj    => $self->{_api_obj},
         options    => $self->{_distilled_options},
         # single object
-        set_obj => @{ $self->_get_object_list(
-            $self->{mode}, $self->{_distilled_options}{label}
+        match_obj => @{ $self->_get_object_list(
+            $self->{mode}, $self->{_distilled_options}{$matchwith}
         ) }[0],
         format     => $self->{output_format},
         wait       => $self->{wait},
@@ -349,6 +337,23 @@ sub nodebalancer {
     %{$self->{_result}} = %combined;
 }
 
+sub runnomatching {
+    my $self = shift;
+    my $sub = 'imagedelete';
+
+    if ( $self->{mode} eq 'linode' && $self->{_opts}{action} eq 'image-delete' ) {
+        $sub  = 'imagedelete';
+    }
+
+    my $result = "Linode::CLI::Object::$correct_case{$self->{mode}}"->$sub(
+        api_obj    => $self->{_api_obj},
+        options    => $self->{_distilled_options},
+        format     => $self->{output_format},
+        wait       => $self->{wait},
+    );
+    my %combined = ( %$result, %{ $self->{_result} } );
+    %{ $self->{_result} } = %combined;
+}
 
 sub showoptions {
     my $self = shift;

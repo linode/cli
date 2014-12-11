@@ -232,6 +232,15 @@ sub create {
 
     my $linode_label = @{ $options->{label} }[0];
 
+    # from distribution/image check
+    if ( !exists $options->{distribution} && !exists $options->{imageid} ) {
+        return $self->fail(
+            action  => 'create',
+            label   => $linode_label,
+            message => "A distribution or an imageid must be provided.",
+        );
+    }
+
     # check if this label is already in use
     my $linodeobjects = $api->linode_list();
     for my $lobject (@$linodeobjects) {
@@ -307,30 +316,24 @@ sub buildrebuild {
     my $linode_label = @{ $options->{label} }[0];
     my $linode_id    = $args{set_obj}->{linodeid};
     my $error_ins    = " Re-run with 'linode rebuild $linode_label ...'";
+    my $linode_disk_createtype;
 
-    # Make sure we have the root password
-    if ( !exists $options->{password} && $format eq 'human' ) {
-        print 'Root password for this Linode: ';
-        system( 'stty', '-echo' );
-        chop( $options->{password} = <STDIN> );
-        system( 'stty', 'echo' );
-        say '';
-    } elsif ( !exists $options->{password} && $format ne 'human' ) {
+    # from distribution/image check
+    if ( !exists $options->{distribution} && !exists $options->{imageid} ) {
         return $self->fail(
             action  => $options->{action},
             label   => $linode_label,
-            message => "A root user's password is required.$error_ins",
+            message => "A distribution or an imageid must be provided.",
         );
     }
 
+    my $kernel = 138; #  latest 64 bit
+    if ( exists $options->{kernelid} ) {
+        $kernel = $options->{kernelid};
+    }
+
     my $params = {
-        linode_disk_createfromx=> {
-            linodeid        => $linode_id,
-            distributionid  => $options->{distributionid},
-            label           => "${linode_label}-disk",
-            rootpass        => $options->{password}
-        },
-        linode_disk_create => {
+         linode_disk_create => {
             linodeid        => $linode_id,
             label           => "${linode_label}-swap",
             type            => 'swap',
@@ -338,94 +341,133 @@ sub buildrebuild {
         },
         linode_config_create => {
             linodeid        => $linode_id,
-            kernelid        => $options->{kernelid},
+            kernelid        => $kernel,
             label           => "${linode_label}-config"
         }
     };
 
 
-    if ( exists $options->{stackscript} ) {
-        # create from stackscript args
+    if ( exists $options->{imageid} ) {
+        # create from image
+        $linode_disk_createtype = 'linode_disk_createfromimage';
 
-        # stackscript ID handling
-        if ( $options->{stackscript} =~ m/^\d+$/ ) { # look like an ID?
-            $params->{linode_disk_createfromx}{stackscriptid} = $options->{stackscript};
-        } else {
-            # If the provided is not an ID, try to match it to one of the users StackScripts
-            my $objects = $api->stackscript_list();
-            for my $object ( @$objects ) {
-                if ( $object->{ 'label' } =~ m/$options->{stackscript}/i ) {
-                    $params->{linode_disk_createfromx}{stackscriptid} = $object->{ 'stackscriptid' };
-                    last;
-                }
-            }
-            return $self->fail(
-                action  => $options->{action},
-                label   => $linode_label,
-                message => "Unable to find StackScript $options->{stackscript}."
-                         . $error_ins,
-            ) unless $params->{linode_disk_createfromx}{stackscriptid};
-        }
-
-        # UDF Responses in JSON format
-        if ( exists $options->{stackscriptjson} ) {
-            my $jsonin = $options->{stackscriptjson};
-            $jsonin =~ s/^\s+//; # remove any leading whitespace
-            $jsonin =~ s/\s+$//; # remove any trailing whitespace
-
-            if ( length($jsonin) > 1 && substr($jsonin, 0, 1) ne '{' ) {
-                # assume a file path, read in the contents of the file
-                if ( -e $jsonin ) {
-                    $params->{linode_disk_createfromx}{stackscriptudfresponses} = do {
-                        local $/ = undef;
-                        open my $fh, '<', $jsonin or do {
-                            return $self->fail(
-                                action  => $options->{action},
-                                label   => $linode_label,
-                                message => "Unable to open file '$jsonin': $!"
-                                         . $error_ins,
-                            );
-                        };
-                        <$fh>;
-                    };
-                } else {
-                    return $self->fail(
-                        action  => $options->{action},
-                        label   => $linode_label,
-                        message => "File '$jsonin' does not exist."
-                                 . $error_ins,
-                    );
-                }
-            } else {
-                # assume JSON
-                $params->{linode_disk_createfromx}{stackscriptudfresponses} = $jsonin;
-            }
-            my $test_json = try {
-                decode_json( $params->{linode_disk_createfromx}{stackscriptudfresponses} );
-            };
-            return $self->fail(
-                action  => $options->{action},
-                label   => $linode_label,
-                message => "The JSON provided is invalid." . $error_ins,
-            ) unless $test_json;
-
-        } else {
-            return $self->fail(
-                action  => $options->{action},
-                label   => $linode_label,
-                message => "StackScripts require JSON (stackscriptjson) with"
-                         . " user defined fields." . $error_ins,
-            );
+        $params->{ $linode_disk_createtype } = {
+            linodeid        => $linode_id,
+            imageid         => $options->{imageid}
+        };
+        # optional
+        if ( exists $options->{password} ) {
+            $params->{ $linode_disk_createtype }{rootpass} = $options->{password};
         }
 
     } else {
-        # create from distribution args
+        # create from distribution or stackscript
+        $linode_disk_createtype = 'linode_disk_createfromx';
 
-        $options->{pubkeyfile}
-            = glob_tilde($options->{pubkeyfile}) if $options->{pubkeyfile};
+        # Make sure we have the root password
+        if ( !exists $options->{password} && $format eq 'human' ) {
+            print 'Root password for this Linode: ';
+            system( 'stty', '-echo' );
+            chop( $options->{password} = <STDIN> );
+            system( 'stty', 'echo' );
+            say '';
+        } elsif ( !exists $options->{password} && $format ne 'human' ) {
+            return $self->fail(
+                action  => $options->{action},
+                label   => $linode_label,
+                message => "A root user's password is required.$error_ins",
+            );
+        }
+
+        $params->{ $linode_disk_createtype } = {
+            linodeid        => $linode_id,
+            distributionid  => $options->{distributionid},
+            label           => "${linode_label}-disk",
+            rootpass        => $options->{password}
+        };
+
+        if ( exists $options->{stackscript} ) {
+            # create from stackscript args
+
+            # stackscript ID handling
+            if ( $options->{stackscript} =~ m/^\d+$/ ) { # look like an ID?
+                $params->{ $linode_disk_createtype }{stackscriptid} = $options->{stackscript};
+            } else {
+                # If the provided is not an ID, try to match it to one of the users StackScripts
+                my $objects = $api->stackscript_list();
+                for my $object ( @$objects ) {
+                    if ( $object->{ 'label' } =~ m/$options->{stackscript}/i ) {
+                        $params->{ $linode_disk_createtype }{stackscriptid} = $object->{ 'stackscriptid' };
+                        last;
+                    }
+                }
+                return $self->fail(
+                    action  => $options->{action},
+                    label   => $linode_label,
+                    message => "Unable to find StackScript $options->{stackscript}."
+                             . $error_ins,
+                ) unless $params->{ $linode_disk_createtype }{stackscriptid};
+            }
+
+            # UDF Responses in JSON format
+            if ( exists $options->{stackscriptjson} ) {
+                my $jsonin = $options->{stackscriptjson};
+                $jsonin =~ s/^\s+//; # remove any leading whitespace
+                $jsonin =~ s/\s+$//; # remove any trailing whitespace
+
+                if ( length($jsonin) > 1 && substr($jsonin, 0, 1) ne '{' ) {
+                    # assume a file path, read in the contents of the file
+                    if ( -e $jsonin ) {
+                        $params->{ $linode_disk_createtype }{stackscriptudfresponses} = do {
+                            local $/ = undef;
+                            open my $fh, '<', $jsonin or do {
+                                return $self->fail(
+                                    action  => $options->{action},
+                                    label   => $linode_label,
+                                    message => "Unable to open file '$jsonin': $!"
+                                             . $error_ins,
+                                );
+                            };
+                            <$fh>;
+                        };
+                    } else {
+                        return $self->fail(
+                            action  => $options->{action},
+                            label   => $linode_label,
+                            message => "File '$jsonin' does not exist."
+                                     . $error_ins,
+                        );
+                    }
+                } else {
+                    # assume JSON
+                    $params->{ $linode_disk_createtype }{stackscriptudfresponses} = $jsonin;
+                }
+                my $test_json = try {
+                    decode_json( $params->{ $linode_disk_createtype }{stackscriptudfresponses} );
+                };
+                return $self->fail(
+                    action  => $options->{action},
+                    label   => $linode_label,
+                    message => "The JSON provided is invalid." . $error_ins,
+                ) unless $test_json;
+
+            } else {
+                return $self->fail(
+                    action  => $options->{action},
+                    label   => $linode_label,
+                    message => "StackScripts require JSON (stackscriptjson) with"
+                             . " user defined fields." . $error_ins,
+                );
+            }
+
+        }
+    }
+
+    if ( exists $options->{pubkeyfile} ) {
+        $options->{pubkeyfile} = glob_tilde($options->{pubkeyfile});
 
         if ( $options->{pubkeyfile} && -f $options->{pubkeyfile} ) {
-            $params->{linode_disk_createfromx}->{rootsshkey} = do {
+            $params->{ $linode_disk_createtype }->{rootsshkey} = do {
                 local $/ = undef;
                 open my $fh, '<', $options->{pubkeyfile} or do {
                     return $self->fail(
@@ -437,8 +479,7 @@ sub buildrebuild {
                 };
                 <$fh>;
             };
-        }
-        elsif ( $options->{pubkeyfile} ) {
+        } else {
             return $self->fail(
                 action  => $options->{action},
                 label   => $linode_label,
@@ -526,19 +567,22 @@ sub buildrebuild {
 
     # calculate disk space
     my $linode_hd_space = $api->linode_list( linodeid => $linode_id )->[0]->{totalhd};
-    $params->{linode_disk_createfromx}->{size}
+    $params->{ $linode_disk_createtype }->{size}
         = ( $linode_hd_space - $params->{linode_disk_create}{size} );
 
     my @disk_list;
     my $disk = {};
     # Deploy main disk image
     my $maindisk_result = try {
-        if ( exists $options->{stackscript} ) {
+        if ( exists $options->{imageid} ) {
+            $disk = $api->linode_disk_createfromimage(
+                %{ $params->{ $linode_disk_createtype } } );
+        } elsif ( exists $options->{stackscript} ) {
             $disk = $api->linode_disk_createfromstackscript(
-                %{ $params->{linode_disk_createfromx} } );
+                %{ $params->{ $linode_disk_createtype } } );
         } else {
             $disk = $api->linode_disk_createfromdistribution(
-                %{ $params->{linode_disk_createfromx} } );
+                %{ $params->{ $linode_disk_createtype } } );
         }
     };
     return $self->fail(
@@ -928,6 +972,285 @@ sub add_ip {
 
     return $self->{_result};
 }
+
+sub disklist {
+    my ( $self, %args ) = @_;
+    my $label         = $args{label};
+    my $output_format = $args{output_format} || 'human';
+    my $out_arrayref = [];
+    my $out_recordsarrayref = [];
+    my $out_hashref = {};
+    my $api_obj = $self->{_api_obj};
+    my @colw = ( 48, 12, 12, 12 ); # name (disk label), diskid, type, size
+
+    for my $object_label ( keys %{ $self->{object} } ) {
+        if ( $output_format eq 'human' ) {
+            my $disks = $api_obj->linode_disk_list( linodeid => $self->{object}->{$object_label}->{linodeid} );
+            if ( @$disks != 0 ) {
+                push @$out_recordsarrayref, (
+                    "+ " . ( '-' x $colw[0] ) . ' + ' . ( '-' x $colw[1] ) . ' + ' . ( '-' x $colw[2] ) .
+                    ' + ' . ( '-' x $colw[3] ) . ' +');
+                push @$out_recordsarrayref, sprintf(
+                    "| %-${colw[0]}s | %-${colw[1]}s | %-${colw[2]}s | %-${colw[3]}s |",
+                    'name', 'diskid', 'type', 'size' );
+                push @$out_recordsarrayref, (
+                    '| ' . ( '-' x $colw[0] ) . ' + ' . ( '-' x $colw[1] ) . ' + ' . ( '-' x $colw[2] ) .
+                    ' + ' . ( '-' x $colw[3] ) . ' |');
+                for my $disk ( @$disks ) {
+                    push @$out_recordsarrayref, sprintf(
+                        "| %-${colw[0]}s | %-${colw[1]}s | %-${colw[2]}s | %-${colw[3]}s |",
+                        format_len( $disk->{label}, $colw[0] ),
+                        $disk->{diskid},
+                        $disk->{type},
+                        $disk->{size});
+                }
+                push @$out_recordsarrayref, (
+                    '+ ' . ( '-' x $colw[0] ) . ' + ' . ( '-' x $colw[1] ) . ' + ' . ( '-' x $colw[2] ) .
+                    ' + ' . ( '-' x $colw[3] ) . " +\n");
+            } else {
+                push @$out_recordsarrayref, ("No disks to list.\n");
+            }
+        } else {
+            # json output
+            my $disks = $api_obj->linode_disk_list( linodeid => $self->{object}->{$object_label}->{linodeid} );
+            if ( @$disks != 0 ) {
+                for my $disk ( @$disks ) {
+                    push( @{ $out_hashref->{$object_label}{disks} }, $disk);
+                }
+            }
+        }
+    }
+
+    if ( $output_format eq 'raw' ) {
+        return $out_hashref;
+    } elsif ( $output_format eq 'json' ) {
+       if (scalar( keys %{ $out_hashref }) > 0) {
+            for my $object ( keys %$out_hashref ) {
+                $self->{_result} = $self->succeed(
+                    action  => $self->{_action},
+                    label   => $object,
+                    payload => $out_hashref->{$object},
+                    result  => $self->{_result},
+                    format  => $output_format,
+                );
+            }
+            return $self->{_result};
+        } else {
+            # empty
+            return $self->succeed(
+                action  => $self->{_action},
+                label   => '',
+                payload => {},
+                result  => {},
+                message => "No Disks to list.",
+                format  => $self->{output_format},
+            );
+        }
+    } else {
+        return join("\n", @$out_arrayref, @$out_recordsarrayref);
+    }
+}
+
+sub imagelist {
+    my ( $self, %args ) = @_;
+
+    my $output_format = $args{output_format} || 'human';
+    my $out_arrayref = [];
+    my $out_recordsarrayref = [];
+    my $out_hashref = {};
+    my $api_obj = $self->{_api_obj};
+    my @colw = ( 48, 12, 12, 12 ); # name (disk label), imageid, fs type, size
+
+    if ( $output_format eq 'human' ) {
+        my $images = $api_obj->image_list();
+        if ( @$images != 0 ) {
+            push @$out_recordsarrayref, (
+                "+ " . ( '-' x $colw[0] ) . ' + ' . ( '-' x $colw[1] ) . ' + ' . ( '-' x $colw[2] ) .
+                ' + ' . ( '-' x $colw[3] ) . ' +');
+            push @$out_recordsarrayref, sprintf(
+                "| %-${colw[0]}s | %-${colw[1]}s | %-${colw[2]}s | %-${colw[3]}s |",
+                'image name', 'imageid', 'fs_type', 'size' );
+            push @$out_recordsarrayref, (
+                '| ' . ( '-' x $colw[0] ) . ' + ' . ( '-' x $colw[1] ) . ' + ' . ( '-' x $colw[2] ) .
+                ' + ' . ( '-' x $colw[3] ) . ' |');
+            for my $image ( @$images ) {
+                push @$out_recordsarrayref, sprintf(
+                    "| %-${colw[0]}s | %-${colw[1]}s | %-${colw[2]}s | %-${colw[3]}s |",
+                    format_len( $image->{label}, $colw[0] ),
+                    $image->{imageid},
+                    $image->{fs_type},
+                    $image->{minsize});
+            }
+            push @$out_recordsarrayref, (
+                '+ ' . ( '-' x $colw[0] ) . ' + ' . ( '-' x $colw[1] ) . ' + ' . ( '-' x $colw[2] ) .
+                ' + ' . ( '-' x $colw[3] ) . " +\n");
+        } else {
+            push @$out_recordsarrayref, ("No images to list.\n");
+        }
+    } else {
+        # json output
+        $out_hashref->{images} = [];
+        my $images = $api_obj->image_list();
+        if ( @$images != 0 ) {
+            for my $image ( @$images ) {
+                push( @{ $out_hashref->{images} }, $image);
+            }
+        }
+    }
+
+    if ( $output_format eq 'raw' ) {
+        return $out_hashref;
+    } elsif ( $output_format eq 'json' ) {
+        return $self->succeed(
+            action  => $self->{_action},
+            label   => 'youraccount',
+            payload => $out_hashref,
+            result  => $self->{_result},
+            format  => $args{output_format}
+        );
+    } else {
+        return join("\n", @$out_arrayref, @$out_recordsarrayref);
+    }
+}
+
+sub imagecreate {
+    my ( $self, %args ) = @_;
+
+    my $api_obj   = $args{api_obj};
+    my $options   = $args{options};
+    my $match_obj = $args{match_obj};
+    my $found = 0;
+    my $linode_label = $match_obj->{label};
+    my $disk_name = '';
+
+    my $wait = 0;
+    if ( defined $options->{wait} && $options->{wait} == 0 ) {
+        $wait = 5;
+    } elsif ( defined $options->{wait} ) {
+        $wait = $options->{wait};
+    }
+
+    # lookup disk
+    my $disks = $api_obj->linode_disk_list( linodeid => $match_obj->{linodeid} );
+    if ( @$disks != 0 ) {
+        for my $disk ( @$disks ) {
+            if ( $options->{diskid} eq $disk->{diskid} ) {
+                $found = 1;
+                last;
+            }
+        }
+    }
+    if ( !$found ) {
+        return $self->fail(
+            action  => $options->{action},
+            label   => $linode_label,
+            message => "Unable to find disk $options->{diskid}."
+        );
+    }
+
+    my $params = {
+        set => {
+            linodeid => $match_obj->{linodeid}, diskid => $options->{diskid}
+        }
+    };
+    # Optional parameters
+    # - description
+    # - label/name
+    if ( exists $options->{description} ) {
+        $params->{set}{description} = $options->{description};
+    }
+    if ( exists $options->{name} ) {
+        $params->{set}{label} = $options->{name};
+    }
+
+    my $imagecreate;
+    my $imagecreate_result = try {
+        $imagecreate = $api_obj->linode_disk_imagize( %{ $params->{set} } );
+    };
+
+    return $self->fail(
+        action  => $options->{action},
+        label   => $linode_label,
+        message => "Unable to create image from disk $options->{diskid}.",
+        payload => { action => $options->{action} },
+    ) unless $imagecreate_result;
+
+    if ($wait) {
+        say "Creating image from disk $options->{diskid}..." if ( $args{format} eq 'human' );
+        my $imagecomplete_job_result
+            = $self->_poll_and_wait( $api_obj, $match_obj->{linodeid}, $imagecreate->{jobid},
+            $args{format}, $wait );
+
+            return $self->succeed(
+                action  => $options->{action},
+                label   => $linode_label,
+                message => "Imagized disk $options->{diskid}.",
+                payload => { jobid => $imagecreate->{jobid}, job => $options->{action}, imageid => $imagecreate->{imageid} },
+            ) if $imagecomplete_job_result;
+
+            return $self->fail(
+                action  => $options->{action},
+                label   => $linode_label,
+                message => "Timed out waiting for create image from disk $options->{diskid} to complete.",
+                payload => { jobid => $imagecreate->{jobid}, job => $options->{action} },
+            );
+    }
+
+    return $self->succeed(
+        action  => $options->{action},
+        label   => $linode_label,
+        message => "Created image from disk $options->{diskid}.",
+        payload => { jobid => $imagecreate->{jobid}, imageid => $imagecreate->{imageid} },
+    );
+}
+
+sub imagedelete {
+    my ( $self, %args ) = @_;
+
+    my $api_obj = $args{api_obj};
+    my $options = $args{options};
+    my $found = 0;
+
+    # lookup image
+    my $images = $api_obj->image_list();
+    if ( @$images != 0 ) {
+        for my $image ( @$images ) {
+            if ( $options->{imageid} eq $image->{imageid} ) {
+                $found = 1;
+                last;
+            }
+        }
+    }
+
+    if ( !$found ) {
+        return $self->fail(
+            action  => 'image-delete',
+            imageid => $options->{imageid},
+            message => "Unable to find Image $options->{imageid} to delete."
+        );
+    }
+
+    my $delete_result = try {
+        $api_obj->image_delete( imageid => $options->{imageid} );
+    };
+    if ($delete_result) {
+        return $self->succeed(
+            action  => 'image-delete',
+            label   => $options->{imageid},
+            message => "Deleted Image $options->{imageid}.",
+            payload => { action => 'image-delete' },
+        );
+    } else {
+        return $self->fail(
+            action  => 'image-delete',
+            label   => $options->{imageid},
+            message => "Unable to delete Image $options->{imageid}.",
+            payload => { action => 'image-delete' },
+        );
+    }
+}
+
+
 
 sub _poll_and_wait {
     my ( $self, $api_obj, $linode_id, $job_id, $output_format, $timeout ) = @_;

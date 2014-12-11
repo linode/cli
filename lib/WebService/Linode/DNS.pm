@@ -12,7 +12,7 @@ WebService::Linode::DNS - Deprecated Perl Interface to the Linode.com API DNS me
 
 =cut
 
-our $VERSION = '0.20';
+our $VERSION = '0.25';
 our @ISA = ("WebService::Linode::Base");
 
 sub getDomainIDbyName {
@@ -335,7 +335,8 @@ L<http://search.cpan.org/dist/WebService-Linode>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2008-2009 Linode, LLC, all rights reserved.
+Copyright 2008-2014 Michael Greb, all rights reserved.
+Copyright 2008-2014 Linode, LLC, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

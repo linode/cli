@@ -15,7 +15,7 @@ WebService::Linode::Base - Perl Interface to the Linode.com API.
 
 =cut
 
-our $VERSION = '0.20';
+our $VERSION = '0.25';
 our $err;
 our $errstr;
 
@@ -37,6 +37,9 @@ sub new {
     $self->{_ua} = LWP::UserAgent->new;
     $self->{_ua}->agent("WebService::Linode::Base/$WebService::Linode::Base::VERSION ");
     $self->{_ua}->agent($args{useragent}) if $args{useragent};
+
+    # set up storage for queued requests
+    $self->{_batch_queue} = [];
 
     bless $self, $package;
     return $self;
@@ -68,27 +71,54 @@ sub send_request {
     return $self->{_ua}->post( $self->{_apiurl}, content => { %args } );
 }
 
+sub queue_request {
+    my ($self, %args) = @_;
+    my $queue = $self->{_batch_queue};
+
+    $self->_debug(10, "Queueing request for batch: " . join(' ' , %args));
+    push @$queue, \%args;
+
+    # return current number of items in the queue
+    return scalar @$queue;
+}
+
+sub list_queue {
+    my $self = shift;
+    my $queue = $self->{_batch_queue};
+    return @$queue;
+}
+
+sub clear_queue {
+    my $self = shift;
+    my $queue = $self->{_batch_queue};
+    @$queue = ();
+    return @$queue;
+}
+
+sub process_queue {
+    my ($self,$maxitems) = @_;
+    my $queue = $self->{_batch_queue};
+    # Default to processing the entire queue, cap at queue length
+    $maxitems = @$queue if not defined $maxitems or $maxitems > @$queue;
+
+    my @todo = splice @$queue, 0, $maxitems;
+    my $batch_json = to_json( \@todo );
+
+    return $self->do_request( api_action=>'batch', api_requestArray=>$batch_json );
+}
+
 sub parse_response {
     my $self = shift;
     my $response = shift;
 
     if ( $response->content =~ m|ERRORARRAY|i ) {
+        $self->_debug(10, "Received response: " . $response->content );
         my $json = from_json( $response->content );
-        if (scalar( @{ $json->{ERRORARRAY} } ) == 0
-            || ( scalar( @{ $json->{ERRORARRAY} } ) == 1
-                && $json->{ERRORARRAY}->[0]->{ERRORCODE} == 0 ) )
-        {   return $json->{DATA};
+        if ( ref $json eq 'ARRAY' ) {
+            return map { $self->_parse_api_response_data( $_ ) } @$json;
         }
         else {
-            # TODO this only returns the first error from the API
-
-            my $msg
-                = "API Error "
-                . $json->{ERRORARRAY}->[0]->{ERRORCODE} . ": "
-                . $json->{ERRORARRAY}->[0]->{ERRORMESSAGE};
-
-            $self->_error( $json->{ERRORARRAY}->[0]->{ERRORCODE}, $msg );
-            return;
+            return $self->_parse_api_response_data( $json );
         }
     }
     elsif ( $response->status_line ) {
@@ -99,6 +129,27 @@ sub parse_response {
         $self->_error( -1, 'No JSON found' );
         return;
     }
+}
+
+sub _parse_api_response_data {
+    my $self = shift;
+    my $rdata = shift;
+
+    my $errors = $rdata->{ERRORARRAY};
+    if ( not $errors or ref $errors ne 'ARRAY' ) {
+        $self->_error( -1, 'Invalid response: ERRORARRAY missing or invalid' );
+        return;
+    }
+
+    return $rdata->{DATA} if @$errors == 0;
+    return $rdata->{DATA} if @$errors == 1 and $errors->[0]{ERRORCODE} == 0;
+
+    # If we've reached here, there's an error to report
+    # TODO this only returns the first error from the API
+    my $error = $rdata->{ERRORARRAY}->[0];
+    my $msg = "API Error $error->{ERRORCODE}: $error->{ERRORMESSAGE}";
+    $self->_error( $error->{ERRORCODE}, $msg );
+    return;
 }
 
 sub _lc_keys {
@@ -179,6 +230,25 @@ response returning just the DATA section.
 Executes the send_request method, parses the response with the parse_response
 method and returns the data.
 
+=head2 queue_request
+
+Takes same arguments as send_request, but queues the request to be handled by
+a single batch request later.
+
+=head2 list_queue
+
+Returns list of queued requests.
+
+=head2 clear_queue
+
+Clears batch request queue.
+
+=head2 process_queue
+
+Sends queued items in a batch request.  Takes an optional number of items to
+send in the batch request, defaulting to all queued requests.  Returns an api
+reponse for each batch item.
+
 =head2 apikey
 
 Takes one optional argument, an apikey that if passed replaces the key
@@ -239,11 +309,11 @@ L<http://search.cpan.org/dist/WebService-Linode>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2008-2009 Linode, LLC, all rights reserved.
+Copyright 2008-2014 Michael Greb, all rights reserved.
+Copyright 2008-2014 Linode, LLC, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
 
 =cut
 
-'urmom';
