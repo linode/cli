@@ -1112,6 +1112,98 @@ sub imagelist {
         return join("\n", @$out_arrayref, @$out_recordsarrayref);
     }
 }
+
+sub imagecreate {
+    my ( $self, %args ) = @_;
+
+    my $api_obj   = $args{api_obj};
+    my $options   = $args{options};
+    my $match_obj = $args{match_obj};
+    my $found = 0;
+    my $linode_label = $match_obj->{label};
+    my $disk_name = '';
+
+    my $wait = 0;
+    if ( defined $options->{wait} && $options->{wait} == 0 ) {
+        $wait = 5;
+    } elsif ( defined $options->{wait} ) {
+        $wait = $options->{wait};
+    }
+
+    # lookup disk
+    my $disks = $api_obj->linode_disk_list( linodeid => $match_obj->{linodeid} );
+    if ( @$disks != 0 ) {
+        for my $disk ( @$disks ) {
+            if ( $options->{diskid} eq $disk->{diskid} ) {
+                $found = 1;
+                last;
+            }
+        }
+    }
+    if ( !$found ) {
+        return $self->fail(
+            action  => $options->{action},
+            label   => $linode_label,
+            message => "Unable to find disk $options->{diskid}."
+        );
+    }
+
+    my $params = {
+        set => {
+            linodeid => $match_obj->{linodeid}, diskid => $options->{diskid}
+        }
+    };
+    # Optional parameters
+    # - description
+    # - label/name
+    if ( exists $options->{description} ) {
+        $params->{set}{description} = $options->{description};
+    }
+    if ( exists $options->{name} ) {
+        $params->{set}{label} = $options->{name};
+    }
+
+    my $imagecreate;
+    my $imagecreate_result = try {
+        $imagecreate = $api_obj->linode_disk_imagize( %{ $params->{set} } );
+    };
+
+    return $self->fail(
+        action  => $options->{action},
+        label   => $linode_label,
+        message => "Unable to create image from disk $options->{diskid}.",
+        payload => { action => $options->{action} },
+    ) unless $imagecreate_result;
+
+    if ($wait) {
+        say "Creating image from disk $options->{diskid}..." if ( $args{format} eq 'human' );
+        my $imagecomplete_job_result
+            = $self->_poll_and_wait( $api_obj, $match_obj->{linodeid}, $imagecreate->{jobid},
+            $args{format}, $wait );
+
+            return $self->succeed(
+                action  => $options->{action},
+                label   => $linode_label,
+                message => "Imagized disk $options->{diskid}.",
+                payload => { jobid => $imagecreate->{jobid}, job => $options->{action}, imageid => $imagecreate->{imageid} },
+            ) if $imagecomplete_job_result;
+
+            return $self->fail(
+                action  => $options->{action},
+                label   => $linode_label,
+                message => "Timed out waiting for create image from disk $options->{diskid} to complete.",
+                payload => { jobid => $imagecreate->{jobid}, job => $options->{action} },
+            );
+    }
+
+    return $self->succeed(
+        action  => $options->{action},
+        label   => $linode_label,
+        message => "Created image from disk $options->{diskid}.",
+        payload => { jobid => $imagecreate->{jobid}, imageid => $imagecreate->{imageid} },
+    );
+}
+
 sub imagedelete {
     my ( $self, %args ) = @_;
 

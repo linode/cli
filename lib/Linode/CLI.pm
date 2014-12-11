@@ -319,6 +319,8 @@ sub runsinglematch {
         $sub  = 'recordupdate';
     } elsif ( $self->{mode} eq 'domain' && $self->{_opts}{action} eq 'record-delete' ) {
         $sub  = 'recorddelete';
+    } elsif ($self->{mode} eq 'linode' && $self->{_opts}->{action} eq 'image-create') {
+        $sub  = 'imagecreate';
     }
 
     my $result = "Linode::CLI::Object::$correct_case{$self->{mode}}"->$sub(

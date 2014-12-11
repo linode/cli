@@ -184,6 +184,16 @@ our %paramsdef = (
             'run'     => 'list'
         },
         'image-list' => { 'run'   => 'list' },
+        'image-create'    => {
+            'options' => {
+                'label'       => 'label|l=s@',
+                'diskid'      => 'diskid|d=i',
+                'description' => 'description|D:s',
+                'name'        => 'name|n:s',
+                'wait'        => 'wait|w:i'
+            },
+            'run'       => 'runsinglematch',
+        },
         'image-delete' => {
             'options' => { 'imageid' => 'imageid|i=i' },
             'run'       => 'runnomatching'
