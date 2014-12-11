@@ -317,3 +317,4 @@ under the same terms as Perl itself.
 
 =cut
 
+1;
