@@ -194,6 +194,14 @@ our %paramsdef = (
             },
             'run'       => 'runsinglematch',
         },
+        'image-update' => {
+            'options' => {
+                'imageid'     => 'imageid|i=i',
+                'description' => 'description|D:s',
+                'name'        => 'name|n:s'
+            },
+            'run'       => 'runnomatching'
+        },
         'image-delete' => {
             'options' => { 'imageid' => 'imageid|i=i' },
             'run'       => 'runnomatching'

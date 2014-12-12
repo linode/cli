@@ -343,6 +343,8 @@ sub runnomatching {
 
     if ( $self->{mode} eq 'linode' && $self->{_opts}{action} eq 'image-delete' ) {
         $sub  = 'imagedelete';
+    } elsif ( $self->{mode} eq 'linode' && $self->{_opts}{action} eq 'image-update' ) {
+        $sub  = 'imageupdate';
     }
 
     my $result = "Linode::CLI::Object::$correct_case{$self->{mode}}"->$sub(

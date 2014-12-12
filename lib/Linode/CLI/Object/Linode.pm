@@ -1204,6 +1204,68 @@ sub imagecreate {
     );
 }
 
+sub imageupdate {
+    my ( $self, %args ) = @_;
+
+    my $api_obj = $args{api_obj};
+    my $options = $args{options};
+    my $found = 0;
+
+    # lookup image
+    my $images = $api_obj->image_list();
+    if ( @$images != 0 ) {
+        for my $image ( @$images ) {
+            if ( $options->{imageid} eq $image->{imageid} ) {
+                $found = 1;
+                last;
+            }
+        }
+    }
+
+    if ( !$found ) {
+        return $self->fail(
+        action  => 'image-update',
+        imageid => $options->{imageid},
+        message => "Unable to find Image $options->{imageid} to update."
+        );
+    }
+
+    my $params = {
+        set => {
+            imageid => $options->{imageid}
+        }
+    };
+
+    # Optional parameters
+    # - description
+    # - label/name
+    if ( exists $options->{description} ) {
+        $params->{set}{description} = $options->{description};
+    }
+    if ( exists $options->{name} ) {
+        $params->{set}{label} = $options->{name};
+    }
+
+    my $update_result = try {
+        $api_obj->image_update( %{ $params->{set} } );
+    };
+    if ($update_result) {
+        return $self->succeed(
+        action  => 'image-update',
+        label   => $options->{imageid},
+        message => "Updated Image $options->{imageid}.",
+        payload => { action => 'image-update' },
+        );
+    } else {
+        return $self->fail(
+        action  => 'image-update',
+        label   => $options->{imageid},
+        message => "Unable to update Image $options->{imageid}.",
+        payload => { action => 'image-update' },
+        );
+    }
+}
+
 sub imagedelete {
     my ( $self, %args ) = @_;
 
