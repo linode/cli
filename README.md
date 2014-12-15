@@ -236,6 +236,35 @@ linode stackscript show My-StackScript-Label
 linode stackscript source mystackscript > myscript.sh
 ```
 
+### Working with Linode Images
+
+Listing a Linode's disks (displays disk names and disk IDs)
+
+```
+linode disk-list mylinodelabel
+
+```
+
+Creating a Linode Image
+
+```
+linode image-create mylinodelabel --diskid diskid
+```
+
+Listing your Linode Images
+
+```
+linode image-list
+
+```
+
+Updating or removing your Linode Images
+
+```
+linode image-update --imageid imageid --name newname
+linode image-delete --imageid imageid
+```
+
 ### Displaying account information
 
 Account information, including the current account balance and network transfer pool usage, can be queried with the `linode-account` tool.
