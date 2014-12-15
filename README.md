@@ -462,9 +462,19 @@ Creates a gold-master image for future deployments.
 
 **-D**, **--description**: Optional. An optional description of the created image.
 
-**-n**, **--name**: Optional. Sets the name of the image shown in the base image list, defaults to the source image label.
+**-n**, **--name**: Optional. Sets the name of the image. If not provided, the name defaults to the source image label.
 
 **-w**, **--wait**: Optional. Amount of time (in minutes) to wait for human output. Using the flag only, will use the default of 5.
+
+#### Image-Update
+
+Updates a gold-master image.
+
+**-i**, **--imageid**: Required. The ID of the gold-master image to update.
+
+**-D**, **--description**: Optional. The new image description.
+
+**-n**, **--name**: Optional. The new image name.
 
 #### Image-Delete
 
