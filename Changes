@@ -1,3 +1,6 @@
+1.4.1  2014-12-16
+  - Version number increase to match packaging release
+
 1.4.0  2014-12-16
   - Add support and documentation for Linode Images
   - Update packaged-in WebService::Linode module
