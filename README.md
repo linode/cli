@@ -242,7 +242,6 @@ Listing a Linode's disks (displays disk names and disk IDs)
 
 ```
 linode disk-list mylinodelabel
-
 ```
 
 Creating a Linode Image
@@ -255,7 +254,6 @@ Listing your Linode Images
 
 ```
 linode image-list
-
 ```
 
 Updating or removing your Linode Images
