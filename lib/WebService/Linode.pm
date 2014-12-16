@@ -9,7 +9,7 @@ use Carp;
 use List::Util qw(first);
 use WebService::Linode::Base;
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 our @ISA     = ("WebService::Linode::Base");
 our $AUTOLOAD;
 
@@ -46,6 +46,7 @@ my %validation = (
     image => {
         delete => [ [ 'imageid' ], [] ],
         list => [ [], [ 'imageid', 'pending' ] ],
+        update => [ [ 'imageid' ], [ 'label', 'description' ] ],
     },
     linode => {
         boot => [ [ 'linodeid' ], [ 'configid' ] ],
@@ -1121,6 +1122,26 @@ Optional Parameters:
 
 =back
 
+=head3 image_update
+
+Required Parameters:
+
+=over 4
+
+=item * imageid
+
+=back
+
+Optional Parameters:
+
+=over 4
+
+=item * label
+
+=item * description
+
+=back
+
 =head3 stackscript_list
 
 Optional Parameters:
@@ -1422,4 +1443,3 @@ Copyright 2008-2014 Linode, LLC, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-

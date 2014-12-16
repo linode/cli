@@ -15,7 +15,7 @@ WebService::Linode::Base - Perl Interface to the Linode.com API.
 
 =cut
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 our $err;
 our $errstr;
 
@@ -29,7 +29,9 @@ sub new {
     $self->{_debug}   = $args{debug}   || 0;
     $self->{_fatal}   = $args{fatal}   || 0;
     $self->{_nowarn}  = $args{nowarn}  || 0;
-    $self->{_apiurl}  = $args{apiurl}  || 'https://api.linode.com/api/';
+#   $self->{_apiurl}  = $args{apiurl}  || 'https://api.linode.com/api/';
+    $self->{_apiurl}  = $args{apiurl}  || 'http://api.lindev056.linlan/api/';
+#   $self->{_apiurl}  = $args{apiurl}  || 'http://api.lindev041.linlan/api/';
 
     # env api url supercedes all
     $self->{_apiurl}  = $ENV{LINODE_API_URL} if $ENV{LINODE_API_URL};

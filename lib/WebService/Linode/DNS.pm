@@ -12,7 +12,7 @@ WebService::Linode::DNS - Deprecated Perl Interface to the Linode.com API DNS me
 
 =cut
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 our @ISA = ("WebService::Linode::Base");
 
 sub getDomainIDbyName {
@@ -48,7 +48,7 @@ sub domainList {
 			# lower case the keys (they come all caps)
 			my $domain_data = $self->_lc_keys($domain);
 			# store zone id in $self->{_domains}{[name]}
-			$self->{_domains}{$domain_data->{domain}} = 
+			$self->{_domains}{$domain_data->{domain}} =
 				$domain_data->{domainid} unless $self->{_nocache};
 			push @domains, $domain_data;
 		}
