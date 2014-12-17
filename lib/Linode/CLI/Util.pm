@@ -55,14 +55,7 @@ our %humanyn = (
     '1' => 'yes',
 );
 
-our %humandc = (
-    '2' => 'dallas',
-    '3' => 'fremont',
-    '4' => 'atlanta',
-    '6' => 'newark',
-    '7' => 'london',
-    '8' => 'tokyo',
-);
+our %humandc = ();
 
 our %paramsdef = (
     'linode' => {
@@ -147,7 +140,10 @@ our %paramsdef = (
             },
             'run' => 'update',
         },
-        'list'   => { 'options' => { 'label' => 'label|l:s@' }, },
+        'list'   => {
+            'options' => { 'label' => 'label|l:s@' },
+            'warmcache' => [ 'datacenter' ],
+            },
         'show'   => {
             'options'   => { 'label' => 'label|l=s@' },
             'warmcache' => [ 'datacenter' ],
@@ -365,8 +361,14 @@ our %paramsdef = (
             'seeknext' => [ 'connections' ],
         },
         'delete' => { 'options' => { 'label' => 'label|l=s@' }, },
-        'list'   => { 'options' => { 'label' => 'label|l:s@' }, },
-        'show'   => { 'options' => { 'label' => 'label|l=s@' }, },
+        'list'   => {
+            'options' => { 'label' => 'label|l:s@' },
+            'warmcache' => [ 'datacenter' ],
+        },
+        'show'   => {
+            'options' => { 'label' => 'label|l=s@' },
+            'warmcache' => [ 'datacenter' ],
+        },
         'config-create'  => {
             'options' => {
             'label'          => 'label|nodebalancer|l=s@',

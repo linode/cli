@@ -619,6 +619,11 @@ sub _warm_cache {
                         api_obj     => $self->{_api_obj},
                         object_list => $self->{_api_obj}->avail_datacenters(),
                     )->list( output_format => 'raw' );
+
+                # fill humandc
+                for my $object_label ( sort keys $self->{_cache}{datacenter}{$expire} ) {
+                    $humandc{ $self->{_cache}{datacenter}{$expire}{$object_label}{datacenterid} } = $object_label;
+                }
             }
             elsif ( $_ eq 'distribution' ) {
                 $self->{_cache}{distribution}{$expire} =
