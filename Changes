@@ -1,3 +1,6 @@
+1.4.3  2014-12-23
+  - Remove testing URL that was left in
+
 1.4.2  2014-12-17
   - Load datacenter names when needed (warmup), remove hard-coded dc's
 
