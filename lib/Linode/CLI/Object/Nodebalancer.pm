@@ -346,10 +346,10 @@ sub configcreate {
     # - check-interval
     # - check-timeout
     # - check-attempts
-    # - check-path
-    # - check-body
     # - ssl-cert
     # - ssl-key
+    # - check-path
+    # - check-body
 
     if ( exists $options->{port} ) {
         if ( $options->{port} >= 1 && $options->{port} <= 65534 ) {
@@ -459,10 +459,45 @@ sub configcreate {
             );
         }
     }
+    if ( exists $options->{'ssl-cert'} ) {
+        my $file_cert = glob_tilde( $options->{'ssl-cert'} );
+        if ( -f $file_cert ) { # is it a file?
+            $params->{set}{ssl_cert} = do {
+                local $/ = undef;
+                open my $fh, '<', $file_cert or do {
+                    return $self->fail(
+                        action  => 'config-update',
+                        label   => $nb_label,
+                        message => "Unable to open ssl-cert file : $!",
+                    );
+                };
+                <$fh>;
+            };
+        } else {
+            $params->{set}{ssl_cert} = $options->{'ssl-cert'};
+        }
+    }
+    if ( exists $options->{'ssl-key'} ) {
+        my $file_key = glob_tilde( $options->{'ssl-key'} );
+        if ( -f $file_key ) { # is it a file?
+            $params->{set}{ssl_key} = do {
+                local $/ = undef;
+                open my $fh, '<', $file_key or do {
+                    return $self->fail(
+                        action  => 'config-update',
+                        label   => $nb_label,
+                        message => "Unable to open ssl-key file : $!",
+                    );
+                };
+                <$fh>;
+            };
+        } else {
+            $params->{set}{ssl_key} = $options->{'ssl-key'};
+        }
+    }
+
     $params->{set}{check_path} = $options->{'check-path'} if $options->{'check-path'};
     $params->{set}{check_body} = $options->{'check-body'} if $options->{'check-body'};
-    $params->{set}{ssl_cert}   = $options->{'ssl-cert'} if $options->{'ssl-cert'};
-    $params->{set}{ssl_key}    = $options->{'ssl-key'} if $options->{'ssl-key'};
 
     # Create the NodeBlanacer Node
     my $create_result = try {
@@ -535,10 +570,10 @@ sub configupdate {
     # - check-interval
     # - check-timeout
     # - check-attempts
-    # - check-path
-    # - check-body
     # - ssl-cert
     # - ssl-key
+    # - check-path
+    # - check-body
 
     if ( exists $options->{'new-port'} ) {
         if ( $options->{'new-port'} >= 1 && $options->{'new-port'} <= 65534 ) {
@@ -645,10 +680,45 @@ sub configupdate {
             );
         }
     }
+    if ( exists $options->{'ssl-cert'} ) {
+        my $file_cert = glob_tilde( $options->{'ssl-cert'} );
+        if ( -f $file_cert ) { # is it a file?
+            $params->{set}{ssl_cert} = do {
+                local $/ = undef;
+                open my $fh, '<', $file_cert or do {
+                    return $self->fail(
+                        action  => 'config-update',
+                        label   => $nb_label,
+                        message => "Unable to open ssl-cert file : $!",
+                    );
+                };
+                <$fh>;
+            };
+        } else {
+            $params->{set}{ssl_cert} = $options->{'ssl-cert'};
+        }
+    }
+    if ( exists $options->{'ssl-key'} ) {
+        my $file_key = glob_tilde( $options->{'ssl-key'} );
+        if ( -f $file_key ) { # is it a file?
+            $params->{set}{ssl_key} = do {
+                local $/ = undef;
+                open my $fh, '<', $file_key or do {
+                    return $self->fail(
+                        action  => 'config-update',
+                        label   => $nb_label,
+                        message => "Unable to open ssl-key file : $!",
+                    );
+                };
+                <$fh>;
+            };
+        } else {
+            $params->{set}{ssl_key} = $options->{'ssl-key'};
+        }
+    }
+
     $params->{set}{check_path} = $options->{'check-path'} if $options->{'check-path'};
     $params->{set}{check_body} = $options->{'check-body'} if $options->{'check-body'};
-    $params->{set}{ssl_cert}   = $options->{'ssl-cert'} if $options->{'ssl-cert'};
-    $params->{set}{ssl_key}    = $options->{'ssl-key'} if $options->{'ssl-key'};
 
     # Update the NodeBlanacer Config
     my $update_result = try {

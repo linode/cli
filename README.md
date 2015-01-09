@@ -737,9 +737,9 @@ Create a NodeBalancer config (port).
 
 **-B**, **--check-body**: Optional. When check-health='http_body', a regex against the expected result body.
 
-**-C**, **--ssl-cert**: Optional. SSL certificate served by the NodeBalancer when the protocol is 'https'.
+**-C**, **--ssl-cert**: Optional. SSL certificate served by the NodeBalancer when the protocol is 'https'. A path to the file is also accepted.
 
-**-K**, **--ssl-key**: Optional. Unpassphrased private key for the SSL certificate when protocol is 'https'.
+**-K**, **--ssl-key**: Optional. Unpassphrased private key for the SSL certificate when protocol is 'https'. A path to the file is also accepted.
 
 #### Update NodeBalancer Config/Port (config-update)
 
@@ -769,9 +769,9 @@ Update a NodeBalancer config (port).
 
 **-B**, **--check-body**: Optional. When check-health='http_body', a regex against the expected result body.
 
-**-C**, **--ssl-cert**: Optional. SSL certificate served by the NodeBalancer when the protocol is 'https'.
+**-C**, **--ssl-cert**: Optional. SSL certificate served by the NodeBalancer when the protocol is 'https'. A path to the file is also accepted.
 
-**-K**, **--ssl-key**: Optional. Unpassphrased private key for the SSL certificate when protocol is 'https'.
+**-K**, **--ssl-key**: Optional. Unpassphrased private key for the SSL certificate when protocol is 'https'. A path to the file is also accepted.
 
 #### Delete NodeBalancer Config/Port (config-delete)
 
