@@ -492,7 +492,6 @@ sub eat_cmdargs {
     my $cmdargs = {};
     $cmdargs->{output} = 'martian';
 
-    check_configs();
     GetOptions( $cmdargs, @paramsfirst );
 
     if ( exists $cmdargs->{version} ) {
@@ -578,10 +577,16 @@ sub eat_cmdargs {
 
         # 3) .linodecli config files
         my $dir_home = $ENV{HOME} || ( getpwuid($<) )[7];
+        if ( -f  "$dir_home/.linodecli" ) {
+            # legacy config found, upgrade
+            check_configs();
+        }
+
         my $file_cli = "$dir_home/.linodecli/config";
         if ( exists $cmdargs->{username} ) {
             $file_cli = "$dir_home/.linodecli/config_" . $cmdargs->{username};
         }
+
         if ( -f $file_cli ) {
             # check user's file permissions
             my $filemode = ( stat( $file_cli ) )[2];
@@ -740,6 +745,7 @@ sub load_config {
 sub write_config {
     my ($file, $options) = @_;
 
+    check_configs(); # make sure we have the directory structure in place
     open my $fh, '>', $file or die "Unable to open file '$file': $!\n";
 
     chmod(0640, $fh);
