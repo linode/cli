@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 # linode-cli
-# Copyright (C) 2014 Linode, LLC
+# Copyright (C) 2015 Linode, LLC
 
 use 5.010;
 use strict;
@@ -435,7 +435,7 @@ Optional. Allows domain record filtering by type. One of: NS, MX, A, AAAA, CNAME
 
 =head1 COPYRIGHT/LICENSE
 
-Copyright 2014 Linode, LLC.  Linode CLI is made available under the terms
+Copyright 2015 Linode, LLC.  Linode CLI is made available under the terms
 of the Perl Artistic License, or GPLv2 at the recipients discretion.
 
 =head2 Perl Artistic License
