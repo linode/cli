@@ -1,3 +1,9 @@
+1.4.4  2015-01-12
+  - Fix for issue #19, Debian package changes for Perl
+  - Fix for issue #25, allow a file path for nodebalancer ssl configs
+  - Fix for issue #27, don't require a .linodecli directory, until needed
+  - Update year(s) to 2015
+
 1.4.3  2014-12-23
   - Remove testing URL that was left in
 
