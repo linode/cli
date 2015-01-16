@@ -621,7 +621,7 @@ sub _warm_cache {
                     )->list( output_format => 'raw' );
 
                 # fill humandc
-                for my $object_label ( sort keys $self->{_cache}{datacenter}{$expire} ) {
+                for my $object_label ( sort keys %{ $self->{_cache}{datacenter}{$expire} } ) {
                     $humandc{ $self->{_cache}{datacenter}{$expire}{$object_label}{datacenterid} } = $object_label;
                 }
             }
