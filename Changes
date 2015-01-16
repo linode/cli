@@ -1,3 +1,6 @@
+1.4.5  2015-01-16
+  - Fix experimental warning for keys in CLI.pm
+
 1.4.4  2015-01-12
   - Fix for issue #19, Debian package changes for Perl
   - Fix for issue #25, allow a file path for nodebalancer ssl configs
