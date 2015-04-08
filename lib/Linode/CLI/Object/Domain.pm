@@ -731,7 +731,7 @@ sub recordlist {
     my $out_hashref = {};
     my $api_obj = $self->{_api_obj};
     my $options = $args{options};
-    my @colw = ( 8, 24, 32, 8 );
+    my @colw = ( 8, 24, 32, 8, 8 );
 
 
     for my $object_label ( keys %{ $self->{object} } ) {
@@ -747,46 +747,48 @@ sub recordlist {
                     for my $record ( @$records ) {
                         if ( lc($options->{type}) eq lc($record->{type}) ) {
                             push @$out_recordsfilteredarrayref, sprintf(
-                                "| %-${colw[0]}s | %-${colw[1]}s | %-${colw[2]}s | %-${colw[3]}s |",
+                                "| %-${colw[0]}s | %-${colw[1]}s | %-${colw[2]}s | %-${colw[3]}s | %-${colw[4]}s |",
                                 uc($record->{type}),
                                 format_len( $record->{name}, $colw[1] ),
                                 format_len( $record->{target}, $colw[2] ),
-                                $record->{port});
+                                $record->{port},
+                                $record->{ttl_sec});
                             $filterhits++;
                         }
                     }
                     if ( $filterhits > 0 ) {
                         push @$out_recordsarrayref, (
-                            "+ " . ( '-' x $colw[0] ) . ' + ' . ( '-' x $colw[1] ) . ' + ' . ( '-' x $colw[2] ) . ' + ' . ( '-' x $colw[3] ) . ' +');
+                            "+ " . ( '-' x $colw[0] ) . ' + ' . ( '-' x $colw[1] ) . ' + ' . ( '-' x $colw[2] ) . ' + ' . ( '-' x $colw[3] ) . ' + ' . ( '-' x $colw[4] ) . ' +');
                         push @$out_recordsarrayref, sprintf(
-                            "| %-${colw[0]}s | %-${colw[1]}s | %-${colw[2]}s | %-${colw[3]}s |",
-                            'type', 'name', 'target', 'port' );
+                            "| %-${colw[0]}s | %-${colw[1]}s | %-${colw[2]}s | %-${colw[3]}s | %-${colw[4]}s |",
+                            'type', 'name', 'target', 'port', 'ttl' );
                         push @$out_recordsarrayref, (
-                            '| ' . ( '-' x $colw[0] ) . ' + ' . ( '-' x $colw[1] ) . ' + ' . ( '-' x $colw[2] ) . ' + ' . ( '-' x $colw[3] ) . ' |');
+                            '| ' . ( '-' x $colw[0] ) . ' + ' . ( '-' x $colw[1] ) . ' + ' . ( '-' x $colw[2] ) . ' + ' . ( '-' x $colw[3] ) . ' + ' . ( '-' x $colw[4] ) . ' |');
                         map { push @$out_recordsarrayref, $_ } @$out_recordsfilteredarrayref;
                         push @$out_recordsarrayref, (
-                            '+ ' . ( '-' x $colw[0] ) . ' + ' . ( '-' x $colw[1] ) . ' + ' . ( '-' x $colw[2] ) . ' + ' . ( '-' x $colw[3] ) . " +\n");
+                            '+ ' . ( '-' x $colw[0] ) . ' + ' . ( '-' x $colw[1] ) . ' + ' . ( '-' x $colw[2] ) . ' + ' . ( '-' x $colw[3] ) . ' + ' . ( '-' x $colw[4] ) . " +\n");
                     } else {
                         push @$out_recordsarrayref, ("No records match filter type.\n");
                     }
                 } else {
                     push @$out_recordsarrayref, (
-                        "+ " . ( '-' x $colw[0] ) . ' + ' . ( '-' x $colw[1] ) . ' + ' . ( '-' x $colw[2] ) . ' + ' . ( '-' x $colw[3] ) . ' +');
+                        "+ " . ( '-' x $colw[0] ) . ' + ' . ( '-' x $colw[1] ) . ' + ' . ( '-' x $colw[2] ) . ' + ' . ( '-' x $colw[3] ) . ' + ' . ( '-' x $colw[4] ) . ' +');
                     push @$out_recordsarrayref, sprintf(
-                        "| %-${colw[0]}s | %-${colw[1]}s | %-${colw[2]}s | %-${colw[3]}s |",
-                        'type', 'name', 'target', 'port' );
+                        "| %-${colw[0]}s | %-${colw[1]}s | %-${colw[2]}s | %-${colw[3]}s | %-${colw[4]}s |",
+                        'type', 'name', 'target', 'port', 'ttl' );
                     push @$out_recordsarrayref, (
-                        '| ' . ( '-' x $colw[0] ) . ' + ' . ( '-' x $colw[1] ) . ' + ' . ( '-' x $colw[2] ) . ' + ' . ( '-' x $colw[3] ) . ' |');
+                        '| ' . ( '-' x $colw[0] ) . ' + ' . ( '-' x $colw[1] ) . ' + ' . ( '-' x $colw[2] ) . ' + ' . ( '-' x $colw[3] ) . ' + ' . ( '-' x $colw[4] ) . " |");
                     for my $record ( sort { uc($a->{type}) cmp uc($b->{type}) } @$records ) {
                         push @$out_recordsarrayref, sprintf(
-                            "| %-${colw[0]}s | %-${colw[1]}s | %-${colw[2]}s | %-${colw[3]}s |",
+                            "| %-${colw[0]}s | %-${colw[1]}s | %-${colw[2]}s | %-${colw[3]}s | %-${colw[4]}s |",
                             uc($record->{type}),
                             format_len( $record->{name}, $colw[1] ),
                             format_len( $record->{target}, $colw[2] ),
-                            $record->{port});
+                            $record->{port},
+                            $record->{ttl_sec});
                     }
                     push @$out_recordsarrayref, (
-                    '+ ' . ( '-' x $colw[0] ) . ' + ' . ( '-' x $colw[1] ) . ' + ' . ( '-' x $colw[2] ) . ' + ' . ( '-' x $colw[3] )  . " +\n");
+                    '+ ' . ( '-' x $colw[0] ) . ' + ' . ( '-' x $colw[1] ) . ' + ' . ( '-' x $colw[2] ) . ' + ' . ( '-' x $colw[3] ) . ' + ' . ( '-' x $colw[4] ) . " +\n");
                 }
             } else {
                 push @$out_recordsarrayref, ("No records to list.\n");
