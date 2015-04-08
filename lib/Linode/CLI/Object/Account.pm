@@ -80,10 +80,17 @@ sub list {
 
 sub show {
     my ( $self, %args ) = @_;
+    my $saybalance;
 
-    return sprintf( "%18s %-45s\n%18s \$ %-43.2f\n%18s %-45s\n%18s %-45s\n%18s %-45s\n%18s %-45s\n",
+    if ($self->{object}{info}{balance} < 0) {
+        $saybalance = sprintf("%.2f", abs($self->{object}{info}{balance})) . " credit";
+    } else {
+        $saybalance = sprintf("%.2f", $self->{object}{info}{balance});
+    }
+
+    return sprintf( "%18s %-45s\n%18s \$%-45s\n%18s %-45s\n%18s %-45s\n%18s %-45s\n%18s %-45s\n",
             'managed:', $humanyn{ format_tf( $self->{object}{info}{managed} ) },
-            'balance:', $self->{object}{info}{balance},
+            'balance:', $saybalance,
             'transfer pool:', human_displaymemory( $self->{object}{info}{transfer_pool} * 1024 ),
             'transfer used:', human_displaymemory( $self->{object}{info}{transfer_used} * 1024 ),
             'transfer billable:', human_displaymemory( $self->{object}{info}{transfer_billable} * 1024 ),
