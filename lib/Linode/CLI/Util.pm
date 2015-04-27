@@ -136,7 +136,7 @@ our %paramsdef = (
         'group' => {
             'options' => {
                 'label' => 'label|l=s@',
-                'group' => 'group|n=s'
+                'group' => 'group|g=s'
             },
             'run' => 'update',
         },
