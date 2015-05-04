@@ -1,3 +1,8 @@
+1.4.6  2015-05-04
+  - Improve account show when account has a credit
+  - Add TTL to linode domain record-list output
+  - Fix incorrect short option for --group on group command
+
 1.4.5  2015-01-16
   - Fix experimental warning for keys in CLI.pm
 
