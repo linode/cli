@@ -23,8 +23,7 @@ sudo apt-get install linode-cli
 Installing the packaged version of Linode CLI on Mac OS X requires Homebrew: http://brew.sh
 
 ```
-brew tap linode/cli
-brew install linode-cli
+brew install linode/cli/linode-cli
 ```
 
 ### Others
