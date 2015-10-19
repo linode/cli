@@ -30,9 +30,8 @@ brew install linode/cli/linode-cli
 
 You'll need the following Perl modules. They can be installed from the CPAN using your preferred method.
 
-* Crypt::SSLeay
 * JSON
-* LWP::UserAgent
+* LWP
 * Mozilla::CA
 * Try::Tiny
 * WebService::Linode
