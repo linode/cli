@@ -8,7 +8,6 @@ WriteMakefile(
     ABSTRACT     => 'A simple command-line interface to the Linode platform.',
     AUTHOR       => 'Linode, LLC',
     PREREQ_PM    => {
-        'Crypt::SSLeay'      => 0,
         'JSON'               => 0,
         'LWP::UserAgent'     => 0,
         'Mozilla::CA'        => 0,
