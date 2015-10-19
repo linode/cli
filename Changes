@@ -1,3 +1,6 @@
+1.4.7  2015-10-19
+  - Changes in reponse to changes with the Crypt::SSLeay package
+
 1.4.6  2015-05-04
   - Improve account show when account has a credit
   - Add TTL to linode domain record-list output
