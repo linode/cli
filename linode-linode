@@ -129,7 +129,11 @@ Required. The datacenter to use for deployment. Locations are Atlanta, Dallas, F
 
 =item B<-d>, B<--distribution>
 
-Required. Distribution name or DistributionID to deploy.
+Required when not using imageid. Distribution name or DistributionID to deploy.
+
+=item B<-i>, B<--imageid>
+
+Required when not using distribution. The ID of the gold-master image to use for deployment.
 
 =item B<-p>, B<--plan>
 
@@ -181,7 +185,11 @@ Required. A Linode to operate on.
 
 =item B<-d>, B<--distribution>
 
-Required. Distribution name or DistributionID to deploy.
+Required when not using imageid. Distribution name or DistributionID to deploy.
+
+=item B<-i>, B<--imageid>
+
+Required when not using distribution. The ID of the gold-master image to use for deployment.
 
 =item B<-P>, B<--password>
 
