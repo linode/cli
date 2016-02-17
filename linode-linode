@@ -69,6 +69,16 @@ B<linode-linode> [B<-a> action] [action-options...] [options...]
 
 =item S<-a plans,      --action plans       list all Linode plans>
 
+=item S<-a disk-list,  --action disk-list   list a Linode's disk>
+
+=item S<-a image-list, --action image-list  list available images>
+
+=item S<-a image-create,    --action image-create   create a new image>
+
+=item S<-a image-update,    --action image-update   update an existing image>
+
+=item S<-a image-delete,    --action image-delete   delete an image>
+
 =item S<               --api-key=KEY      your user's API key>
 
 =item S<-h,            --help               display this help and exit>
@@ -129,7 +139,11 @@ Required. The datacenter to use for deployment. Locations are Atlanta, Dallas, F
 
 =item B<-d>, B<--distribution>
 
-Required. Distribution name or DistributionID to deploy.
+Required when not using imageid. Distribution name or DistributionID to deploy.
+
+=item B<-i>, B<--imageid>
+
+Required when not using distribution. The ID of the gold-master image to use for deployment.
 
 =item B<-p>, B<--plan>
 
@@ -181,7 +195,11 @@ Required. A Linode to operate on.
 
 =item B<-d>, B<--distribution>
 
-Required. Distribution name or DistributionID to deploy.
+Required when not using imageid. Distribution name or DistributionID to deploy.
+
+=item B<-i>, B<--imageid>
+
+Required when not using distribution. The ID of the gold-master image to use for deployment.
 
 =item B<-P>, B<--password>
 
@@ -420,6 +438,102 @@ Required. A specific Linode to show.
 =over 8
 
 =item List all available Linode plans.
+
+=back
+
+=head2 DISK-LIST
+
+=over 8
+
+=item Lists disks associated with a specific Linode.
+
+=over 8
+
+=item B<-l>, B<--label>
+
+Required. The Linode to display.
+
+=back
+
+=back
+
+=head2 IMAGE-LIST
+
+=over 8
+
+=item Lists available gold-master images.
+
+=back
+
+=head2 IMAGE-CREATE
+
+=over 8
+
+=item Creates a gold-master image for future deployments.
+
+=over 8
+
+=item B<-l>, B<--label>
+
+Required. Specifies the source Linode to create the image from.
+
+=item B<-d>, B<--diskid>
+
+Required. Specifies the source Disk ID to create the image from.
+
+=item B<-D>, B<--description>
+
+Optional. An optional description of the created image.
+
+=item B<-n>, B<--name>
+
+Optional. Sets the name of the image. If not provided, the name defaults to the source image label.
+
+=item B<-w>, B<--wait>
+
+Optional. Amount of time (in minutes) to wait for human output. Using the flag only, will use the default of 5.
+
+=back
+
+=back
+
+=head2 IMAGE-UPDATE
+
+=over 8
+
+=item Updates a gold-master image.
+
+=over 8
+
+=item B<-i>, B<--imageid>
+
+Required. The ID of the gold-master image to update.
+
+=item B<-D>, B<--description>
+
+Optional. The new image description.
+
+=item B<-n>, B<--name>
+
+Optional. The new image name.
+
+=back
+
+=back
+
+=head2 IMAGE-DELETE
+
+=over 8
+
+=item Deletes a gold-master image.
+
+=over 8
+
+=item B<-i>, B<--imageid>
+
+Required. The ID of the gold-master image to delete.
+
+=back
 
 =back
 
