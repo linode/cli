@@ -101,7 +101,7 @@ linode rename mylinodename mylinodenewname
 
 ### Creating a new Linode
 
-**Warning:** This *will* attempt to charge the credit card on file, or use any account credit available, and spin up a new Linode 1GB.
+**Warning:** This *will* attempt to charge the credit card on file, or use any account credit available, and spin up a new Linode 2GB.
 
 ```
 linode create New-Linode --location dallas --plan linode2048 --payment-term 1 --distribution 'Debian 7' --group Frontends
