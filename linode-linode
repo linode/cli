@@ -339,7 +339,7 @@ A Linode to operate on.
 
 =item B<-p>, B<--plan>
 
-The Plan to resize to. Plans are linode1024, linode2048, linode4096, linode8192, linode16384, linode24576, linode32768, and linode40960.
+The Plan to resize to. Plans are linode2048, linode4096, linode8192, linode12288, linode24576, linode49152, linode65536, linode81920, and linode122880.
 
 =item B<-w>, B<--wait>
 
