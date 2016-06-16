@@ -101,7 +101,7 @@ linode rename mylinodename mylinodenewname
 
 ### Creating a new Linode
 
-**Warning:** This *will* attempt to charge the credit card on file, or use any account credit available, and spin up a new Linode 1GB.
+**Warning:** This *will* attempt to charge the credit card on file, or use any account credit available, and spin up a new Linode 2GB.
 
 ```
 linode create New-Linode --location dallas --plan linode2048 --payment-term 1 --distribution 'Debian 7' --group Frontends
@@ -294,7 +294,7 @@ linode list --json
       "group" : "",
       "status" : "powered off",
       "backupsenabled" : false,
-      "totalram" : "1GB",
+      "totalram" : "2GB",
       "request_error" : "",
       "totalhd" : "24GB",
       "label" : "linodefrontend1",
@@ -305,7 +305,7 @@ linode list --json
       "group" : "backend",
       "status" : "running",
       "backupsenabled" : true,
-      "totalram" : "1GB",
+      "totalram" : "4GB",
       "request_error" : "",
       "totalhd" : "48GB",
       "label" : "linodebackend1",
@@ -359,7 +359,7 @@ Create and start a new Linode.
 
 **-i**, **--imageid**: Required when not using distribution. The ID of the gold-master image to use for deployment.
 
-**-p**, **--plan**: Required. The Plan to deploy. Plans are linode2048, linode4096, linode8192, linode16384, linode32768, linode49152, linode65536, and linode98304.
+**-p**, **--plan**: Required. The Plan to deploy. Plans are linode2048, linode4096, linode8192, linode12288, linode24576, linode49152, linode65536, linode81920, and linode122880.
 
 **-P**, **--password**: Required. The root user's password.  Needs to be at least 6 characters and contain at least two of these four character classes: lower case letters, upper case letters, numbers, and punctuation.
 
@@ -425,7 +425,7 @@ Resize a Linode to a new plan size, and issue a boot job.
 
 **-l**, **--label**: A Linode to operate on.
 
-**-p**, **--plan**: The Plan to resize to. Plans are linode2048, linode4096, linode8192, linode16384, linode32768, linode49152, linode65536, and linode98304.
+**-p**, **--plan**: The Plan to resize to. Plans are linode2048, linode4096, linode8192, linode12288, linode24576, linode49152, linode65536, linode81920, and linode122880.
 
 **-w**, **--wait**: Optional. Amount of time (in minutes) to wait for human output. Using the flag only, will use the default of 20.
 
