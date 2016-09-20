@@ -355,7 +355,7 @@ Create and start a new Linode.
 
 **-L**, **--location**, **--datacenter**: Required. The datacenter to use for deployment. Locations are Atlanta, Dallas, Fremont, London, Newark, and Tokyo.
 
-**-d**, **--distribution**, **distro**: Required when not using imageid. Distribution name or DistributionID to deploy.
+**-d**, **--distribution**: Required when not using imageid. Distribution name or DistributionID to deploy.
 
 **-i**, **--imageid**: Required when not using distribution. The ID of the gold-master image to use for deployment.
 
