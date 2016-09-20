@@ -353,7 +353,7 @@ Create and start a new Linode.
 
 **-l**, **--label**: Required. A Linode to operate on.
 
-**-L**, **--location**: Required. The datacenter to use for deployment. Locations are Atlanta, Dallas, Fremont, London, Newark, and Tokyo.
+**-L**, **--location**, **--datacenter**: Required. The datacenter to use for deployment. Locations are Atlanta, Dallas, Fremont, London, Newark, and Tokyo.
 
 **-d**, **--distribution**: Required when not using imageid. Distribution name or DistributionID to deploy.
 
