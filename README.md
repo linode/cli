@@ -26,6 +26,16 @@ Installing the packaged version of Linode CLI on Mac OS X requires Homebrew: htt
 brew install linode/cli/linode-cli
 ```
 
+#### Mac OS X segmentation faults
+
+Linode-cli must be built using the system perl, so if you end up with segmentation faults when running `linode` on OSX, try 
+
+```
+brew unlink perl
+brew uninstall linode-cli
+brew install linode-cli
+```
+
 ### Others
 
 You'll need the following Perl modules. They can be installed from the CPAN using your preferred method.
