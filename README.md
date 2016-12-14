@@ -46,6 +46,18 @@ You'll need the following Perl modules. They can be installed from the CPAN usin
 * Try::Tiny
 * WebService::Linode
 
+To install with root:
+
+```
+sudo cpan -i JSON LWP Mozilla::CP Try::Tiny WebService::Linode
+```
+
+To install with local::lib:
+
+```
+perl -MCPAN -Mlocal::lib -e 'CPAN::install(JSON, LWP, Mozilla::CA, Try::Tiny, WebService::Linode)'
+```
+
 Then, download the Linode CLI tarball, extract it, and install:
 
 ```
