@@ -1,0 +1,98 @@
+# -*- shell-script -*-
+
+_linode ()
+{
+    local OBJECTS='linode account domain nodebalancer stackscript'
+
+    local LINODE_ACTIONS='create start stop restart renameOC rebuild ip-add \
+                          group resize delete list show locations distros \
+                          plans disk-list image-list image-create image-update \
+                          image-delete'
+    local LINODE_CREATE_FLAGS='-l --label -L --location --datacenter -d \
+                               --distribution -i --imageid -p --plan -P \
+                               --password -t --payment-term -g --group -K \
+                               --pubkey-file -S --stackscript -J \
+                               --stackscriptjson -w --wait'
+    local LINODE_REBUILD_FLAGS='-l --label -d --distribution -i --imageid -P \
+                                --password -K --pubkey-file -S --stackscript \
+                                -J --stackscriptjson -w --wait'
+
+    local ACCOUNT_ACTIONS='show'
+
+    local DOMAIN_ACTIONS='create update delete list show record-create \
+                          record-update record-delete record-list record-show'
+
+    local NODEBALANCER_ACTIONS='create rename throttle delete list show \
+                                config-create config-update config-delete \
+                                config-list config-show node-create node-update \
+                                node-delete node-list node-show'
+
+    local STACKSCRIPT_ACTIONS='create update delete list show source'
+
+    local cur
+    local prev
+    local curOrSecon # Not totally sure if this is necessary
+
+    COMPREPLY=()
+    cur=${COMP_WORDS[COMP_CWORD]}
+    prev=${COMP_WORDS[COMP_CWORD-1]}
+
+    curOrSecond=${$2:-cur}
+
+    case "$curOrSecond" in
+        account)
+            # Account object was specified, provide account actions
+            COMPREPLY=( $( compgen -W "$ACCOUNT_ACTIONS" -- $cur ) )
+            ;;
+        domain)
+            # Domain object was specified, provide domain actions
+            COMPREPLY=( $( compgen -W "$DOMAIN_ACTIONS" -- $cur ) )
+            ;;
+        nodebalancer)
+            # Nodebalancer object was specified, provide nodebalancer actions
+            COMPREPLY=( $( compgen -W "$NODEBALANCER_ACTIONS" -- $cur ) )
+            ;;
+        stackscript)
+            # Stackscript object was specified, provide nodebalancer actions
+            COMPREPLY=( $( compgen -W "$STACKSCRIPT_ACTIONS" -- $cur ) )
+            ;;
+        linode)
+            # Either linode object or linode action was specified
+            if [[ $COMP_CWORD -eq 3 ]]; then
+                # Linode object was specified, provide linode actions and linode flags
+                COMPREPLY=( $( compgen -W "$LINODE_ACTIONS" -- $cur ) )
+                return
+            fi
+
+            # Action was specified, provide action flags and possible values
+            case "$cur" in
+                -*)
+                    # Provide action flags
+                    case "$@:2:2" in
+                        *" create "*)
+                            COMPREPLY=( $( compgen -W "$LINODE_CREATE_FLAGS" ) )
+                            ;;
+                        *" rebuild "*)
+                            COMPREPLY=( $( compgen -W "$LINODE_REBUILD_FLAGS" ) )
+                            ;;
+                    esac
+                    ;;
+                *)
+                    # Provide action values
+                    ;;
+            esac
+            ;;
+        *)
+            # No object is specified, so supply both objects and linode actions
+            COMPREPLY=( $( compgen -W "$OBJECTS $LINODE_ACTIONS" -- $cur ) )
+            ;;
+    esac
+}
+
+if [[ "$SHELL" == *"zsh"* ]]
+then
+    autoload -U +X compinit && compinit
+    autoload -U +X bashcompinit && bashcompinit
+fi
+
+complete -F _linode -o display linode
