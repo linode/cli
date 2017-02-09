@@ -40,6 +40,7 @@ sub new_from_list {
         totalhd        => 'disk',
         totalram       => 'ram',
         ips            => 'ips',
+        create_dt      => 'create_dt'
     };
 
     return $class->SUPER::new_from_list(
@@ -59,7 +60,7 @@ sub list {
     my $out_arrayref  = [];
     my $out_hashref   = {};
 
-    my @colw = ( 32, 14, 10, 8, 10, 10 );
+    my @colw = ( 32, 14, 10, 8, 10, 10, 22 );
     my $grouped_objects = {};
 
     # Group into display groups
@@ -82,26 +83,27 @@ sub list {
             push @$out_arrayref, (
                 '+ ' . ( '-' x $colw[0] ) . ' + ' . ( '-' x $colw[1] ) . ' + ' .
                 ( '-' x $colw[2] ) . ' + ' . ( '-' x $colw[3] ) . ' + ' .
-                ( '-' x $colw[4] ) . ' + ' . ( '-' x $colw[5] ) . ' +');
+                ( '-' x $colw[4] ) . ' + ' . ( '-' x $colw[5] ) . ' + ' . ( '-' x $colw[6] ) . ' +');
             push @$out_arrayref, sprintf(
-                "| %-${colw[0]}s | %-${colw[1]}s | %-${colw[2]}s | %-${colw[3]}s | %-${colw[4]}s | %-${colw[5]}s |",
-                'label', 'status', 'location', 'backups', 'disk', 'ram' );
+                "| %-${colw[0]}s | %-${colw[1]}s | %-${colw[2]}s | %-${colw[3]}s | %-${colw[4]}s | %-${colw[5]}s | %-${colw[6]}s |",
+                'label', 'status', 'location', 'backups', 'disk', 'ram' , 'create_dt' );
             push @$out_arrayref, (
                 '| ' . ( '-' x $colw[0] ) . ' + ' . ( '-' x $colw[1] ) . ' + ' .
                 ( '-' x $colw[2] ) . ' + ' . ( '-' x $colw[3] ) . ' + ' .
-                ( '-' x $colw[4] ) . ' + ' . ( '-' x $colw[5] ) . ' |');
+                ( '-' x $colw[4] ) . ' + ' . ( '-' x $colw[5] ) . ' + ' . ( '-' x $colw[6] ) . ' |');
         }
 
         for my $object ( keys %{ $grouped_objects->{$group} } ) {
             if ( $output_format eq 'human' ) {
                 my $line = sprintf(
-                    "| %-${colw[0]}s | %-${colw[1]}s | %-${colw[2]}s | %-${colw[3]}s | %-${colw[4]}s | %-${colw[5]}s |",
+                    "| %-${colw[0]}s | %-${colw[1]}s | %-${colw[2]}s | %-${colw[3]}s | %-${colw[4]}s | %-${colw[5]}s | %-${colw[6]}s |",
                     format_len( $grouped_objects->{$group}{$object}{label}, $colw[0] ),
                     $humanstatus{ $grouped_objects->{$group}{$object}{status} },
                     $humandc{ $grouped_objects->{$group}{$object}{datacenterid} },
                     $humanyn{ $grouped_objects->{$group}{$object}{backupsenabled} },
                     human_displaymemory( $grouped_objects->{$group}{$object}{totalhd} ),
-                    human_displaymemory( $grouped_objects->{$group}{$object}{totalram} )
+                    human_displaymemory( $grouped_objects->{$group}{$object}{totalram} ),
+                    format_len( $grouped_objects->{$group}{$object}{create_dt} ),
                 );
 
                 push @$out_arrayref, colorize( $line );
@@ -132,6 +134,10 @@ sub list {
                             $grouped_objects->{$group}{$object}{$key}
                         };
                     }
+                    elsif ( $key eq 'create_dt' ) {
+                        $out_hashref->{$object}{$key}
+                            = $grouped_objects->{$group}{$object}{$key};
+                    }
                     else {
                         $out_hashref->{$object}{$key}
                             = $grouped_objects->{$group}{$object}{$key};
@@ -146,7 +152,7 @@ sub list {
             push @$out_arrayref, ( '+ ' . ( '-' x $colw[0] ) . ' + ' .
                 ( '-' x $colw[1] ) . ' + ' . ( '-' x $colw[2] ) . ' + ' .
                 ( '-' x $colw[3] ) . ' + ' . ( '-' x $colw[4] ) . ' + ' .
-                ( '-' x $colw[5] ) . " +\n" );
+                ( '-' x $colw[5] ) . ' + ' . ( '-' x $colw[6] ) . " +\n" );
         }
     }
 
@@ -194,7 +200,8 @@ sub list {
             push @$out_arrayref, ( '+ ' . ( '-' x $colw[0] ) . ' + ' .
                 ( '-' x $colw[1] ) . ' + ' . ( '-' x $colw[2] ) . ' + ' .
                 ( '-' x $colw[3] ) . ' + ' . ( '-' x $colw[4] ) . ' + ' .
-                ( '-' x $colw[5] ) . " +\n" );
+                ( '-' x $colw[5] ) . ( '-' x $colw[6] ) . ' + ' .
+                " +\n" );
         }
         return join( "\n", @$out_arrayref );
     }
@@ -209,14 +216,15 @@ sub show {
     for my $object_label ( keys %{ $self->{object} } ) {
         my $linodeid = $self->{object}{$object_label}{linodeid};
         my @ips = map { $_->{ipaddress} } @{$api->linode_ip_list(linodeid => $linodeid)};
-        $return .= sprintf( "%9s %-45s\n%9s %-45s\n%9s %-45s\n%9s %-45s\n%9s %-45s\n%9s %-45s\n%9s %-45s\n",
+        $return .= sprintf( "%9s %-45s\n%9s %-45s\n%9s %-45s\n%9s %-45s\n%9s %-45s\n%9s %-45s\n%9s %-45s\n%9s %-45s\n",
             'label:', $self->{object}->{$object_label}->{label},
             'status:', $humanstatus{ $self->{object}{$object_label}{status} },
             'location:', $humandc{ $self->{object}{$object_label}{datacenterid} },
             'backups:', $humanyn{ $self->{object}{$object_label}{backupsenabled} },
             'disk:',human_displaymemory( $self->{object}{$object_label}{totalhd} ),
             'ram:', human_displaymemory( $self->{object}{$object_label}{totalram} ),
-            'ips:', join(' ', @ips)
+            'ips:', join(' ', @ips),
+            'create_dt', $self->{object}->{$object_label}->{create_dt}
         ) . "\n";
     }
 
