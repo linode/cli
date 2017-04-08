@@ -18,6 +18,23 @@ sudo apt-get update
 sudo apt-get install linode-cli
 ```
 
+### Fedora
+
+Fedora's official repositories include Linode CLI (in F24 and newer). To install,
+
+```
+sudo dnf install linode-cli
+```
+
+### CentOS
+
+Installing Linode CLI on CentOS requires the EPEL repository to be installed and enabled, before installing Linode CLI.
+
+```
+sudo yum install epel-release
+sudo yum install linode-cli
+```
+
 ### Mac OS X
 
 Installing the packaged version of Linode CLI on Mac OS X requires Homebrew: http://brew.sh
