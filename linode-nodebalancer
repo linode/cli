@@ -123,7 +123,7 @@ Required. The name of the NodeBalancer.
 
 =item B<-L> B<--location>
 
-Required. The datacenter to use for deployment. Locations are Dallas, Fremont, Atlanta, Newark, London, and Tokyo.
+Required. The datacenter to use for deployment. Locations are Atlanta, Dallas, Frankfurt, Fremont, London, Newark, Singapore, Shinagawa.
 
 =item B<-t> B<--payment-term>
 
