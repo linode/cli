@@ -103,7 +103,7 @@ sub list {
                     $humanyn{ $grouped_objects->{$group}{$object}{backupsenabled} },
                     human_displaymemory( $grouped_objects->{$group}{$object}{totalhd} ),
                     human_displaymemory( $grouped_objects->{$group}{$object}{totalram} ),
-                    format_len( $grouped_objects->{$group}{$object}{create_dt} ),
+                    format_len( $grouped_objects->{$group}{$object}{create_dt}, $colw[6] ),
                 );
 
                 push @$out_arrayref, colorize( $line );
