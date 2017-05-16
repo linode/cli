@@ -7,7 +7,7 @@ Linode CLI is a simple command-line interface to the Linode platform.
 
 ## Installation
 
-Linode CLI is currently packaged for Debian, Ubuntu, and through Homebrew on Mac OS X. Final versions of linode-cli will be packaged up and very easy to install for major distributions.
+Linode CLI is currently packaged for Debian, Ubuntu, CentOS, Fedora, NixOS and through Homebrew on Mac OS X. Final versions of linode-cli will be packaged up and very easy to install for major distributions.
 
 ### Debian/Ubuntu
 
@@ -33,6 +33,17 @@ Installing Linode CLI on CentOS requires the EPEL repository to be installed and
 ```
 sudo yum install epel-release
 sudo yum install linode-cli
+```
+
+### NixOS/Nix
+
+Linode CLI is included in NixPkgs, so installation should be straightforward
+
+```
+# Using symbolic name. 
+nix-env -i perl-linode-cli
+# Using attribute name. (Channel name is derived using $() here)
+nix-env -iA $(nix-channel --list | head -n1 | cut -d' ' -f1).linode-cli
 ```
 
 ### Mac OS X
