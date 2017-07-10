@@ -4,6 +4,7 @@ Linode CLI
 ## Overview
 
 Linode CLI is a simple command-line interface to the Linode platform.
+**Note: There is a newer version of the Linode CLI ([linode-cli](https://github.com/linode/linode-cli)) that uses the new Linode [API V4](https://developers.linode.com/v4/introduction).**
 
 ## Installation
 
