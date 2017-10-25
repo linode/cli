@@ -157,6 +157,14 @@ our %paramsdef = (
             },
             'run'       => 'add_ip',
         },
+        'list-ip' => { 'alias' => 'ip-list' },
+        'ip-list' => {
+            'options' => {
+                'label'   => 'label|l=s@',
+                'private' => 'private',
+            },
+            'run' => 'list',
+        },
         'configure' => {
             'run' => 'configure',
             'warmcache' => [ 'plan', 'distribution', 'datacenter' ]

@@ -1121,6 +1121,77 @@ sub imagelist {
     }
 }
 
+sub iplist {
+    my ( $self, %args ) = @_;
+    my $api             = $self->{_api_obj};
+    my $private         = exists $args{options}{private} ? 1 : 0;
+    my $label           = $args{label};
+    my $output_format   = $args{output_format} || 'human';
+    my $out_arrayref    = [];
+    my $out_hashref     = {};
+
+    my @colw = ( 32, 16 );      # name (label), IP address(es)
+
+    for my $object ( keys %{ $self->{object} } ) {
+        my $linode_id    = $self->{object}{$object}{linodeid};
+
+        my @ips = map { $_->{ipaddress} } @{$api->linode_ip_list(linodeid => $linode_id)};
+        if ( $private ) {
+            @ips = grep /^192\.168/, @ips;
+        }
+
+        $self->{object}{$object}{ips} = \@ips;
+    }
+
+    for my $object_label ( keys %{ $self->{object} } ) {
+        my $ips = $self->{object}{$object_label}{ips};
+
+        if ( $output_format eq 'human' ) {
+            if ( @$ips != 0 ) {
+                push @$out_arrayref, (
+                    '+ ' . ( '-' x $colw[0] ) . ' + ' . ( '-' x $colw[1] ) . ' +');
+                push @$out_arrayref, sprintf(
+                    "| %-${colw[0]}s | %-${colw[1]}s |",
+                    'name', 'ips' );
+                push @$out_arrayref, (
+                    '+ ' . ( '-' x $colw[0] ) . ' + ' . ( '-' x $colw[1] ) . ' +');
+                for my $ip ( @$ips ) {
+                    push @$out_arrayref, sprintf(
+                        "| %-${colw[0]}s | %-${colw[1]}s |",
+                        format_len( $object_label, $colw[0] ),
+                        $ip);
+                }
+                push @$out_arrayref, (
+                    '+ ' . ( '-' x $colw[0] ) . ' + ' . ( '-' x $colw[1] ) . " +\n");
+            }
+        } else {
+            # json output
+            if ( @$ips != 0 ) {
+                for my $ip ( @$ips ) {
+                    push @{ $out_hashref->{$object_label}{ips} }, $ip;
+                }
+            }
+        }
+    }
+
+    if ( $output_format eq 'raw' ) {
+        return $out_hashref;
+    } elsif ( $output_format eq 'json' ) {
+        for my $object ( keys %$out_hashref ) {
+            $self->{_result} = $self->succeed(
+                action  => $self->{_action},
+                label   => $object,
+                payload => $out_hashref->{$object},
+                result  => $self->{_result},
+                format  => $output_format,
+            );
+        }
+        return $self->{_result};
+    } else {
+        return join "\n" => @$out_arrayref;
+    }
+}
+
 sub imagecreate {
     my ( $self, %args ) = @_;
 

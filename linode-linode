@@ -57,6 +57,8 @@ B<linode-linode> [B<-a> action] [action-options...] [options...]
 
 =item S<-a ip-add,     --action ip-add      add an IP address to a Linode>
 
+=item S<-a ip-list,    --action ip-list     list IP address(es) of a Linode>
+
 =item S<-a delete,     --action delete      completely delete a Linode>
 
 =item S<-a list,       --action list        list info about Linodes>
@@ -364,6 +366,26 @@ A Linode to operate on.
 =item B<--private>
 
 Add a private IP address instead of a public one.
+
+=back
+
+=back
+
+=head2 IP-LIST
+
+=over 8
+
+=item List the IP address(es) assigned to a Linode.
+
+=over 8
+
+=item B<-l>, B<--label>
+
+A Linode to operate on.
+
+=item B<--private>
+
+List only the private IP address.
 
 =back
 

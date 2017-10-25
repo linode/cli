@@ -172,6 +172,8 @@ sub list {
         $sub = 'disklist';
     } elsif ($self->{mode} eq 'linode' && $self->{_opts}->{action} eq 'image-list') {
         $sub = 'imagelist';
+    } elsif ($self->{mode} eq 'linode' && $self->{_opts}->{action} eq 'ip-list') {
+        $sub = 'iplist';
     }
 
     my $list_result = try {
