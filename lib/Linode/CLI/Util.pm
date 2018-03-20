@@ -606,7 +606,7 @@ sub eat_cmdargs {
             if ( $eachp =~ m/=/ ) { # use GetOptions flag (=) to determine a required one
                 my @valuesp = split( /\|/, $eachp );
                 if ( !exists $cmdargs->{ $valuesp[0] } ) {
-                    die "The '$cmdargs->{action}' command requires a --${valuesp[0]} parameter.  Run --help or for usage.\n";
+                    die "The '$cmdargs->{action}' command requires a --${valuesp[0]} parameter.  Run --help for usage.\n";
                 }
             }
         }
