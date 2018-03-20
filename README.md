@@ -404,13 +404,13 @@ Create and start a new Linode.
 
 **-l**, **--label**: Required. A Linode to operate on.
 
-**-L**, **--location**, **--datacenter**: Required. The datacenter to use for deployment. Locations are Atlanta, Dallas, Fremont, London, Newark, and Tokyo.
+**-L**, **--location**, **--datacenter**: Required. The datacenter to use for deployment. Locations are Atlanta, Dallas, Frankfurt, Fremont, London, Newark, Singapore, Shinagawa.
 
 **-d**, **--distribution**: Required when not using imageid. Distribution name or DistributionID to deploy.
 
 **-i**, **--imageid**: Required when not using distribution. The ID of the gold-master image to use for deployment.
 
-**-p**, **--plan**: Required. The Plan to deploy. Plans are linode2048, linode4096, linode8192, linode12288, linode24576, linode49152, linode65536, linode81920, and linode122880.
+**-p**, **--plan**: Required. The Plan to deploy. Plans are linode1024, linode2048, linode4096, linode8192, linode12288, linode16384, linode24576, linode32768, linode49152, linode61440, linode65536, linode81920, linode102400, and linode204800.
 
 **-P**, **--password**: Required. The root user's password.  Needs to be at least 6 characters and contain at least two of these four character classes: lower case letters, upper case letters, numbers, and punctuation.
 
@@ -476,7 +476,7 @@ Resize a Linode to a new plan size, and issue a boot job.
 
 **-l**, **--label**: A Linode to operate on.
 
-**-p**, **--plan**: The Plan to resize to. Plans are linode2048, linode4096, linode8192, linode12288, linode24576, linode49152, linode65536, linode81920, and linode122880.
+**-p**, **--plan**: The Plan to resize to. Plans are linode1024, linode2048, linode4096, linode8192, linode12288, linode16384, linode24576, linode32768, linode49152, linode61440, linode65536, linode81920, linode102400, and linode204800.
 
 **-w**, **--wait**: Optional. Amount of time (in minutes) to wait for human output. Using the flag only, will use the default of 20.
 
