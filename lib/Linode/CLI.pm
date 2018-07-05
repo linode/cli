@@ -369,7 +369,10 @@ sub showoptions {
         push (@$responses, $cache->{$_}{label}) foreach ( keys %$cache );
     } elsif ($self->{mode} eq 'linode' && $self->{_opts}{action} eq 'plans') {
         my $cache = $self->_use_cache('plan');
-        push (@$responses, $_) foreach ( keys %$cache );
+        foreach my $plan ( keys %$cache ) {
+            $plan =~ s/\s//g;
+            push (@$responses, lcfirst($plan));
+        }
     }
 
     for my $response (@$responses) {
