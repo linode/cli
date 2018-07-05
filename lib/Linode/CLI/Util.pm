@@ -27,7 +27,7 @@ use Pod::Usage;
 use Getopt::Long (qw(:config no_ignore_case bundling pass_through));
 use Term::ANSIColor ':constants';
 
-our $VERSION = '1.4.7';
+our $VERSION = '1.4.8';
 our @MODES   = (qw(
     linode stackscript domain nodebalancer longview account user
 ));
