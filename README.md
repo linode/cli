@@ -155,17 +155,17 @@ linode rename mylinodename mylinodenewname
 **Warning:** This *will* attempt to charge the credit card on file, or use any account credit available, and spin up a new Linode 2GB.
 
 ```
-linode create New-Linode --location dallas --plan linode2048 --payment-term 1 --distribution 'Debian 7' --group Frontends
+linode create New-Linode --location dallas --plan linode2G --payment-term 1 --distribution 'Debian 9' --group Frontends
 ```
 
 ### Resizing a Linode
 
 **Warning:** This *will* shut the Linode down, charge/credit the account, and issue a migration to another host server.
 
-This example resizes a Linode 2048 to a Linode 4096.
+This example resizes a Linode 2GB to a Linode 4GB.
 
 ```
-linode resize mylinode linode4096
+linode resize mylinode linode4GB
 ```
 
 ### Deleting a Linode
@@ -280,7 +280,7 @@ Actions can be performed on StackScripts.
 
 ```
 linode stackscript list
-linode stackscript create --label "StackScript Name" --codefile "/path/myscript.sh" --distribution "Debian 7"
+linode stackscript create --label "StackScript Name" --codefile "/path/myscript.sh" --distribution "Debian 9"
 linode stackscript show My-StackScript-Label
 linode stackscript source mystackscript > myscript.sh
 ```
@@ -410,7 +410,16 @@ Create and start a new Linode.
 
 **-i**, **--imageid**: Required when not using distribution. The ID of the gold-master image to use for deployment.
 
-**-p**, **--plan**: Required. The Plan to deploy. Plans are linode1024, linode2048, linode4096, linode8192, linode12288, linode16384, linode24576, linode32768, linode49152, linode61440, linode65536, linode81920, linode102400, and linode204800.
+**-p**, **--plan**: Required. The Plan to deploy. Plans are:
+
+    Standard Instances:
+    linode2GB, linode4GB, linode8GB, linode16GB, linode32GB, linode64GB, linode96GB, linode128GB, linode192GB
+
+    High Memory Instances:
+    linode24GB, linode48GB, linode90GB, linode150GB, linode300GB
+
+    Nanode Instances:
+    nanode1GB
 
 **-P**, **--password**: Required. The root user's password.  Needs to be at least 6 characters and contain at least two of these four character classes: lower case letters, upper case letters, numbers, and punctuation.
 
@@ -476,7 +485,16 @@ Resize a Linode to a new plan size, and issue a boot job.
 
 **-l**, **--label**: A Linode to operate on.
 
-**-p**, **--plan**: The Plan to resize to. Plans are linode1024, linode2048, linode4096, linode8192, linode12288, linode16384, linode24576, linode32768, linode49152, linode61440, linode65536, linode81920, linode102400, and linode204800.
+**-p**, **--plan**: The Plan to resize to. Plans are:
+
+    Standard Instances:
+    linode2GB, linode4GB, linode8GB, linode16GB, linode32GB, linode64GB, linode96GB, linode128GB, linode192GB
+
+    High Memory Instances:
+    linode24GB, linode48GB, linode90GB, linode150GB, linode300GB
+
+    Nanode Instances:
+    nanode1GB
 
 **-w**, **--wait**: Optional. Amount of time (in minutes) to wait for human output. Using the flag only, will use the default of 20.
 

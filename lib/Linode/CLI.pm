@@ -369,7 +369,10 @@ sub showoptions {
         push (@$responses, $cache->{$_}{label}) foreach ( keys %$cache );
     } elsif ($self->{mode} eq 'linode' && $self->{_opts}{action} eq 'plans') {
         my $cache = $self->_use_cache('plan');
-        push (@$responses, $_) foreach ( keys %$cache );
+        foreach my $plan ( keys %$cache ) {
+            $plan =~ s/\s//g;
+            push (@$responses, lcfirst($plan));
+        }
     }
 
     for my $response (@$responses) {
@@ -880,15 +883,6 @@ sub _fuzzy_match {
                         last;
                 }
             }
-            # not found yet, look for partial match
-            if ( $found eq '' ) {
-                for my $object_label ( sort keys %$cache ) {
-                    if ( $object_label =~ /^\Q$param\E/i ) { # left partial match
-                        $found = $object_label;
-                        last;
-                    }
-                }
-            }
 
            if ( $found ne '' ) {
                 if ( $self->{mode} eq 'stackscript' && $object eq 'distribution') {
@@ -900,7 +894,7 @@ sub _fuzzy_match {
                     }
                 }
             } else {
-                die "Unable to fuzzy match $object: $param\n";
+                die "Unable to match $object: $param\n";
             }
         }
     }
