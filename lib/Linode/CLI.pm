@@ -880,15 +880,6 @@ sub _fuzzy_match {
                         last;
                 }
             }
-            # not found yet, look for partial match
-            if ( $found eq '' ) {
-                for my $object_label ( sort keys %$cache ) {
-                    if ( $object_label =~ /^\Q$param\E/i ) { # left partial match
-                        $found = $object_label;
-                        last;
-                    }
-                }
-            }
 
            if ( $found ne '' ) {
                 if ( $self->{mode} eq 'stackscript' && $object eq 'distribution') {
@@ -900,7 +891,7 @@ sub _fuzzy_match {
                     }
                 }
             } else {
-                die "Unable to fuzzy match $object: $param\n";
+                die "Unable to match $object: $param\n";
             }
         }
     }
